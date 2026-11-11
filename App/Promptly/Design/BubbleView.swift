@@ -4,8 +4,8 @@ import SwiftUI
 ///
 /// `.bubble` style inflates in small puffs as the meeting nears (each easing out, no bounce), stretches upward and
 /// thins as it grows, swells slowly near the start and trembles at the start. Tapping pops it like real gum: the film
-/// tears open near the top, splits into a few ragged sheets that snap back down toward the bottom edge and crumple
-/// into a small lump, and a new bubble inflates out of the lump. `.steady` keeps one size but still pops.
+/// tears into oddly shaped scraps and strands that fly up and outward, tumble and fall away over about a second,
+/// leaving a small lump at the bottom edge that the next bubble inflates out of. `.steady` keeps one size but still pops.
 /// It also pops when `popCount` changes (for "Not going"). Anchored to the bottom edge, mostly below the screen.
 struct BubbleView: View {
     var progress: Double
@@ -21,12 +21,11 @@ struct BubbleView: View {
     @State private var popScale = CGSize(width: 1, height: 1)
     @State private var opacity: Double = 1
     @State private var regrowScale: CGFloat = 1
-    @State private var showSheets = false
-    @State private var sheetsOpen = false
-    @State private var sheetsCollapse = false
+    @State private var showPieces = false
+    @State private var piecesUp = false
+    @State private var piecesDown = false
     @State private var showLump = false
     @State private var lumpScale: CGFloat = 0.6
-    @State private var specksOut = false
     @State private var popping = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -53,7 +52,7 @@ struct BubbleView: View {
                         .offset(x: m.dx, y: m.dy)
                         .opacity(opacity)
                 }
-                if showSheets { sheets }
+                if showPieces { pieces }
                 if showLump { lump }
             }
             .frame(width: geo.size.width, height: geo.size.height, alignment: .bottom)
@@ -108,53 +107,54 @@ struct BubbleView: View {
 
     // MARK: Pop
 
-    /// Where the film gives way: near the top of the bubble, a little off center.
-    private let tear = UnitPoint(x: 0.54, y: 0.1)
+    /// The scraps a pop leaves: where each starts on the bubble (unit coordinates), its size as a share of the
+    /// bubble's width, how far it flies (points: sideways, up), how far it then falls, how much it spins, and whether
+    /// it's a stretched strand rather than a scrap.
+    private struct Scrap {
+        let start: UnitPoint
+        let size: CGFloat
+        let fly: CGSize
+        let fall: CGFloat
+        let spin: Double
+        let strand: Bool
+        let seed: Int
+    }
 
-    /// Sector edges around the tear, in degrees, deliberately uneven so the sheets differ in size.
-    private static let sheetEdges: [Double] = [-118, -72, -31, 18, 62, 101, 158, 214]
+    private static let scraps: [Scrap] = [
+        Scrap(start: .init(x: 0.50, y: 0.08), size: 0.22, fly: .init(width: 10, height: -330), fall: 260, spin: 160, strand: false, seed: 1),
+        Scrap(start: .init(x: 0.30, y: 0.16), size: 0.26, fly: .init(width: -150, height: -260), fall: 300, spin: -210, strand: false, seed: 2),
+        Scrap(start: .init(x: 0.70, y: 0.15), size: 0.24, fly: .init(width: 160, height: -280), fall: 290, spin: 230, strand: false, seed: 3),
+        Scrap(start: .init(x: 0.16, y: 0.34), size: 0.20, fly: .init(width: -210, height: -150), fall: 340, spin: -140, strand: false, seed: 4),
+        Scrap(start: .init(x: 0.84, y: 0.33), size: 0.21, fly: .init(width: 220, height: -170), fall: 330, spin: 170, strand: false, seed: 5),
+        Scrap(start: .init(x: 0.42, y: 0.22), size: 0.16, fly: .init(width: -70, height: -380), fall: 240, spin: 300, strand: true, seed: 6),
+        Scrap(start: .init(x: 0.60, y: 0.24), size: 0.15, fly: .init(width: 90, height: -360), fall: 250, spin: -280, strand: true, seed: 7),
+        Scrap(start: .init(x: 0.24, y: 0.48), size: 0.17, fly: .init(width: -180, height: -90), fall: 360, spin: 120, strand: true, seed: 8),
+        Scrap(start: .init(x: 0.78, y: 0.50), size: 0.14, fly: .init(width: 190, height: -110), fall: 350, spin: -150, strand: false, seed: 9),
+        Scrap(start: .init(x: 0.55, y: 0.05), size: 0.07, fly: .init(width: 40, height: -420), fall: 220, spin: 400, strand: false, seed: 10),
+        Scrap(start: .init(x: 0.38, y: 0.10), size: 0.06, fly: .init(width: -60, height: -400), fall: 230, spin: -380, strand: false, seed: 11),
+        Scrap(start: .init(x: 0.66, y: 0.40), size: 0.08, fly: .init(width: 120, height: -300), fall: 280, spin: 260, strand: true, seed: 12),
+    ]
 
-    /// The torn sheets: slices of the bubble that open slightly, then snap back down and crumple.
-    private var sheets: some View {
-        let edges = Self.sheetEdges
-        return ZStack(alignment: .bottom) {
-            ForEach(0..<edges.count, id: \.self) { i in
-                let a0 = edges[i]
-                let a1 = i + 1 < edges.count ? edges[i + 1] : edges[0] + 360
-                let mid = (a0 + a1) / 2 * .pi / 180
-                let open = CGSize(width: cos(mid) * 14, height: sin(mid) * 10)
-                let spin = (i % 2 == 0 ? -1.0 : 1.0) * (12 + Double(i % 3) * 7)
-                GumBubbleShape(thinness: puff)
-                    .frame(width: width, height: height)
-                    .clipShape(TornWedge(tear: tear, from: a0, to: a1, seed: i))
-                    .offset(sheetsOpen ? open : .zero)
-                    .rotationEffect(.degrees(sheetsCollapse ? spin : 0), anchor: .bottom)
-                    .scaleEffect(x: sheetsCollapse ? 0.38 : 1, y: sheetsCollapse ? 0.08 : 1, anchor: .bottom)
-                    .opacity(sheetsCollapse ? 0.85 : 1)
+    /// The scraps fly up and outward, tumbling, then fall away and fade.
+    private var pieces: some View {
+        ZStack(alignment: .topLeading) {
+            ForEach(0..<Self.scraps.count, id: \.self) { i in
+                let scrap = Self.scraps[i]
+                let side = width * scrap.size
+                let fallScale: CGFloat = 1.25
+                GumScrap(seed: scrap.seed, strand: scrap.strand)
+                    .frame(width: scrap.strand ? side * 1.9 : side, height: scrap.strand ? side * 0.42 : side * 0.82)
+                    .rotationEffect(.degrees(piecesDown ? scrap.spin : (piecesUp ? scrap.spin * 0.45 : 0)))
+                    .scaleEffect(piecesDown ? 0.55 : (piecesUp ? 0.9 : 1))
+                    .position(x: width * scrap.start.x, y: height * scrap.start.y)
+                    .offset(x: piecesDown ? scrap.fly.width * fallScale : (piecesUp ? scrap.fly.width : 0),
+                            y: piecesDown ? scrap.fly.height + scrap.fall : (piecesUp ? scrap.fly.height : 0))
+                    .opacity(piecesDown ? 0 : 1)
             }
-            specks
         }
         .frame(width: width, height: height)
         .allowsHitTesting(false)
         .accessibilityHidden(true)
-    }
-
-    /// A few tiny bits that come off the tear. Most of the gum stays connected.
-    private var specks: some View {
-        ZStack(alignment: .topLeading) {
-            ForEach(0..<4, id: \.self) { i in
-                let dx = [-26.0, -9, 12, 30][i]
-                let dy = [-18.0, -30, -26, -12][i]
-                Capsule()
-                    .fill(GumColors.coral.opacity(0.85))
-                    .frame(width: CGFloat(5 + i % 2 * 3), height: CGFloat(3 + i % 2))
-                    .rotationEffect(.degrees(Double(i) * 40))
-                    .offset(x: specksOut ? dx : 0, y: specksOut ? dy + (sheetsCollapse ? 70 : 0) : 0)
-                    .opacity(sheetsCollapse ? 0 : 1)
-            }
-        }
-        .frame(width: width, height: height, alignment: .topLeading)
-        .offset(x: width * tear.x, y: height * tear.y)
     }
 
     /// The crumpled gum left at the bottom edge, out of which the next bubble inflates.
@@ -186,69 +186,99 @@ struct BubbleView: View {
         }
         Task { @MainActor in
             // A last stretch at the weak spot.
-            withAnimation(.easeOut(duration: 0.07)) { popScale = CGSize(width: 1.03, height: 1.045) }
-            try? await Task.sleep(for: .milliseconds(70))
-            // Tear: swap the whole bubble for its sheets, which part slightly at the tear.
-            sheetsOpen = false
-            sheetsCollapse = false
-            specksOut = false
-            showSheets = true
+            withAnimation(.easeOut(duration: 0.08)) { popScale = CGSize(width: 1.03, height: 1.045) }
+            try? await Task.sleep(for: .milliseconds(80))
+            // It tears: the bubble becomes scraps that fly up and out...
+            piecesUp = false
+            piecesDown = false
+            showPieces = true
             opacity = 0
             popScale = CGSize(width: 1, height: 1)
-            withAnimation(.easeOut(duration: 0.07)) { sheetsOpen = true }
-            withAnimation(.easeOut(duration: 0.25)) { specksOut = true }
-            try? await Task.sleep(for: .milliseconds(70))
-            // Snap back: the sheets whip down toward the bottom edge and crumple.
-            withAnimation(.easeIn(duration: 0.24)) { sheetsCollapse = true }
-            try? await Task.sleep(for: .milliseconds(150))
-            action?()
+            withAnimation(.timingCurve(0.15, 0.7, 0.35, 1, duration: 0.5)) { piecesUp = true }
             showLump = true
             lumpScale = 0.4
-            withAnimation(.easeOut(duration: 0.18)) { lumpScale = 1 }
-            try? await Task.sleep(for: .milliseconds(140))
-            showSheets = false
-            try? await Task.sleep(for: .milliseconds(260))
+            withAnimation(.easeOut(duration: 0.25)) { lumpScale = 1 }
+            try? await Task.sleep(for: .milliseconds(300))
+            action?()
+            try? await Task.sleep(for: .milliseconds(200))
+            // ...then tumble down and fade, like gravity took over.
+            withAnimation(.timingCurve(0.5, 0, 0.85, 0.6, duration: 0.65)) { piecesDown = true }
+            try? await Task.sleep(for: .milliseconds(450))
             // A new bubble inflates out of the lump, easing out with no overshoot.
             regrowScale = 0.05
             opacity = 1
             withAnimation(.timingCurve(0.2, 0.7, 0.3, 1, duration: 1.1)) { regrowScale = 1 }
             withAnimation(.easeOut(duration: 0.35)) { lumpScale = 0.2 }
-            try? await Task.sleep(for: .milliseconds(350))
+            try? await Task.sleep(for: .milliseconds(250))
+            showPieces = false
+            try? await Task.sleep(for: .milliseconds(150))
             showLump = false
-            try? await Task.sleep(for: .milliseconds(750))
+            try? await Task.sleep(for: .milliseconds(700))
             popping = false
         }
     }
 }
 
-/// One torn sheet: a wedge of the bubble from the tear point outward, with ragged, wrinkled edges.
-struct TornWedge: Shape {
-    var tear: UnitPoint
-    var from: Double
-    var to: Double
+/// One scrap of torn gum: an irregular blob with ragged edges, or a stretched strand pinched in the middle.
+struct GumScrap: View {
     var seed: Int
+    var strand: Bool
 
-    func path(in rect: CGRect) -> Path {
-        let c = CGPoint(x: rect.minX + tear.x * rect.width, y: rect.minY + tear.y * rect.height)
-        let reach = max(rect.width, rect.height) * 1.6
-        func edge(_ degrees: Double, _ s: Int) -> [CGPoint] {
-            let a = degrees * .pi / 180
-            return (1...10).map { i in
-                let t = Double(i) / 10
-                let jag = sin(Double(s * 37 + i * 101)) * 0.035 * reach * (0.4 + t)
-                return CGPoint(x: c.x + cos(a) * reach * t - sin(a) * jag,
-                               y: c.y + sin(a) * reach * t + cos(a) * jag)
+    var body: some View {
+        GeometryReader { geo in
+            let w = geo.size.width
+            let h = geo.size.height
+            ZStack {
+                ScrapShape(seed: seed, strand: strand)
+                    .fill(LinearGradient(colors: [GumColors.light, GumColors.coral, GumColors.dark],
+                                         startPoint: .topLeading, endPoint: .bottomTrailing))
+                ScrapShape(seed: seed, strand: strand)
+                    .stroke(GumColors.dark.opacity(0.45), lineWidth: 1)
+                Ellipse()
+                    .fill(.white.opacity(0.45))
+                    .frame(width: w * 0.32, height: h * 0.18)
+                    .position(x: w * 0.38, y: h * 0.32)
+                    .blur(radius: 1)
             }
         }
-        var p = Path()
-        p.move(to: c)
-        for pt in edge(from, seed) { p.addLine(to: pt) }
-        let steps = 12
-        for k in 1...steps {
-            let a = (from + (to - from) * Double(k) / Double(steps)) * .pi / 180
-            p.addLine(to: CGPoint(x: c.x + cos(a) * reach, y: c.y + sin(a) * reach))
+    }
+}
+
+/// An uneven closed outline: a lumpy blob with a few torn notches, or a thin strand with frayed ends.
+struct ScrapShape: Shape {
+    var seed: Int
+    var strand: Bool
+
+    func path(in rect: CGRect) -> Path {
+        let c = CGPoint(x: rect.midX, y: rect.midY)
+        let n = 14
+        var pts: [CGPoint] = []
+        for k in 0..<n {
+            let a = Double(k) / Double(n) * 2 * .pi
+            // Smooth lumps plus a couple of sharp torn notches.
+            var r = 0.72 + 0.18 * sin(a * 2 + Double(seed)) + 0.12 * sin(a * 3 + Double(seed * 7))
+            if (k + seed) % 5 == 0 { r *= 0.62 }
+            if (k + seed * 3) % 7 == 0 { r *= 1.18 }
+            if strand {
+                // Pinched in the middle, frayed at the ends.
+                let pinch = 0.55 + 0.45 * abs(cos(a))
+                r *= pinch
+            }
+            pts.append(CGPoint(x: c.x + cos(a) * rect.width / 2 * r, y: c.y + sin(a) * rect.height / 2 * r))
         }
-        for pt in edge(to, seed + 1).reversed() { p.addLine(to: pt) }
+        var p = Path()
+        let mid = { (a: CGPoint, b: CGPoint) in CGPoint(x: (a.x + b.x) / 2, y: (a.y + b.y) / 2) }
+        p.move(to: mid(pts[n - 1], pts[0]))
+        for k in 0..<n {
+            let next = pts[(k + 1) % n]
+            // Notched points get a sharp corner; the rest are rounded.
+            if (k + seed) % 5 == 0 {
+                p.addLine(to: pts[k])
+                p.addLine(to: mid(pts[k], next))
+            } else {
+                p.addQuadCurve(to: mid(pts[k], next), control: pts[k])
+            }
+        }
         p.closeSubpath()
         return p
     }
