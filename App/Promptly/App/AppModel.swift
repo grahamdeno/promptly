@@ -2,6 +2,7 @@ import BackgroundTasks
 import EventKit
 import Observation
 import SwiftUI
+import UIKit
 
 /// Holds the meetings, settings and permissions, and keeps AlarmKit in step with the calendar.
 @MainActor
@@ -49,6 +50,26 @@ final class AppModel {
     var popSound: Bool {
         didSet { prefs.popSound = popSound }
     }
+    var alarmSound: AlarmSoundChoice {
+        didSet {
+            prefs.alarmSound = alarmSound
+            alarmService.sound = alarmSound
+            alarmService.cancelOwned()
+            Task { await syncAlarms() }
+        }
+    }
+    var gentleCalendarIDs: Set<String> {
+        didSet {
+            prefs.gentleCalendarIDs = gentleCalendarIDs
+            Task {
+                if !gentleCalendarIDs.isEmpty { _ = await nudgeService.requestAccess() }
+                await syncAlarms()
+            }
+        }
+    }
+    var keepAwake: Bool {
+        didSet { prefs.keepAwake = keepAwake; applyKeepAwake() }
+    }
     var nudges: Bool {
         didSet {
             prefs.nudges = nudges
@@ -74,6 +95,10 @@ final class AppModel {
         countdownCard = prefs.countdownCard
         buzz = prefs.buzz
         popSound = prefs.popSound
+        alarmSound = prefs.alarmSound
+        gentleCalendarIDs = prefs.gentleCalendarIDs
+        keepAwake = prefs.keepAwake
+        alarmService.sound = prefs.alarmSound
         nudges = prefs.nudges
         cleared = prefs.clearedMeetingIDs
         taughtPop = prefs.taughtPop
@@ -108,7 +133,13 @@ final class AppModel {
 
     // MARK: Lifecycle
 
+    /// Keeps the screen on while Pop In is open, when the owner turns that on.
+    func applyKeepAwake() {
+        UIApplication.shared.isIdleTimerDisabled = keepAwake && onboarded
+    }
+
     func becameActive() async {
+        applyKeepAwake()
         calendarAuthorized = calendarService.isAuthorized
         alarmsAuthorized = alarmService.isAuthorized
         await refresh()
@@ -135,8 +166,11 @@ final class AppModel {
 
     func syncAlarms() async {
         guard alarmsAuthorized else { return }
-        let planned = AlarmPlanner.plan(meetings: meetings, leadMinutes: leadMinutes, now: .now, cleared: cleared,
+        let alarmMeetings = meetings.filter { !gentleCalendarIDs.contains($0.calendarID) }
+        let gentleMeetings = meetings.filter { gentleCalendarIDs.contains($0.calendarID) }
+        let planned = AlarmPlanner.plan(meetings: alarmMeetings, leadMinutes: leadMinutes, now: .now, cleared: cleared,
                                         countdown: countdownCard)
+        let gentlePlanned = AlarmPlanner.plan(meetings: gentleMeetings, leadMinutes: leadMinutes, now: .now, cleared: cleared)
         nextAlarm = planned.first?.fireDate
         do {
             try await alarmService.sync(planned)
@@ -145,7 +179,7 @@ final class AppModel {
         } catch {
             syncProblem = "Couldn't set an alarm: \(error.localizedDescription)"
         }
-        await nudgeService.sync(planned, enabled: nudges)
+        await nudgeService.sync(planned, enabled: nudges, gentle: gentlePlanned)
     }
 
     /// Rings a test alarm so the full-screen alert can be checked with the phone locked.

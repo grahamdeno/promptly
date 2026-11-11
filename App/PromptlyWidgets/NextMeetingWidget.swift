@@ -11,7 +11,7 @@ struct NextMeetingWidget: Widget {
         }
         .configurationDisplayName("Next meeting")
         .description("The next meeting and its bubble. Tap the bubble to pop it.")
-        .supportedFamilies([.systemSmall, .systemMedium])
+        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
         .contentMarginsDisabled()
     }
 }
@@ -45,7 +45,7 @@ struct NextMeetingProvider: TimelineProvider {
 
     private func entry(at date: Date, snapshot: WidgetSnapshot) -> NextMeetingEntry {
         let upcoming = snapshot.upcoming(at: date)
-        return NextMeetingEntry(date: date, next: upcoming.first, then: Array(upcoming.dropFirst().prefix(2)))
+        return NextMeetingEntry(date: date, next: upcoming.first, then: Array(upcoming.dropFirst().prefix(4)))
     }
 }
 
@@ -61,6 +61,7 @@ struct NextMeetingView: View {
             let progress = WidgetTimeline.progress(now: entry.date, start: next.start)
             switch family {
             case .systemMedium: medium(next, progress: progress)
+            case .systemLarge: large(next, progress: progress)
             default: small(next, progress: progress)
             }
         } else {
@@ -102,7 +103,7 @@ struct NextMeetingView: View {
                 Text(subtitle(next)).font(.system(size: 12)).foregroundStyle(Self.secondary).lineLimit(1)
                 countdown(next).font(.system(size: 30, weight: .medium).monospacedDigit()).padding(.top, 4)
                 Spacer(minLength: 4)
-                ForEach(entry.then, id: \.id) { item in
+                ForEach(entry.then.prefix(2), id: \.id) { item in
                     HStack(spacing: 6) {
                         Text(time(item.start)).font(.system(size: 11, weight: .semibold)).foregroundStyle(GumColors.dark)
                         Text(item.title).font(.system(size: 11)).foregroundStyle(Self.ink).lineLimit(1)
@@ -124,6 +125,41 @@ struct NextMeetingView: View {
                 .frame(width: 140)
                 .frame(maxHeight: .infinity, alignment: .bottom)
             }
+        }
+    }
+
+    private func large(_ next: WidgetSnapshot.Item, progress: Double) -> some View {
+        ZStack(alignment: .bottom) {
+            Link(destination: WidgetTimeline.popURL(meetingID: next.id) ?? URL(string: "promptly://")!) {
+                ZStack(alignment: .bottom) {
+                    bubble(progress: progress, base: 170).offset(y: 70)
+                    Text(next.hasLink ? "Pop to join" : "Pop")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .shadow(color: .black.opacity(0.2), radius: 3, y: 1)
+                        .padding(.bottom, 36 + 60 * progress)
+                }
+            }
+            VStack(alignment: .leading, spacing: 3) {
+                Text(next.start <= entry.date ? "Now" : "Next")
+                    .font(.system(size: 13, weight: .medium)).foregroundStyle(Self.secondary)
+                Text(next.title)
+                    .font(.system(size: 20, weight: .semibold)).foregroundStyle(Self.ink).lineLimit(2)
+                Text(subtitle(next)).font(.system(size: 13)).foregroundStyle(Self.secondary).lineLimit(1)
+                countdown(next).font(.system(size: 40, weight: .medium).monospacedDigit()).padding(.top, 4)
+                VStack(alignment: .leading, spacing: 6) {
+                    ForEach(entry.then, id: \.id) { item in
+                        HStack(spacing: 8) {
+                            Text(time(item.start)).font(.system(size: 13, weight: .semibold)).foregroundStyle(GumColors.dark)
+                            Text(item.title).font(.system(size: 13)).foregroundStyle(Self.ink).lineLimit(1)
+                        }
+                    }
+                }
+                .padding(.top, 10)
+                Spacer()
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .padding(18)
         }
     }
 

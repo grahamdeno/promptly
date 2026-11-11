@@ -1,5 +1,12 @@
 import Foundation
 
+enum AlarmSoundChoice: String, CaseIterable, Sendable {
+    /// Soft low bloops that speed up, like a bubble filling (Sounds/bubble_blow_alarm.wav).
+    case bubbleBlow
+    /// Apple's standard alarm sound. AlarmKit can't pick a named system tone such as Mercury.
+    case appleDefault
+}
+
 enum BallStyle: String, CaseIterable, Sendable {
     /// Inflates as the meeting nears and pops when cleared. The owner may roll this back to `.steady`.
     case bubble
@@ -60,6 +67,23 @@ final class Prefs: @unchecked Sendable {
     var taughtPop: Bool {
         get { defaults.bool(forKey: "taughtPop") }
         set { defaults.set(newValue, forKey: "taughtPop") }
+    }
+
+    var alarmSound: AlarmSoundChoice {
+        get { AlarmSoundChoice(rawValue: defaults.string(forKey: "alarmSound") ?? "") ?? .bubbleBlow }
+        set { defaults.set(newValue.rawValue, forKey: "alarmSound") }
+    }
+
+    /// Calendars that get a gentle notification instead of a full alarm.
+    var gentleCalendarIDs: Set<String> {
+        get { Set(defaults.stringArray(forKey: "gentleCalendarIDs") ?? []) }
+        set { defaults.set(Array(newValue).sorted(), forKey: "gentleCalendarIDs") }
+    }
+
+    /// Keep the screen on while Pop In is open (handy on an iPad left on the desk). Default off.
+    var keepAwake: Bool {
+        get { defaults.bool(forKey: "keepAwake") }
+        set { defaults.set(newValue, forKey: "keepAwake") }
     }
 
     /// Calendars switched off. Everything else rings, so a newly added calendar is on by default.

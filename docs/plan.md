@@ -77,7 +77,19 @@ Design canvas: https://claude.ai/artifact/6dpuMwrhhPZNf3aAZSfAEh
 - [x] Pop sound: the airy gum pop (#5 of eight synthesized options, made for Pop In, no licensing) plays with the pop
       haptic. Ambient audio session: silent switch mutes it, mixes with other audio. Setting, on by default.
 
+## Sprint 8 (owner said build and ship, 2026-11-11)
+- [x] Alarm sound setting: Bubble blow (default; soft low bloops that speed up, ~28 s file since AlarmKit custom sounds
+      may not loop) or Apple default. AlarmKit can't play a named system tone such as Mercury; `.default` is Apple's
+      standard alarm sound. Changing the sound reschedules all meeting alarms.
+- [x] Per-calendar alert style: Alarm (full screen) or Gentle (one time-sensitive notification at ring time).
+- [x] iPad: universal app. Regular width shows the meeting and the rest of today on the left, the bubble on the right;
+      all orientations, Split View and Stage Manager. "Keep screen on" setting (desk-clock mode). Large widget.
+      No buzz on iPad (no haptics); the pop sound still plays.
+- [ ] On device: confirm the bubble-blow alarm plays (forum reports say `.named` needs the file extension, used here)
+      and whether it loops.
+
 ## Later
+- iPad screenshots in App Store Connect before public release (Grok).
 - Smart filters: travel-time buffer, a second alert for chosen meetings, quiet hours.
 - Apple Watch.
 

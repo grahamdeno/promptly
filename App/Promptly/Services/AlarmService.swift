@@ -26,6 +26,14 @@ final class AlarmService {
     var scheduledCount: Int { ((try? manager.alarms) ?? []).count }
 
     /// Cancels meeting alarms that are no longer wanted and schedules the missing ones.
+    var sound: AlarmSoundChoice = .bubbleBlow
+
+    /// Cancels every meeting alarm this service set, so the next sync reschedules them (e.g. after a sound change).
+    func cancelOwned() {
+        for id in ownedIDs { try? manager.cancel(id: id) }
+        ownedIDs = []
+    }
+
     func sync(_ planned: [PlannedAlarm]) async throws {
         let existing = Set(((try? manager.alarms) ?? []).map(\.id))
         let wanted = Dictionary(planned.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
@@ -85,7 +93,7 @@ final class AlarmService {
             attributes: attributes,
             stopIntent: nil,
             secondaryIntent: OpenMeetingIntent(meetingID: meeting.id, joinURL: meeting.joinURL?.absoluteString ?? ""),
-            sound: .default
+            sound: sound == .appleDefault ? .default : .named("bubble_blow_alarm.wav")
         )
         _ = try await manager.schedule(id: planned.id, configuration: configuration)
     }

@@ -7,6 +7,8 @@ struct HomeView: View {
     @Environment(\.openURL) private var openURL
     @State private var showCalendars = false
 
+    @Environment(\.horizontalSizeClass) private var sizeClass
+
     var body: some View {
         TimelineView(.periodic(from: .now, by: 1)) { context in
             let now = context.date
@@ -14,40 +16,91 @@ struct HomeView: View {
             let next = model.calendarAuthorized && model.alarmsAuthorized ? upcoming.first : nil
             let progress = next.map { Countdown.progress(now: now, start: $0.start) } ?? 0
 
-            ZStack {
-                Color.white.ignoresSafeArea()
-
-                BubbleView(
-                    progress: progress,
-                    style: model.ballStyle,
-                    popCount: model.popCount,
-                    hint: next.map { $0.joinURL == nil ? "Pop when ready" : "Pop to join" },
-                    accessibilityTitle: next.map { ($0.joinURL == nil ? "Pop the bubble to clear " : "Pop the bubble to join ") + $0.title } ?? "",
-                    onPop: next.map { meeting -> () -> Void in
-                        { if let url = model.join(meeting) { openURL(url) } }
+            if sizeClass == .regular {
+                // iPad: the meeting and the rest of today on the left, the bubble on the right.
+                ZStack {
+                    Color.white.ignoresSafeArea()
+                    HStack(spacing: 0) {
+                        VStack(alignment: .leading, spacing: 0) {
+                            header
+                            Spacer(minLength: 24).frame(maxHeight: 96)
+                            textColumn(now: now, upcoming: upcoming, next: next, showThen: false)
+                            if next != nil { todayList(Array(upcoming.dropFirst().prefix(5))) }
+                            Spacer()
+                        }
+                        .frame(maxWidth: 480, alignment: .leading)
+                        .padding(.horizontal, 48)
+                        bubble(next: next, progress: progress, maxSize: 600)
+                            .frame(maxWidth: .infinity)
+                            .ignoresSafeArea()
                     }
-                )
-                .ignoresSafeArea()
-
-                VStack(alignment: .leading, spacing: 0) {
-                    header
-                    Spacer(minLength: 24).frame(maxHeight: 64)
-                    if !model.calendarAuthorized || !model.alarmsAuthorized {
-                        permissionNotice
-                    } else if let next {
-                        meetingBlock(next, now: now, then: upcoming.dropFirst().first)
-                    } else {
-                        emptyBlock
-                    }
-                    Spacer()
                 }
-                .padding(.horizontal, 28)
+            } else {
+                ZStack {
+                    Color.white.ignoresSafeArea()
+                    bubble(next: next, progress: progress, maxSize: 710)
+                        .ignoresSafeArea()
+                    VStack(alignment: .leading, spacing: 0) {
+                        header
+                        Spacer(minLength: 24).frame(maxHeight: 64)
+                        textColumn(now: now, upcoming: upcoming, next: next, showThen: true)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 28)
+                }
             }
         }
         .hapticRamp(until: model.upcoming(at: .now).first?.start, enabled: model.buzz)
         .sheet(isPresented: $showCalendars) {
             CalendarsView(firstRun: false)
                 .environment(model)
+        }
+    }
+
+    private func bubble(next: Meeting?, progress: Double, maxSize: CGFloat) -> some View {
+        BubbleView(
+            progress: progress,
+            style: model.ballStyle,
+            popCount: model.popCount,
+            accessibilityTitle: next.map { ($0.joinURL == nil ? "Pop the bubble to clear " : "Pop the bubble to join ") + $0.title } ?? "",
+            maxSize: maxSize,
+            onPop: next.map { meeting -> () -> Void in
+                { if let url = model.join(meeting) { openURL(url) } }
+            }
+        )
+    }
+
+    @ViewBuilder
+    private func textColumn(now: Date, upcoming: [Meeting], next: Meeting?, showThen: Bool) -> some View {
+        if !model.calendarAuthorized || !model.alarmsAuthorized {
+            permissionNotice
+        } else if let next {
+            meetingBlock(next, now: now, then: showThen ? upcoming.dropFirst().first : nil)
+        } else {
+            emptyBlock
+        }
+    }
+
+    private func todayList(_ items: [Meeting]) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            if !items.isEmpty {
+                Text("Later")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(Brand.secondary)
+                    .padding(.top, 40)
+            }
+            ForEach(items) { item in
+                HStack(alignment: .firstTextBaseline, spacing: 14) {
+                    Text(Countdown.time(item.start))
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(Brand.coralDark)
+                        .frame(width: 72, alignment: .leading)
+                    Text(item.title)
+                        .font(.system(size: 17))
+                        .foregroundStyle(Brand.ink)
+                        .lineLimit(1)
+                }
+            }
         }
     }
 
