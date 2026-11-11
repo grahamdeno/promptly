@@ -5,7 +5,7 @@ Read docs/plan.md before making product changes.
 ## What it is
 Full-screen meeting alarms from the iPhone's own calendars (AlarmKit + EventKit), in the calm white style of
 Lovely Mail. App Store name "Promptly: Meeting Alarms", bundle `com.grahamdeno.promptly`, App Group
-`group.com.grahamdeno.promptly`, App Store Connect Apple ID 6833469809. iOS 26, iPhone only.
+`group.com.grahamdeno.promptly`, App Store Connect Apple ID 6833469809. iOS 26, iPhone and iPad (one universal app).
 
 ## Development
 - Native SwiftUI; project.yml is the XcodeGen source of truth. Generate: `xcodegen generate`

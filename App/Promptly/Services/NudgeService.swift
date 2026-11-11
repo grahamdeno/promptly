@@ -12,9 +12,24 @@ final class NudgeService {
         (try? await center.requestAuthorization(options: [.alert, .sound])) ?? false
     }
 
-    func sync(_ planned: [PlannedAlarm], enabled: Bool, now: Date = .now) async {
+    /// Nudges for alarm meetings (when enabled), plus one gentle notification at ring time for meetings on
+    /// calendars set to Gentle.
+    func sync(_ planned: [PlannedAlarm], enabled: Bool, gentle: [PlannedAlarm] = [], now: Date = .now) async {
         let pending = await center.pendingNotificationRequests().map(\.identifier).filter { $0.hasPrefix(prefix) }
         center.removePendingNotificationRequests(withIdentifiers: pending)
+        for alarm in gentle where alarm.fireDate > now.addingTimeInterval(5) {
+            let minutes = Int((alarm.meeting.start.timeIntervalSince(alarm.fireDate) / 60).rounded())
+            let content = UNMutableNotificationContent()
+            content.title = alarm.meeting.title
+            content.body = minutes <= 0 ? "Starting now" : "Starts in \(minutes) min"
+            content.sound = .default
+            content.interruptionLevel = .timeSensitive
+            content.threadIdentifier = "pop-in-gentle"
+            let comps = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute, .second], from: alarm.fireDate)
+            let request = UNNotificationRequest(identifier: "\(prefix)gentle-\(alarm.meeting.id)", content: content,
+                                                trigger: UNCalendarNotificationTrigger(dateMatching: comps, repeats: false))
+            try? await center.add(request)
+        }
         guard enabled else { return }
         for alarm in planned {
             for minutes in Self.offsets {

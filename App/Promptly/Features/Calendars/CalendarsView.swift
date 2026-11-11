@@ -38,6 +38,12 @@ struct CalendarsView: View {
                         model.leadMinutes = $0
                     }
 
+                    sectionLabel("Alarm sound")
+                    choiceRow(options: AlarmSoundChoice.allCases, selected: model.alarmSound,
+                              label: { $0 == .bubbleBlow ? "Bubble blow" : "Apple default" }) {
+                        model.alarmSound = $0
+                    }
+
                     sectionLabel("Before it rings")
                     settingToggle("Countdown on Lock Screen", detail: "A card with the bubble for the last ten minutes",
                                   isOn: Binding(get: { model.countdownCard }, set: { model.countdownCard = $0 }))
@@ -45,6 +51,8 @@ struct CalendarsView: View {
                                   isOn: Binding(get: { model.buzz }, set: { model.buzz = $0 }))
                     settingToggle("Pop sound", detail: "A soft gum pop; quiet when the phone is on silent",
                                   isOn: Binding(get: { model.popSound }, set: { model.popSound = $0 }))
+                    settingToggle("Keep screen on", detail: "While Pop In is open, like a desk clock",
+                                  isOn: Binding(get: { model.keepAwake }, set: { model.keepAwake = $0 }))
                     settingToggle("Nudges at 5 and 2 minutes", detail: "One buzz each, even when locked",
                                   isOn: Binding(get: { model.nudges }, set: { model.nudges = $0 }))
 
@@ -99,12 +107,28 @@ struct CalendarsView: View {
                 if on { model.disabledCalendarIDs.remove(calendar.id) } else { model.disabledCalendarIDs.insert(calendar.id) }
             }
         )
+        let gentle = model.gentleCalendarIDs.contains(calendar.id)
         return Toggle(isOn: isOn) {
             HStack(spacing: 14) {
                 Circle().fill(Brand.color(hex: calendar.colorHex)).frame(width: 10, height: 10)
                 VStack(alignment: .leading, spacing: 1) {
                     Text(calendar.title).font(.system(size: 17)).foregroundStyle(Brand.ink)
                     Text(calendar.source).font(.system(size: 13)).foregroundStyle(Brand.secondary)
+                }
+                Spacer(minLength: 8)
+                if isOn.wrappedValue {
+                    Menu {
+                        Button("Alarm: full screen, rings") { model.gentleCalendarIDs.remove(calendar.id) }
+                        Button("Gentle: one notification") { model.gentleCalendarIDs.insert(calendar.id) }
+                    } label: {
+                        Text(gentle ? "Gentle" : "Alarm")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundStyle(Brand.ink)
+                            .padding(.horizontal, 12)
+                            .frame(minHeight: 32)
+                            .background(Capsule().fill(Brand.ink.opacity(0.07)))
+                    }
+                    .accessibilityLabel("\(calendar.title) alert style: \(gentle ? "Gentle" : "Alarm")")
                 }
             }
         }
