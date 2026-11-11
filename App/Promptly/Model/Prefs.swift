@@ -69,6 +69,11 @@ final class Prefs: @unchecked Sendable {
         set { defaults.set(newValue, forKey: "taughtPop") }
     }
 
+    var gumColor: GumPalette {
+        get { GumPalette(rawValue: defaults.string(forKey: GumPalette.key) ?? "") ?? .bubblegum }
+        set { defaults.set(newValue.rawValue, forKey: GumPalette.key) }
+    }
+
     var alarmSound: AlarmSoundChoice {
         get { AlarmSoundChoice(rawValue: defaults.string(forKey: "alarmSound") ?? "") ?? .bubbleBlow }
         set { defaults.set(newValue.rawValue, forKey: "alarmSound") }

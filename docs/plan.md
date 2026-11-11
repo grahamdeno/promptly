@@ -96,6 +96,9 @@ Design canvas: https://claude.ai/artifact/6dpuMwrhhPZNf3aAZSfAEh
       popping/clearing also silences any ringing alarm.
 - [x] Alarm title now says when: "Sprint review · in 1 min".
 - [x] While Pop In is open (e.g. the iPad on the desk), the Now screen takes over when the alarm time arrives.
+- [x] Bubble color setting: Bubblegum (new default), Hot pink, Coral. Tints the bubble, scraps, widgets, wordmark dot
+      and the alarm's Lock Screen buttons (alarms reschedule on change). App icon stays coral for now.
+- [x] Bubble larger at its max: 880 pt on iPhone (was 710), 760 on iPad, 920 on the Now screen.
 
 ## Later
 - iPad screenshots in App Store Connect before public release (Grok).

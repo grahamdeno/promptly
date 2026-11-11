@@ -15,7 +15,7 @@ struct BubbleView: View {
     var hint: String? = nil
     var accessibilityTitle: String = "Pop the bubble"
     var minSize: CGFloat = 150
-    var maxSize: CGFloat = 710
+    var maxSize: CGFloat = 880
     var steadySize: CGFloat = 300
     var onPop: (() -> Void)? = nil
 

@@ -78,6 +78,11 @@ struct CalendarsView: View {
                     }
                     .padding(.horizontal, 8)
 
+                    sectionLabel("Bubble color")
+                    choiceRow(options: GumPalette.allCases, selected: model.gumColor, label: { $0.label }) {
+                        model.gumColor = $0
+                    }
+
                     sectionLabel("Ball")
                     choiceRow(options: BallStyle.allCases, selected: model.ballStyle,
                               label: { $0 == .bubble ? "Bubble" : "Steady" }) {

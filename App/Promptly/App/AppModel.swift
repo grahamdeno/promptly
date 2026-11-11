@@ -50,6 +50,15 @@ final class AppModel {
     var popSound: Bool {
         didSet { prefs.popSound = popSound }
     }
+    /// Bubble color. Also tints the alarm's buttons, so a change reschedules the alarms; widgets redraw.
+    var gumColor: GumPalette {
+        didSet {
+            prefs.gumColor = gumColor
+            alarmService.cancelOwned()
+            writeWidgetSnapshot()
+            Task { await syncAlarms() }
+        }
+    }
     var alarmSound: AlarmSoundChoice {
         didSet {
             prefs.alarmSound = alarmSound
@@ -96,6 +105,7 @@ final class AppModel {
         buzz = prefs.buzz
         popSound = prefs.popSound
         alarmSound = prefs.alarmSound
+        gumColor = prefs.gumColor
         gentleCalendarIDs = prefs.gentleCalendarIDs
         keepAwake = prefs.keepAwake
         alarmService.sound = prefs.alarmSound

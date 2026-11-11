@@ -30,7 +30,7 @@ struct HomeView: View {
                         }
                         .frame(maxWidth: 480, alignment: .leading)
                         .padding(.horizontal, 48)
-                        bubble(next: next, progress: progress, maxSize: 600)
+                        bubble(next: next, progress: progress, maxSize: 760)
                             .frame(maxWidth: .infinity)
                             .ignoresSafeArea()
                     }
@@ -38,7 +38,7 @@ struct HomeView: View {
             } else {
                 ZStack {
                     Color.white.ignoresSafeArea()
-                    bubble(next: next, progress: progress, maxSize: 710)
+                    bubble(next: next, progress: progress, maxSize: 880)
                         .ignoresSafeArea()
                     VStack(alignment: .leading, spacing: 0) {
                         header

@@ -1,9 +1,9 @@
 import SwiftUI
 
 enum Brand {
-    static let coral = GumColors.coral
-    static let coralLight = GumColors.light
-    static let coralDark = GumColors.dark
+    static var coral: Color { GumColors.coral }
+    static var coralLight: Color { GumColors.light }
+    static var coralDark: Color { GumColors.dark }
     static let ink = Color(red: 0x14 / 255, green: 0x14 / 255, blue: 0x14 / 255)
     /// 5.3:1 on white.
     static let secondary = Color(red: 0x6B / 255, green: 0x6B / 255, blue: 0x6B / 255)

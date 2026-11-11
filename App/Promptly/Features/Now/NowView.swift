@@ -20,7 +20,7 @@ struct NowView: View {
                     popCount: pops,
                     hint: meeting.joinURL == nil ? "Pop when ready" : "Pop to join",
                     accessibilityTitle: (meeting.joinURL == nil ? "Pop the bubble to clear " : "Pop the bubble to join ") + meeting.title,
-                    minSize: 760, maxSize: 760, steadySize: 520,
+                    minSize: 920, maxSize: 920, steadySize: 560,
                     onPop: {
                         let url = model.join(meeting)
                         leave { if let url { openURL(url) } }
