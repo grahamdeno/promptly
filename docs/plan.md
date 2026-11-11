@@ -105,8 +105,8 @@ Design canvas: https://claude.ai/artifact/6dpuMwrhhPZNf3aAZSfAEh
 ## Sprint 10 (owner's on-device feedback, 2026-11-11)
 - [x] Extra bubbles start sooner: bud at +15, +40, +70 s past the start (grow over 30 s), merge into one screen-filling
       bubble from +110 s over 50 s. (The first test was at about +1 min, before the old +60 s start.)
-- [x] Louder alarm: the same bubble-blow sound the owner picked (140 to 360 Hz bloops, same rhythm) with overtones
-      added so phone speakers carry it, soft-limited for loudness. (A higher-pitched rebuild was rejected: wrong sound.)
+- [x] Alarm sound is now "Gum pops": the #5 airy pop (same as the in-app pop) repeating in 6 s cycles that speed up,
+      soft-limited for loudness. Owner's choice; replaces the bubble-blow bloops. Apple default still available.
 - [x] Readable text: the meeting text sits on a glass pane; secondary text darker. Now screen text was centered by
       mistake (VStack not full width); now left-aligned.
 - [x] Gloss: solid gum with a crisp curved highlight streak, a small window reflection, a pinpoint glint, a thin rim
