@@ -73,7 +73,11 @@ jobs:
           APP="$RUNNER_TEMP/Promptly.xcarchive/Products/Applications/Promptly.app"
           cp Config/Promptly.entitlements "$RUNNER_TEMP/ent.plist"
           plutil -lint "$RUNNER_TEMP/ent.plist"
-          find "$APP" -depth \( -name "*.framework" -o -name "*.dylib" -o -name "*.appex" \) -print -exec codesign --force --sign - {} \;
+          find "$APP" -depth \( -name "*.framework" -o -name "*.dylib" \) -print -exec codesign --force --sign - {} \;
+          # The widget extension carries the App Group too, so export keeps it.
+          WIDGET="$APP/PlugIns/PromptlyWidgets.appex"
+          codesign --force --sign - --entitlements Config/PromptlyWidgets.entitlements --generate-entitlement-der "$WIDGET"
+          codesign -d --entitlements - "$WIDGET" 2>&1 | grep -q "group.com.grahamdeno.promptly" || { echo "::error::widget extension has no App Group entitlement"; exit 1; }
           codesign --force --sign - --entitlements "$RUNNER_TEMP/ent.plist" --generate-entitlement-der "$APP"
           codesign -d --entitlements - "$APP" 2>&1 | tee "$RUNNER_TEMP/archive-ent.txt"
           grep -q "group.com.grahamdeno.promptly" "$RUNNER_TEMP/archive-ent.txt" || { echo "::error::archive has no App Group entitlement"; exit 1; }

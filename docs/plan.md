@@ -56,8 +56,14 @@ Design canvas: https://claude.ai/artifact/6dpuMwrhhPZNf3aAZSfAEh
 - [x] Pop scraps fly higher and farther (up to ~400 pt up, ~220 pt out), tumble, then fall and fade; oddly shaped
       lumpy scraps with torn notches plus stretched strands instead of triangles; the pop lasts about 1.2 s.
 
+## Sprint 5 (owner said yes, 2026-11-11)
+- [x] Home Screen widget, small and medium: next meeting, live countdown, bubble that grows in minute steps over the
+      last hour (easing between redraws), medium shows the next two after it. Tapping the bubble opens Promptly,
+      pops it there with the full gum animation, then opens the link. The app writes a meeting snapshot to the App
+      Group; the widget never reads the calendar.
+- [x] The bubble's tremble fades in from 90 percent and is slightly stronger at the start.
+
 ## Later
-- Small and medium Home Screen widgets (designs on the canvas).
 - Smart filters: travel-time buffer, a second alert for chosen meetings, quiet hours.
 - Apple Watch.
 
