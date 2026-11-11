@@ -33,6 +33,7 @@ struct RootView: View {
             }
         }
         .preferredColorScheme(.light)
+        .id(model.gumColor)
         .fullScreenCover(item: $model.arrived) { meeting in
             NowView(meeting: meeting)
                 .environment(model)

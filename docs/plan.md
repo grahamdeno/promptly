@@ -88,6 +88,20 @@ Design canvas: https://claude.ai/artifact/6dpuMwrhhPZNf3aAZSfAEh
 - [ ] On device: confirm the bubble-blow alarm plays (forum reports say `.named` needs the file extension, used here)
       and whether it loops.
 
+## Sprint 9 (owner's on-device report, 2026-11-11)
+- Confirmed on device: the AlarmKit full-screen alert shows on the Lock Screen (Apple's layout: title, time, app
+  name, coral Open button, slide to stop). Owner expected an In Your Face style takeover; iOS allows only this.
+- [x] Fix: tapping the alarm's Join/Open button didn't stop the alarm (custom buttons don't), so it kept ringing and
+      stayed in the Dynamic Island after the app was closed. The intent now stops its alarm; opening Pop In or
+      popping/clearing also silences any ringing alarm.
+- [x] Alarm title now says when: "Sprint review · in 1 min".
+- [x] While Pop In is open (e.g. the iPad on the desk), the Now screen takes over when the alarm time arrives.
+- [x] Bubble color setting: Bubblegum (new default), Hot pink, Coral. Tints the bubble, scraps, widgets, wordmark dot
+      and the alarm's Lock Screen buttons (alarms reschedule on change). App icon stays coral for now.
+- [x] Overdue: past the start, new bubbles bud off the first at +1, +2 and +3 min (each grows over ~45 s in small
+      puffs), then from +4 min everything swells into one bubble covering the screen over a minute. In-app only.
+- [x] Bubble larger at its max: 880 pt on iPhone (was 710), 760 on iPad, 920 on the Now screen.
+
 ## Later
 - iPad screenshots in App Store Connect before public release (Grok).
 - Smart filters: travel-time buffer, a second alert for chosen meetings, quiet hours.

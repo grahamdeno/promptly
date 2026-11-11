@@ -50,6 +50,15 @@ final class AppModel {
     var popSound: Bool {
         didSet { prefs.popSound = popSound }
     }
+    /// Bubble color. Also tints the alarm's buttons, so a change reschedules the alarms; widgets redraw.
+    var gumColor: GumPalette {
+        didSet {
+            prefs.gumColor = gumColor
+            alarmService.cancelOwned()
+            writeWidgetSnapshot()
+            Task { await syncAlarms() }
+        }
+    }
     var alarmSound: AlarmSoundChoice {
         didSet {
             prefs.alarmSound = alarmSound
@@ -96,6 +105,7 @@ final class AppModel {
         buzz = prefs.buzz
         popSound = prefs.popSound
         alarmSound = prefs.alarmSound
+        gumColor = prefs.gumColor
         gentleCalendarIDs = prefs.gentleCalendarIDs
         keepAwake = prefs.keepAwake
         alarmService.sound = prefs.alarmSound
@@ -143,8 +153,32 @@ final class AppModel {
         calendarAuthorized = calendarService.isAuthorized
         alarmsAuthorized = alarmService.isAuthorized
         await refresh()
+        // Opening Pop In while an alarm rings counts as seeing it: silence it, show the meeting full screen.
+        alarmService.stopAlerting()
         handleArrival()
         scheduleBackgroundRefresh()
+        startWatching()
+    }
+
+    /// While Pop In is open (say, on an iPad left on the desk), take over the screen with the Now view when a
+    /// meeting's alarm time arrives, like In Your Face. Apple's alarm still rings alongside.
+    @ObservationIgnored private var watcher: Task<Void, Never>?
+
+    private func startWatching() {
+        watcher?.cancel()
+        watcher = Task { @MainActor [weak self] in
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(2))
+                guard let self, UIApplication.shared.applicationState == .active, self.arrived == nil else { continue }
+                let now = Date.now
+                let lead = TimeInterval(self.leadMinutes * 60)
+                if let due = self.upcoming(at: now).first(where: {
+                    now >= $0.start.addingTimeInterval(-lead) && now <= $0.start.addingTimeInterval(5 * 60)
+                }), !self.shownNowFor.contains(due.id) {
+                    self.show(due)
+                }
+            }
+        }
     }
 
     func backgroundRefresh() async {
@@ -280,6 +314,7 @@ final class AppModel {
     }
 
     private func markCleared(_ meeting: Meeting) {
+        alarmService.stopAlerting()
         cleared.insert(meeting.id)
         prefs.clearedMeetingIDs = cleared
         popCount += 1
