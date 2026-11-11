@@ -16,16 +16,39 @@ final class AlarmService {
         do { return try await manager.requestAuthorization() == .authorized } catch { return false }
     }
 
-    /// Cancels alarms that are no longer wanted and schedules the missing ones.
+    /// Meeting alarms this service scheduled. Test alarms are never in here, so a sync never cancels them.
+    private var ownedIDs: Set<UUID> {
+        get { Set((UserDefaults.standard.stringArray(forKey: "ownedAlarmIDs") ?? []).compactMap(UUID.init(uuidString:))) }
+        set { UserDefaults.standard.set(newValue.map(\.uuidString), forKey: "ownedAlarmIDs") }
+    }
+
+    /// How many alarms are waiting, for the check on the settings screen.
+    var scheduledCount: Int { ((try? manager.alarms) ?? []).count }
+
+    /// Cancels meeting alarms that are no longer wanted and schedules the missing ones.
     func sync(_ planned: [PlannedAlarm]) async throws {
         let existing = Set(((try? manager.alarms) ?? []).map(\.id))
         let wanted = Dictionary(planned.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
-        for id in existing where wanted[id] == nil {
+        var owned = ownedIDs
+        for id in existing where wanted[id] == nil && owned.contains(id) {
             try? manager.cancel(id: id)
+            owned.remove(id)
         }
         for (id, alarm) in wanted where !existing.contains(id) {
             try await schedule(alarm)
+            owned.insert(id)
         }
+        ownedIDs = owned.intersection(Set(wanted.keys))
+    }
+
+    /// A test alarm: rings after `seconds`, optionally with the Lock Screen countdown card first.
+    func scheduleTest(in seconds: TimeInterval, countdown: TimeInterval?) async throws {
+        let start = Date.now.addingTimeInterval(seconds + 60)
+        let meeting = Meeting(id: "test-\(UUID().uuidString)", eventID: "test", title: "Test meeting",
+                              start: start, end: start.addingTimeInterval(1800), calendarID: "test", joinURL: nil)
+        let fire = Date.now.addingTimeInterval(seconds)
+        let planned = PlannedAlarm(id: UUID(), meeting: meeting, fireDate: fire, countdownSeconds: countdown)
+        try await schedule(planned)
     }
 
     func cancelAll() {

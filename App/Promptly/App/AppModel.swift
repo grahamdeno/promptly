@@ -27,7 +27,12 @@ final class AppModel {
     var linkToOpen: URL?
     /// Increments each time a meeting is joined or cleared; the bubble pops on change.
     var popCount = 0
+    var taughtPop: Bool
     var syncProblem: String?
+    /// For the settings screen's alarm check.
+    var nextAlarm: Date?
+    var scheduledAlarms = 0
+    var testMessage: String?
 
     var leadMinutes: Int {
         didSet { prefs.leadMinutes = leadMinutes; Task { await syncAlarms() } }
@@ -67,6 +72,7 @@ final class AppModel {
         buzz = prefs.buzz
         nudges = prefs.nudges
         cleared = prefs.clearedMeetingIDs
+        taughtPop = prefs.taughtPop
         calendarAuthorized = calendarService.isAuthorized
         alarmsAuthorized = alarmService.isAuthorized
         storeObserver = NotificationCenter.default.addObserver(
@@ -127,13 +133,36 @@ final class AppModel {
         guard alarmsAuthorized else { return }
         let planned = AlarmPlanner.plan(meetings: meetings, leadMinutes: leadMinutes, now: .now, cleared: cleared,
                                         countdown: countdownCard)
+        nextAlarm = planned.first?.fireDate
         do {
             try await alarmService.sync(planned)
             syncProblem = nil
+            scheduledAlarms = alarmService.scheduledCount
         } catch {
             syncProblem = "Couldn't set an alarm: \(error.localizedDescription)"
         }
         await nudgeService.sync(planned, enabled: nudges)
+    }
+
+    /// Rings a test alarm so the full-screen alert can be checked with the phone locked.
+    func testAlarm(withCountdown: Bool) async {
+        alarmsAuthorized = alarmService.isAuthorized
+        guard alarmsAuthorized else {
+            testMessage = "Alarms are off for Pop In. Turn them on in Settings, then try again."
+            return
+        }
+        do {
+            if withCountdown {
+                try await alarmService.scheduleTest(in: 90, countdown: 60)
+                testMessage = "Lock your phone now. The countdown card shows in about 30 seconds, then it rings 60 seconds later."
+            } else {
+                try await alarmService.scheduleTest(in: 20, countdown: nil)
+                testMessage = "Lock your phone now. It rings in 20 seconds."
+            }
+            scheduledAlarms = alarmService.scheduledCount
+        } catch {
+            testMessage = "Couldn't set the test alarm: \(error.localizedDescription)"
+        }
     }
 
     private func scheduleBackgroundRefresh() {
@@ -216,6 +245,7 @@ final class AppModel {
         cleared.insert(meeting.id)
         prefs.clearedMeetingIDs = cleared
         popCount += 1
+        if !taughtPop { taughtPop = true; prefs.taughtPop = true }
         writeWidgetSnapshot()
         Task { await syncAlarms() }
     }

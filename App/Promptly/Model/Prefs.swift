@@ -50,6 +50,12 @@ final class Prefs: @unchecked Sendable {
         set { defaults.set(newValue, forKey: "nudges") }
     }
 
+    /// True after the first pop, so the one-time "Tap the bubble" line stops showing.
+    var taughtPop: Bool {
+        get { defaults.bool(forKey: "taughtPop") }
+        set { defaults.set(newValue, forKey: "taughtPop") }
+    }
+
     /// Calendars switched off. Everything else rings, so a newly added calendar is on by default.
     var disabledCalendarIDs: Set<String> {
         get { Set(defaults.stringArray(forKey: "disabledCalendarIDs") ?? []) }

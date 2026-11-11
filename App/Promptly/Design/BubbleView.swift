@@ -11,6 +11,7 @@ struct BubbleView: View {
     var progress: Double
     var style: BallStyle
     var popCount: Int
+    /// Kept for callers; the bubble no longer shows text.
     var hint: String? = nil
     var accessibilityTitle: String = "Pop the bubble"
     var minSize: CGFloat = 150
@@ -27,6 +28,8 @@ struct BubbleView: View {
     @State private var showLump = false
     @State private var lumpScale: CGFloat = 0.6
     @State private var popping = false
+    /// Every few seconds a fingertip presses a small dent into the bubble, inviting a tap. No text on the gum.
+    @State private var poked = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     /// Inflates in breaths: 36 puffs from empty to full.
@@ -62,6 +65,37 @@ struct BubbleView: View {
         .onChange(of: popCount) { _, _ in
             if !popping { burst(then: nil) }
         }
+        .task(id: onPop != nil) { await pokeLoop() }
+    }
+
+    /// The dent: a soft shadowed hollow near the top of the visible gum.
+    private var pokeDimple: some View {
+        GeometryReader { geo in
+            let w = geo.size.width
+            let h = geo.size.height
+            let size = max(34, w * 0.11)
+            Ellipse()
+                .fill(RadialGradient(colors: [Color(red: 0.47, green: 0.08, blue: 0.02).opacity(0.38),
+                                              GumColors.dark.opacity(0.12), .clear],
+                                     center: UnitPoint(x: 0.4, y: 0.35), startRadius: 0, endRadius: size * 0.6))
+                .overlay(Ellipse().stroke(.white.opacity(0.35), lineWidth: 1.5).blur(radius: 1.5).offset(y: -2))
+                .frame(width: size, height: size * 0.74)
+                .scaleEffect(poked ? 1 : 0.3)
+                .opacity(poked && !popping ? 1 : 0)
+                .position(x: w * 0.6, y: h * 0.2)
+        }
+        .allowsHitTesting(false)
+    }
+
+    private func pokeLoop() async {
+        guard onPop != nil, !reduceMotion else { return }
+        while !Task.isCancelled {
+            try? await Task.sleep(for: .seconds(4))
+            guard !popping, !Task.isCancelled else { continue }
+            withAnimation(.easeOut(duration: 0.16)) { poked = true }
+            try? await Task.sleep(for: .milliseconds(260))
+            withAnimation(.timingCurve(0.2, 0.7, 0.3, 1, duration: 0.5)) { poked = false }
+        }
     }
 
     // MARK: The bubble
@@ -73,17 +107,8 @@ struct BubbleView: View {
         } label: {
             GumBubbleShape(thinness: puff)
                 .frame(width: width, height: height)
-                .overlay(alignment: .top) {
-                    if let hint, !popping {
-                        Text(hint)
-                            .font(.system(size: width < 260 ? 13 : 16, weight: .semibold))
-                            .tracking(0.2)
-                            .foregroundStyle(.white)
-                            .shadow(color: .black.opacity(0.18), radius: 4, y: 1)
-                            .padding(.top, height * (width < 260 ? 0.2 : 0.15))
-                            .phaseAnimator([0.92, 0.55]) { view, value in view.opacity(value) } animation: { _ in .easeInOut(duration: 1.2) }
-                    }
-                }
+                .overlay { if onPop != nil { pokeDimple } }
+                .scaleEffect(x: poked ? 1.008 : 1, y: poked ? 0.992 : 1, anchor: .bottom)
                 .contentShape(Ellipse())
         }
         .buttonStyle(.plain)

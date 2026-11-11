@@ -20,7 +20,7 @@ struct WelcomeView: View {
                         .font(Brand.display(36))
                         .tracking(-0.9)
                         .foregroundStyle(Brand.ink)
-                    Text("Promptly reads your calendars and rings like an alarm a minute before each meeting, with Join right on the alert. Nothing leaves this iPhone.")
+                    Text("Pop In reads your calendars and rings like an alarm a minute before each meeting, with Join right on the alert. Nothing leaves this iPhone.")
                         .font(.system(size: 16))
                         .foregroundStyle(Brand.secondary)
                     Spacer()
