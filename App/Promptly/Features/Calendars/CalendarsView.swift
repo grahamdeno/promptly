@@ -40,7 +40,7 @@ struct CalendarsView: View {
 
                     sectionLabel("Alarm sound")
                     choiceRow(options: AlarmSoundChoice.allCases, selected: model.alarmSound,
-                              label: { $0 == .bubbleBlow ? "Bubble blow" : "Apple default" }) {
+                              label: { $0 == .bubbleBlow ? "Gum pops" : "Apple default" }) {
                         model.alarmSound = $0
                     }
 

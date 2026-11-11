@@ -1,7 +1,7 @@
 import Foundation
 
 enum AlarmSoundChoice: String, CaseIterable, Sendable {
-    /// Soft low bloops that speed up, like a bubble filling (Sounds/bubble_blow_alarm.wav).
+    /// The airy gum pop (#5) repeating in a rhythm that speeds up (Sounds/bubble_blow_alarm.wav). Shown as "Gum pops".
     case bubbleBlow
     /// Apple's standard alarm sound. AlarmKit can't pick a named system tone such as Mercury.
     case appleDefault

@@ -96,11 +96,26 @@ Design canvas: https://claude.ai/artifact/6dpuMwrhhPZNf3aAZSfAEh
       popping/clearing also silences any ringing alarm.
 - [x] Alarm title now says when: "Sprint review · in 1 min".
 - [x] While Pop In is open (e.g. the iPad on the desk), the Now screen takes over when the alarm time arrives.
-- [x] Bubble color setting: Bubblegum (new default), Hot pink, Coral. Tints the bubble, scraps, widgets, wordmark dot
+- [x] Bubble color setting: Bubblegum (new default) or Coral (owner removed Hot pink). Tints the bubble, scraps, widgets, wordmark dot
       and the alarm's Lock Screen buttons (alarms reschedule on change). App icon stays coral for now.
 - [x] Overdue: past the start, new bubbles bud off the first at +1, +2 and +3 min (each grows over ~45 s in small
       puffs), then from +4 min everything swells into one bubble covering the screen over a minute. In-app only.
 - [x] Bubble larger at its max: 880 pt on iPhone (was 710), 760 on iPad, 920 on the Now screen.
+
+## Sprint 10 (owner's on-device feedback, 2026-11-11)
+- [x] Extra bubbles start sooner: bud at +15, +40, +70 s past the start (grow over 30 s), merge into one screen-filling
+      bubble from +110 s over 50 s. (The first test was at about +1 min, before the old +60 s start.)
+- [x] Alarm sound is now "Gum pops": the #5 airy pop (same as the in-app pop) repeating in 6 s cycles that speed up,
+      soft-limited for loudness. Owner's choice; replaces the bubble-blow bloops. Apple default still available.
+- [x] Readable text: the meeting text sits on a glass pane; secondary text darker. Now screen text was centered by
+      mistake (VStack not full width); now left-aligned.
+- [x] Gloss: solid gum with a crisp curved highlight streak, a small window reflection, a pinpoint glint, a thin rim
+      light and shadowed edges, replacing the large faded white blur.
+
+## Sprint 11 (owner: the test showed only the banner, 2026-11-11)
+- [x] Test alarms now add a pretend "Test meeting" to Home (starting one lead time after the ring), so with Pop In open
+      the bubble grows, the Now screen takes over at ring time, and extra bubbles bud after the start. Unlocked with
+      Pop In closed, iOS shows only the banner; locked, Apple's full-screen alarm.
 
 ## Later
 - iPad screenshots in App Store Connect before public release (Grok).

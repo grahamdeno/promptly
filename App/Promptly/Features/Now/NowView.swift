@@ -50,10 +50,14 @@ struct NowView: View {
                     .foregroundStyle(Brand.secondary)
                     .underline()
                     .frame(minHeight: 44)
-                    Spacer()
                 }
-                .padding(.horizontal, 28)
-                .padding(.top, 72)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 18)
+                .padding(.vertical, 14)
+                .glassEffect(.regular, in: .rect(cornerRadius: 26))
+                .padding(.horizontal, 12)
+                .padding(.top, 60)
+                .frame(maxHeight: .infinity, alignment: .top)
             }
         }
         .hapticRamp(until: meeting.start, enabled: model.buzz)

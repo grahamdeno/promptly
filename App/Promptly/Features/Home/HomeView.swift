@@ -72,15 +72,22 @@ struct HomeView: View {
         )
     }
 
-    @ViewBuilder
+    /// The text sits on a glass pane so it stays readable when the bubble rises behind it.
     private func textColumn(now: Date, upcoming: [Meeting], next: Meeting?, showThen: Bool) -> some View {
-        if !model.calendarAuthorized || !model.alarmsAuthorized {
-            permissionNotice
-        } else if let next {
-            meetingBlock(next, now: now, then: showThen ? upcoming.dropFirst().first : nil)
-        } else {
-            emptyBlock
+        Group {
+            if !model.calendarAuthorized || !model.alarmsAuthorized {
+                permissionNotice
+            } else if let next {
+                meetingBlock(next, now: now, then: showThen ? upcoming.dropFirst().first : nil)
+            } else {
+                emptyBlock
+            }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
+        .glassEffect(.regular, in: .rect(cornerRadius: 26))
+        .padding(.horizontal, -16)
     }
 
     private func todayList(_ items: [Meeting]) -> some View {
