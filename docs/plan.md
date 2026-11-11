@@ -88,6 +88,15 @@ Design canvas: https://claude.ai/artifact/6dpuMwrhhPZNf3aAZSfAEh
 - [ ] On device: confirm the bubble-blow alarm plays (forum reports say `.named` needs the file extension, used here)
       and whether it loops.
 
+## Sprint 9 (owner's on-device report, 2026-11-11)
+- Confirmed on device: the AlarmKit full-screen alert shows on the Lock Screen (Apple's layout: title, time, app
+  name, coral Open button, slide to stop). Owner expected an In Your Face style takeover; iOS allows only this.
+- [x] Fix: tapping the alarm's Join/Open button didn't stop the alarm (custom buttons don't), so it kept ringing and
+      stayed in the Dynamic Island after the app was closed. The intent now stops its alarm; opening Pop In or
+      popping/clearing also silences any ringing alarm.
+- [x] Alarm title now says when: "Sprint review · in 1 min".
+- [x] While Pop In is open (e.g. the iPad on the desk), the Now screen takes over when the alarm time arrives.
+
 ## Later
 - iPad screenshots in App Store Connect before public release (Grok).
 - Smart filters: travel-time buffer, a second alert for chosen meetings, quiet hours.

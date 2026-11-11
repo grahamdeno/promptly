@@ -1,3 +1,4 @@
+import AlarmKit
 import AppIntents
 import Foundation
 
@@ -15,14 +16,20 @@ struct OpenMeetingIntent: LiveActivityIntent {
     @Parameter(title: "Link")
     var joinURL: String
 
+    @Parameter(title: "Alarm")
+    var alarmID: String
+
     init() {}
 
-    init(meetingID: String, joinURL: String) {
+    init(meetingID: String, joinURL: String, alarmID: String) {
         self.meetingID = meetingID
         self.joinURL = joinURL
+        self.alarmID = alarmID
     }
 
     func perform() async throws -> some IntentResult {
+        // The custom button doesn't stop the alarm on its own; without this it keeps ringing.
+        if let id = UUID(uuidString: alarmID) { try? AlarmManager.shared.stop(id: id) }
         PendingJoin.save(meetingID: meetingID, joinURL: joinURL)
         return .result()
     }

@@ -59,6 +59,13 @@ final class AlarmService {
         try await schedule(planned)
     }
 
+    /// Silences any alarm that is ringing right now (the owner has opened Pop In or popped the bubble).
+    func stopAlerting() {
+        for alarm in (try? manager.alarms) ?? [] where alarm.state == .alerting {
+            try? manager.stop(id: alarm.id)
+        }
+    }
+
     func cancelAll() {
         for alarm in (try? manager.alarms) ?? [] { try? manager.cancel(id: alarm.id) }
     }
@@ -66,8 +73,10 @@ final class AlarmService {
     private func schedule(_ planned: PlannedAlarm) async throws {
         let meeting = planned.meeting
         let joinText = LocalizedStringResource(stringLiteral: meeting.service.map { "Join \($0.rawValue)" } ?? "Open")
+        let minutes = Int((meeting.start.timeIntervalSince(planned.fireDate) / 60).rounded())
+        let when = minutes <= 0 ? "starting now" : "in \(minutes) min"
         let alert = AlarmPresentation.Alert(
-            title: LocalizedStringResource(stringLiteral: meeting.title),
+            title: LocalizedStringResource(stringLiteral: "\(meeting.title) · \(when)"),
             stopButton: AlarmButton(text: "Dismiss", textColor: .white, systemImageName: "xmark"),
             secondaryButton: AlarmButton(text: joinText, textColor: .white,
                                          systemImageName: meeting.joinURL == nil ? "arrow.up.forward.app" : "video.fill"),
@@ -92,7 +101,8 @@ final class AlarmService {
             schedule: .fixed(planned.scheduleDate),
             attributes: attributes,
             stopIntent: nil,
-            secondaryIntent: OpenMeetingIntent(meetingID: meeting.id, joinURL: meeting.joinURL?.absoluteString ?? ""),
+            secondaryIntent: OpenMeetingIntent(meetingID: meeting.id, joinURL: meeting.joinURL?.absoluteString ?? "",
+                                               alarmID: planned.id.uuidString),
             sound: sound == .appleDefault ? .default : .named("bubble_blow_alarm.wav")
         )
         _ = try await manager.schedule(id: planned.id, configuration: configuration)
