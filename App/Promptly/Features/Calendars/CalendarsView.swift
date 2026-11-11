@@ -43,6 +43,8 @@ struct CalendarsView: View {
                                   isOn: Binding(get: { model.countdownCard }, set: { model.countdownCard = $0 }))
                     settingToggle("Buzz as it gets close", detail: "Builds while Pop In is open",
                                   isOn: Binding(get: { model.buzz }, set: { model.buzz = $0 }))
+                    settingToggle("Pop sound", detail: "A soft gum pop; quiet when the phone is on silent",
+                                  isOn: Binding(get: { model.popSound }, set: { model.popSound = $0 }))
                     settingToggle("Nudges at 5 and 2 minutes", detail: "One buzz each, even when locked",
                                   isOn: Binding(get: { model.nudges }, set: { model.nudges = $0 }))
 

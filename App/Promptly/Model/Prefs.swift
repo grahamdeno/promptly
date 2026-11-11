@@ -44,6 +44,12 @@ final class Prefs: @unchecked Sendable {
         set { defaults.set(newValue, forKey: "buzz") }
     }
 
+    /// The gum pop sound when the bubble pops. Default on.
+    var popSound: Bool {
+        get { defaults.object(forKey: "popSound") as? Bool ?? true }
+        set { defaults.set(newValue, forKey: "popSound") }
+    }
+
     /// One-buzz nudges at 5 and 2 minutes before. Default off.
     var nudges: Bool {
         get { defaults.bool(forKey: "nudges") }

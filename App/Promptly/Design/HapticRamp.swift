@@ -1,3 +1,4 @@
+import AVFoundation
 import SwiftUI
 import UIKit
 
@@ -41,5 +42,26 @@ enum PopHaptics {
     @MainActor static func pop() {
         UIImpactFeedbackGenerator(style: .rigid).impactOccurred(intensity: 1)
         UINotificationFeedbackGenerator().notificationOccurred(.success)
+        PopSound.play()
+    }
+}
+
+/// The airy gum pop (Sounds/pop.wav, made for Pop In). Ambient: stays quiet when the silent switch is on and
+/// mixes with whatever else is playing. Off when the owner turns off "Pop sound".
+@MainActor
+enum PopSound {
+    private static var player: AVAudioPlayer? = {
+        guard let url = Bundle.main.url(forResource: "pop", withExtension: "wav") else { return nil }
+        let p = try? AVAudioPlayer(contentsOf: url)
+        p?.prepareToPlay()
+        return p
+    }()
+
+    static func play() {
+        guard Prefs().popSound else { return }
+        try? AVAudioSession.sharedInstance().setCategory(.ambient, options: [.mixWithOthers])
+        try? AVAudioSession.sharedInstance().setActive(true)
+        player?.currentTime = 0
+        player?.play()
     }
 }

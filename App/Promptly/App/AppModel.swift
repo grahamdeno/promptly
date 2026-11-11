@@ -46,6 +46,9 @@ final class AppModel {
     var buzz: Bool {
         didSet { prefs.buzz = buzz }
     }
+    var popSound: Bool {
+        didSet { prefs.popSound = popSound }
+    }
     var nudges: Bool {
         didSet {
             prefs.nudges = nudges
@@ -70,6 +73,7 @@ final class AppModel {
         disabledCalendarIDs = prefs.disabledCalendarIDs
         countdownCard = prefs.countdownCard
         buzz = prefs.buzz
+        popSound = prefs.popSound
         nudges = prefs.nudges
         cleared = prefs.clearedMeetingIDs
         taughtPop = prefs.taughtPop

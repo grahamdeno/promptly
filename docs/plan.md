@@ -73,6 +73,10 @@ Design canvas: https://claude.ai/artifact/6dpuMwrhhPZNf3aAZSfAEh
       then ring" test alarms (test alarms are never cancelled by a sync). Owner reported not yet seeing the
       full-screen alert; this verifies it on device and settles the countdown timing assumption.
 
+## Sprint 7 (owner picked sound 5, 2026-11-11)
+- [x] Pop sound: the airy gum pop (#5 of eight synthesized options, made for Pop In, no licensing) plays with the pop
+      haptic. Ambient audio session: silent switch mutes it, mixes with other audio. Setting, on by default.
+
 ## Later
 - Smart filters: travel-time buffer, a second alert for chosen meetings, quiet hours.
 - Apple Watch.
