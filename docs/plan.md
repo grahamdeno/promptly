@@ -63,6 +63,16 @@ Design canvas: https://claude.ai/artifact/6dpuMwrhhPZNf3aAZSfAEh
       Group; the widget never reads the calendar.
 - [x] The bubble's tremble fades in from 90 percent and is slightly stronger at the start.
 
+## Sprint 6 (owner said build and ship, 2026-11-11)
+- [x] Renamed in the app to Pop In (App Store name "Pop In: Meeting Alarms", claimed in App Store Connect); bundle ID,
+      repo and code names stay `promptly` for now.
+- [x] Icon B, "Gum on coral": a lighter glossy bubble on a coral gradient.
+- [x] No text on the bubble. A fingertip "poke" dents it every 4 s; "Tap the bubble to pop it and join." shows under
+      the countdown until the first pop.
+- [x] Settings > Check the alarm: shows how many alarms are set and when the next rings; "Ring in 20 s" and "Card,
+      then ring" test alarms (test alarms are never cancelled by a sync). Owner reported not yet seeing the
+      full-screen alert; this verifies it on device and settles the countdown timing assumption.
+
 ## Later
 - Smart filters: travel-time buffer, a second alert for chosen meetings, quiet hours.
 - Apple Watch.

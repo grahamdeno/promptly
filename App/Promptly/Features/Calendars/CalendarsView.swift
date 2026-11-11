@@ -16,7 +16,7 @@ struct CalendarsView: View {
                             .font(Brand.display(32))
                             .tracking(-0.8)
                             .foregroundStyle(Brand.ink)
-                        Text("Promptly rings for meetings on these calendars, even in Silent and Focus.")
+                        Text("Pop In rings for meetings on these calendars, even in Silent and Focus.")
                             .font(.system(size: 15))
                             .foregroundStyle(Brand.secondary)
                     }
@@ -41,10 +41,32 @@ struct CalendarsView: View {
                     sectionLabel("Before it rings")
                     settingToggle("Countdown on Lock Screen", detail: "A card with the bubble for the last ten minutes",
                                   isOn: Binding(get: { model.countdownCard }, set: { model.countdownCard = $0 }))
-                    settingToggle("Buzz as it gets close", detail: "Builds while Promptly is open",
+                    settingToggle("Buzz as it gets close", detail: "Builds while Pop In is open",
                                   isOn: Binding(get: { model.buzz }, set: { model.buzz = $0 }))
                     settingToggle("Nudges at 5 and 2 minutes", detail: "One buzz each, even when locked",
                                   isOn: Binding(get: { model.nudges }, set: { model.nudges = $0 }))
+
+                    sectionLabel("Check the alarm")
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text(alarmStatus)
+                            .font(.system(size: 15))
+                            .foregroundStyle(Brand.secondary)
+                        HStack(spacing: 8) {
+                            Button("Ring in 20 s") { Task { await model.testAlarm(withCountdown: false) } }
+                                .buttonStyle(SecondaryButtonStyle(height: 44, fill: true))
+                            Button("Card, then ring") { Task { await model.testAlarm(withCountdown: true) } }
+                                .buttonStyle(SecondaryButtonStyle(height: 44, fill: true))
+                        }
+                        if let message = model.testMessage {
+                            Text(message)
+                                .font(.system(size: 15, weight: .medium))
+                                .foregroundStyle(Brand.ink)
+                        }
+                        Text("The alarm fills the screen when the phone is locked. While you're using the phone, iPhone shows it as a large banner at the top instead.")
+                            .font(.system(size: 13))
+                            .foregroundStyle(Brand.secondary)
+                    }
+                    .padding(.horizontal, 8)
 
                     sectionLabel("Ball")
                     choiceRow(options: BallStyle.allCases, selected: model.ballStyle,
@@ -88,6 +110,17 @@ struct CalendarsView: View {
         .padding(.horizontal, 8)
         .frame(minHeight: 60)
         .overlay(alignment: .bottom) { Rectangle().fill(Brand.hairline).frame(height: 1) }
+    }
+
+    private var alarmStatus: String {
+        if !model.alarmsAuthorized { return "Alarms are off for Pop In. Turn them on in Settings." }
+        if !model.calendarAuthorized { return "Calendar access is off." }
+        let count = "\(model.scheduledAlarms) alarm\(model.scheduledAlarms == 1 ? "" : "s") set"
+        guard let next = model.nextAlarm else { return "\(count). No meetings in the next two days." }
+        let f = DateFormatter()
+        f.dateStyle = Calendar.current.isDateInToday(next) ? .none : .short
+        f.timeStyle = .short
+        return "\(count). Next rings at \(f.string(from: next))."
     }
 
     private func settingToggle(_ title: String, detail: String, isOn: Binding<Bool>) -> some View {

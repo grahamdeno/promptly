@@ -5,7 +5,7 @@ import Foundation
 /// there is no link). The link travels inside the alarm, so this works even before the calendar reloads.
 struct OpenMeetingIntent: LiveActivityIntent {
     static var title: LocalizedStringResource = "Open meeting"
-    static var description = IntentDescription("Opens Promptly on the meeting that just rang.")
+    static var description = IntentDescription("Opens Pop In on the meeting that just rang.")
     static var openAppWhenRun: Bool = true
     static var isDiscoverable: Bool = false
 

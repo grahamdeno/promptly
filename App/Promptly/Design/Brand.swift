@@ -25,14 +25,14 @@ enum Brand {
 struct Wordmark: View {
     var body: some View {
         HStack(alignment: .lastTextBaseline, spacing: 2) {
-            Text("promptly")
+            Text("pop in")
                 .font(Brand.display(22))
                 .tracking(-0.4)
                 .foregroundStyle(Brand.ink)
             Circle().fill(Brand.coral).frame(width: 7, height: 7)
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Promptly")
+        .accessibilityLabel("Pop In")
     }
 }
 

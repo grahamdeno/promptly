@@ -97,6 +97,14 @@ struct HomeView: View {
             .padding(.top, 14)
             .accessibilityElement(children: .combine)
 
+            if !model.taughtPop {
+                Text("Tap the bubble to pop it and join.")
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundStyle(Brand.ink)
+                    .padding(.top, 10)
+                    .transition(.opacity)
+            }
+
             HStack(spacing: 4) {
                 Button("Not going") { model.clear(meeting) }
                     .font(.system(size: 15, weight: .medium))
@@ -120,7 +128,7 @@ struct HomeView: View {
                 .font(Brand.display(34))
                 .tracking(-0.8)
                 .foregroundStyle(Brand.ink)
-            Text("Your next two days are clear on the calendars Promptly watches.")
+            Text("Your next two days are clear on the calendars Pop In watches.")
                 .font(.system(size: 16))
                 .foregroundStyle(Brand.secondary)
         }
@@ -128,13 +136,13 @@ struct HomeView: View {
 
     private var permissionNotice: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text(model.calendarAuthorized ? "Alarms are off" : "Promptly can't see your calendar")
+            Text(model.calendarAuthorized ? "Alarms are off" : "Pop In can't see your calendar")
                 .font(Brand.display(30))
                 .tracking(-0.6)
                 .foregroundStyle(Brand.ink)
             Text(model.calendarAuthorized
-                 ? "Turn on Alarms for Promptly in Settings so it can ring before your meetings."
-                 : "Allow Full Access to Calendars for Promptly in Settings. It only reads, and nothing leaves this iPhone.")
+                 ? "Turn on Alarms for Pop In in Settings so it can ring before your meetings."
+                 : "Allow Full Access to Calendars for Pop In in Settings. It only reads, and nothing leaves this iPhone.")
                 .font(.system(size: 16))
                 .foregroundStyle(Brand.secondary)
             Button("Open Settings") {

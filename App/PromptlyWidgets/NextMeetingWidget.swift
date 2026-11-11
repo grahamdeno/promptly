@@ -2,7 +2,7 @@ import SwiftUI
 import WidgetKit
 
 /// Home Screen widget: the next meeting, a live countdown, and the bubble growing in steps over the last hour.
-/// Tapping the bubble opens Promptly and pops it there (with the full gum animation), then opens the meeting link.
+/// Tapping the bubble opens Pop In and pops it there (with the full gum animation), then opens the meeting link.
 struct NextMeetingWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: NextMeetingKind.kind, provider: NextMeetingProvider()) { entry in
