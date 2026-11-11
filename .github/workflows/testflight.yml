@@ -1,0 +1,124 @@
+name: testflight
+# Archives Promptly and uploads it to TestFlight (internal testing only).
+# Runs on push to the `testflight` branch, or by hand. Pushing to `testflight` IS distribution:
+# only after the owner says ship.
+# Needs repo secrets ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_P8 (the same App Store Connect API key as Lovely)
+# and the App Store Connect app record for com.grahamdeno.promptly (Apple ID 6833469809, created 2026-11-11).
+# Never submits for review. That stays manual.
+on:
+  push:
+    branches: [testflight]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Archive, sign and check entitlements, but do not upload to TestFlight"
+        type: boolean
+        default: false
+
+concurrency:
+  group: testflight
+  cancel-in-progress: false
+
+jobs:
+  upload:
+    runs-on: macos-26
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read-only guard
+        run: python3 -I scripts/read_only_guard.py check
+
+      - name: Select the newest Xcode 26
+        run: |
+          XC=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          sudo xcode-select -s "$XC"
+          xcodebuild -version
+
+      - name: Tools
+        run: brew install xcodegen
+
+      - name: Generate project
+        run: xcodegen generate
+
+      - name: Write API key
+        env:
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: |
+          if [ -z "$ASC_KEY_P8" ]; then echo "::error::ASC_KEY_P8 secret is missing"; exit 1; fi
+          mkdir -p "$RUNNER_TEMP/keys"
+          printf '%s' "$ASC_KEY_P8" > "$RUNNER_TEMP/keys/AuthKey.p8"
+
+      - name: Archive
+        env:
+          KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ISSUER: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          set -o pipefail
+          xcodebuild archive \
+            -project Promptly.xcodeproj -scheme Promptly \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/Promptly.xcarchive" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$RUNNER_TEMP/keys/AuthKey.p8" \
+            -authenticationKeyID "$KEY_ID" \
+            -authenticationKeyIssuerID "$ISSUER" \
+            CURRENT_PROJECT_VERSION=$((1000 + ${{ github.run_number }})) \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" 2>&1 | tee "$RUNNER_TEMP/archive.log" | tail -n 40 \
+            || { grep -E "error:|Error|No profiles|No Accounts|certificate|provisioning" "$RUNNER_TEMP/archive.log" | sort -u | head -25 | while IFS= read -r l; do echo "::error::$l"; done; exit 1; }
+
+      - name: Sign the archive ad hoc with the app's entitlements
+        run: |
+          # The archive is built unsigned; sign it ad hoc with the App Group entitlement so export carries it.
+          APP="$RUNNER_TEMP/Promptly.xcarchive/Products/Applications/Promptly.app"
+          cp Config/Promptly.entitlements "$RUNNER_TEMP/ent.plist"
+          plutil -lint "$RUNNER_TEMP/ent.plist"
+          find "$APP" -depth \( -name "*.framework" -o -name "*.dylib" -o -name "*.appex" \) -print -exec codesign --force --sign - {} \;
+          codesign --force --sign - --entitlements "$RUNNER_TEMP/ent.plist" --generate-entitlement-der "$APP"
+          codesign -d --entitlements - "$APP" 2>&1 | tee "$RUNNER_TEMP/archive-ent.txt"
+          grep -q "group.com.grahamdeno.promptly" "$RUNNER_TEMP/archive-ent.txt" || { echo "::error::archive has no App Group entitlement"; exit 1; }
+
+      - name: Check usage descriptions in the archived app
+        run: |
+          PLIST="$RUNNER_TEMP/Promptly.xcarchive/Products/Applications/Promptly.app/Info.plist"
+          for key in NSCalendarsFullAccessUsageDescription NSAlarmKitUsageDescription BGTaskSchedulerPermittedIdentifiers; do
+            /usr/libexec/PlistBuddy -c "Print :$key" "$PLIST" >/dev/null || { echo "::error::$key missing from Info.plist"; exit 1; }
+          done
+          echo "::notice::Calendar, alarm and background refresh keys present"
+
+      - name: Export and upload
+        env:
+          KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ISSUER: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          set -o pipefail
+          cat > "$RUNNER_TEMP/export.plist" <<'P'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>teamID</key><string>7MHDTK68M2</string>
+            <key>destination</key><string>__DEST__</string>
+            <key>signingStyle</key><string>automatic</string>
+          </dict></plist>
+          P
+          DEST=upload; [ "${{ inputs.dry_run }}" = "true" ] && DEST=export
+          sed -i '' "s/__DEST__/$DEST/" "$RUNNER_TEMP/export.plist"
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/Promptly.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/export.plist" \
+            -exportPath "$RUNNER_TEMP/export" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$RUNNER_TEMP/keys/AuthKey.p8" \
+            -authenticationKeyID "$KEY_ID" \
+            -authenticationKeyIssuerID "$ISSUER" 2>&1 | tee "$RUNNER_TEMP/export.log" | tail -n 40 \
+            || { grep -E -i "error:|failed|certificate|provisioning|capabilit|entitlement" "$RUNNER_TEMP/export.log" | sort -u | head -25 | while IFS= read -r l; do echo "::error::$l"; done; exit 1; }
+          if [ "$DEST" = "export" ]; then
+            echo "::notice::Dry run: exported and signed. Nothing uploaded."
+          else
+            echo "::notice::Uploaded build $((1000 + ${{ github.run_number }})) to App Store Connect"
+          fi
+
+      - name: Remove key
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/keys"
