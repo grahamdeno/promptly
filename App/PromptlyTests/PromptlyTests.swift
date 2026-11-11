@@ -169,3 +169,13 @@ final class WidgetTimelineTests: XCTestCase {
         XCTAssertEqual(loaded.upcoming(at: now).map(\.id), ["n"])
     }
 }
+
+final class DayLabelTests: XCTestCase {
+    func testTodayTomorrowAndLater() {
+        let cal = Calendar.current
+        let now = cal.date(from: DateComponents(year: 2026, month: 11, day: 11, hour: 17))!
+        XCTAssertEqual(Countdown.day(now.addingTimeInterval(3600), now: now), "")
+        XCTAssertEqual(Countdown.day(now.addingTimeInterval(23 * 3600), now: now), "Tomorrow ")
+        XCTAssertFalse(Countdown.day(now.addingTimeInterval(3 * 86400), now: now).isEmpty)
+    }
+}

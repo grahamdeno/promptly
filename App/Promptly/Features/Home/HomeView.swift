@@ -78,18 +78,14 @@ struct HomeView: View {
     private func textColumn(now: Date, upcoming: [Meeting], next: Meeting?, showThen: Bool) -> some View {
         Group {
             if !model.calendarAuthorized || !model.alarmsAuthorized {
-                permissionNotice
+                permissionNotice.glassCard()
             } else if let next {
                 meetingBlock(next, now: now, then: showThen ? upcoming.dropFirst().first : nil)
             } else {
-                emptyBlock
+                emptyBlock.glassCard()
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 16)
-        .padding(.vertical, 14)
-        .glassEffect(.regular, in: .rect(cornerRadius: 26))
-        .padding(.horizontal, -16)
+        .padding(.horizontal, -12)
     }
 
     private func todayList(_ items: [Meeting]) -> some View {
@@ -103,6 +99,7 @@ struct HomeView: View {
             ForEach(items) { item in
                 HStack(alignment: .firstTextBaseline, spacing: 14) {
                     Text(Countdown.time(item.start))
+                        .lineLimit(1)
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(Brand.coralDark)
                         .frame(width: 72, alignment: .leading)
@@ -130,59 +127,67 @@ struct HomeView: View {
         .padding(.top, 8)
     }
 
+    /// Each kind of information gets its own card: the meeting, the countdown, and what's after it.
     private func meetingBlock(_ meeting: Meeting, now: Date, then: Meeting?) -> some View {
         let parts = Countdown.parts(now: now, start: meeting.start)
         let started = meeting.start <= now
-        return VStack(alignment: .leading, spacing: 8) {
-            Text(started ? "Happening now" : "Next")
-                .font(.system(size: 14, weight: .medium))
-                .foregroundStyle(Brand.secondary)
-            Text(meeting.title)
-                .font(Brand.display(34))
-                .tracking(-0.8)
-                .foregroundStyle(Brand.ink)
-                .lineLimit(3)
-            Text(subtitle(meeting))
-                .font(.system(size: 16))
-                .foregroundStyle(Brand.secondary)
-            HStack(alignment: .lastTextBaseline, spacing: 8) {
-                Text(parts.big)
-                    .font(.system(size: 64, weight: .medium))
-                    .tracking(-2.5)
-                    .monospacedDigit()
-                    .contentTransition(.numericText())
-                if !parts.unit.isEmpty {
-                    Text(parts.unit)
-                        .font(.system(size: 24, weight: .medium))
-                        .foregroundStyle(Brand.secondary)
-                }
-            }
-            .foregroundStyle(Brand.ink)
-            .padding(.top, 14)
-            .accessibilityElement(children: .combine)
-
-            if !model.taughtPop {
-                Text("Tap the bubble to pop it and join.")
-                    .font(.system(size: 15, weight: .medium))
+        return VStack(alignment: .leading, spacing: 18) {
+            VStack(alignment: .leading, spacing: 12) {
+                Text(started ? "Happening now" : "Next")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(Brand.secondary)
+                Text(meeting.title)
+                    .font(Brand.display(32))
+                    .tracking(-0.8)
                     .foregroundStyle(Brand.ink)
-                    .padding(.top, 10)
-                    .transition(.opacity)
-            }
-
-            HStack(spacing: 4) {
+                    .lineLimit(3)
+                Text(subtitle(meeting, now: now))
+                    .font(.system(size: 16))
+                    .foregroundStyle(Brand.secondary)
                 Button("Not going") { model.clear(meeting) }
                     .font(.system(size: 15, weight: .medium))
                     .foregroundStyle(Brand.secondary)
                     .underline()
                     .frame(minHeight: 44)
-                if let then {
-                    Text("·  Then \(Countdown.time(then.start)) \(then.title)")
-                        .font(.system(size: 15))
-                        .foregroundStyle(Brand.secondary)
-                        .lineLimit(1)
+            }
+            .glassCard()
+
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(alignment: .lastTextBaseline, spacing: 8) {
+                    Text(parts.big)
+                        .font(.system(size: 60, weight: .medium))
+                        .tracking(-2.5)
+                        .monospacedDigit()
+                        .contentTransition(.numericText())
+                    if !parts.unit.isEmpty {
+                        Text(parts.unit)
+                            .font(.system(size: 22, weight: .medium))
+                            .foregroundStyle(Brand.secondary)
+                    }
+                }
+                .foregroundStyle(Brand.ink)
+                .accessibilityElement(children: .combine)
+                if !model.taughtPop {
+                    Text("Tap the bubble to pop it and join.")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundStyle(Brand.ink)
+                        .transition(.opacity)
                 }
             }
-            .padding(.top, 6)
+            .glassCard()
+
+            if let then {
+                HStack(spacing: 8) {
+                    Text("Then")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(Brand.secondary)
+                    Text("\(Countdown.time(then.start, now: now))  \(then.title)")
+                        .font(.system(size: 15))
+                        .foregroundStyle(Brand.ink)
+                        .lineLimit(1)
+                }
+                .glassCard()
+            }
         }
     }
 
@@ -216,7 +221,7 @@ struct HomeView: View {
         }
     }
 
-    private func subtitle(_ meeting: Meeting) -> String {
-        [Countdown.span(meeting), meeting.service?.rawValue].compactMap { $0 }.joined(separator: " · ")
+    private func subtitle(_ meeting: Meeting, now: Date) -> String {
+        [Countdown.span(meeting, now: now), meeting.service?.rawValue].compactMap { $0 }.joined(separator: " · ")
     }
 }

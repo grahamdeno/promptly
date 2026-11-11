@@ -25,17 +25,29 @@ enum Countdown {
     }
 
     /// "10:00 to 10:30" in the phone's own time format.
-    static func span(_ meeting: Meeting) -> String {
+    /// "Tomorrow 4:35 PM to 5:05 PM", or just the times for today.
+    static func span(_ meeting: Meeting, now: Date = .now) -> String {
         let f = DateFormatter()
         f.timeStyle = .short
         f.dateStyle = .none
-        return "\(f.string(from: meeting.start)) to \(f.string(from: meeting.end))"
+        return day(meeting.start, now: now) + "\(f.string(from: meeting.start)) to \(f.string(from: meeting.end))"
     }
 
-    static func time(_ date: Date) -> String {
+    /// "10:30 AM" today, "Tomorrow 10:30 AM", or "Fri 10:30 AM".
+    static func time(_ date: Date, now: Date = .now) -> String {
         let f = DateFormatter()
         f.timeStyle = .short
         f.dateStyle = .none
-        return f.string(from: date)
+        return day(date, now: now) + f.string(from: date)
+    }
+
+    static func day(_ date: Date, now: Date = .now, calendar: Calendar = .current) -> String {
+        if calendar.isDate(date, inSameDayAs: now) { return "" }
+        if let tomorrow = calendar.date(byAdding: .day, value: 1, to: now), calendar.isDate(date, inSameDayAs: tomorrow) {
+            return "Tomorrow "
+        }
+        let f = DateFormatter()
+        f.setLocalizedDateFormatFromTemplate("EEE")
+        return f.string(from: date) + " "
     }
 }

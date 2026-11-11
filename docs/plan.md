@@ -124,6 +124,9 @@ Design canvas: https://claude.ai/artifact/6dpuMwrhhPZNf3aAZSfAEh
 - [x] Holistic fixes: no double buzz (Home's buzz pauses under the Now screen); a takeover waits while settings are
       open instead of being lost; the in-app alarm stops on pop, "Not going", or leaving the Now screen.
 - [x] Glint is a small stretched highlight along the curve, not a perfect dot.
+- [x] Home text split into separate glass cards (meeting with Not going, countdown, Then), spaced out more; Now
+      screen has the meeting card with Not going on its own small pill. Meetings not today show the day
+      ("Tomorrow 4:35 PM", "Fri 10:30 AM").
 - Known limit: the in-app alarm always uses Gum pops (Apple's default tone can't be played by an app).
 
 ## Later

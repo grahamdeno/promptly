@@ -29,7 +29,7 @@ struct NowView: View {
                 )
                 .ignoresSafeArea()
 
-                VStack(alignment: .leading, spacing: 10) {
+                VStack(alignment: .leading, spacing: 14) {
                     Text(status(now))
                         .font(.system(size: 14, weight: .medium))
                         .foregroundStyle(Brand.secondary)
@@ -41,20 +41,21 @@ struct NowView: View {
                     Text([Countdown.span(meeting), meeting.service?.rawValue].compactMap { $0 }.joined(separator: " · "))
                         .font(.system(size: 16))
                         .foregroundStyle(Brand.secondary)
+                }
+                .glassCard()
+                .overlay(alignment: .bottomLeading) {
                     Button("Not going") {
                         pops += 1
                         model.clear(meeting)
                         leave {}
                     }
                     .font(.system(size: 15, weight: .medium))
-                    .foregroundStyle(Brand.secondary)
-                    .underline()
+                    .foregroundStyle(Brand.ink)
+                    .padding(.horizontal, 18)
                     .frame(minHeight: 44)
+                    .glassEffect(.regular, in: .capsule)
+                    .offset(y: 56)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 18)
-                .padding(.vertical, 14)
-                .glassEffect(.regular, in: .rect(cornerRadius: 26))
                 .padding(.horizontal, 12)
                 .padding(.top, 60)
                 .frame(maxHeight: .infinity, alignment: .top)
