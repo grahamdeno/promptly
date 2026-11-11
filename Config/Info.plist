@@ -3,6 +3,9 @@
 <plist version="1.0">
 <dict>
 	<!-- Merged with the generated Info.plist. Background refresh keeps alarms in step with calendar changes. -->
+	<!-- Xcode has no INFOPLIST_KEY_ mapping for this one, so it lives here. Without it AlarmKit won't schedule. -->
+	<key>NSAlarmKitUsageDescription</key>
+	<string>Promptly rings before your meetings, even in Silent and Focus, so you don't miss them.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
