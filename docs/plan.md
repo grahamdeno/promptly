@@ -117,6 +117,37 @@ Design canvas: https://claude.ai/artifact/6dpuMwrhhPZNf3aAZSfAEh
       the bubble grows, the Now screen takes over at ring time, and extra bubbles bud after the start. Unlocked with
       Pop In closed, iOS shows only the banner; locked, Apple's full-screen alarm.
 
+## Sprint 12 (owner: no alarm banner while the app is open; holistic pass, 2026-11-11)
+- [x] While Pop In is on screen, Apple's alarms for anything in the next 20 min are held back (re-checked every 30 s);
+      Pop In takes over itself at ring time with its own looping gum-pops alarm sound. The moment Pop In leaves the
+      screen or the phone locks, all alarms are put back (background task). Test alarms follow the same rules.
+- [x] Holistic fixes: no double buzz (Home's buzz pauses under the Now screen); a takeover waits while settings are
+      open instead of being lost; the in-app alarm stops on pop, "Not going", or leaving the Now screen.
+- [x] Glint is a small stretched highlight along the curve, not a perfect dot.
+- [x] Home text split into separate glass cards (meeting with Not going, countdown, Then), spaced out more; Now
+      screen has the meeting card with Not going on its own small pill. Meetings not today show the day
+      ("Tomorrow 4:35 PM", "Fri 10:30 AM").
+- Known limit: the in-app alarm always uses Gum pops (Apple's default tone can't be played by an app).
+
+## Sprint 13: Beta prep, batch 1 (owner said go, 2026-11-11)
+Review: https://claude.ai/artifact/Xs4CqLSRPxh6u4VgfZJpko (App Store readiness review, decisions A-F, RICE backlog)
+- [x] Reliability: alarms put back on any loss of focus (inactive or background); re-plan on time zone and clock
+      changes; while open, a backup alarm 1 min after each soon ring (cancelled when Pop In takes over);
+      same-minute meetings merged into one alarm ("A + B").
+- [x] Smart alert rule (default): full alarm only for meetings with a video link, gentle notification for the rest;
+      per calendar Smart / Alarm / Gentle. Takeover only for full-alarm meetings.
+- [x] First run: one screen per permission explaining why first, calendar choice, then "You're covered" with the
+      next meeting, or "Try a pop" demo when nothing is coming up. Demo also on the empty Home.
+- [x] Settings: Calendars, Ring before (1/2/5/10), Alarm sound, Bubble color up front; Advanced folded; Diagnostics
+      (test alarms, alarm count, Bubble/Steady) hidden behind 5 taps on the version line.
+- [x] Accessibility: Dynamic Type via @ScaledMetric and text styles; VoiceOver meeting card with Join and Not going
+      actions; bubble hint; Reduce Motion already removes wobble, budding and poke.
+- [x] Undo: 5-second "Cleared … Undo" after a pop or Not going.
+- [x] Icon: Bubblegum primary icon; Coral alternate, switched automatically with the bubble color.
+- [x] Alarm sound "Recorded": the owner's recorded pops, cleaned and boosted (~20x), 23 s.
+- [x] site/: home, privacy and support pages for popin.tangomike.app, deployed by GitHub Pages (needs Pages enabled
+      and a DNS CNAME, via Grok).
+
 ## Later
 - iPad screenshots in App Store Connect before public release (Grok).
 - Smart filters: travel-time buffer, a second alert for chosen meetings, quiet hours.

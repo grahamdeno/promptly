@@ -46,6 +46,32 @@ enum PopHaptics {
     }
 }
 
+/// Pop In's own alarm while it's open (Apple's is held back then): the gum pops alarm on a loop, at full alarm
+/// volume, until the bubble is popped or "Not going" is tapped.
+@MainActor
+enum AlarmLoop {
+    private static var player: AVAudioPlayer?
+
+    static func start() {
+        let file = Prefs().alarmSound.fileName
+        guard player?.isPlaying != true,
+              let url = Bundle.main.url(forResource: (file as NSString).deletingPathExtension, withExtension: "wav"),
+              let p = try? AVAudioPlayer(contentsOf: url) else { return }
+        try? AVAudioSession.sharedInstance().setCategory(.playback, options: [.duckOthers])
+        try? AVAudioSession.sharedInstance().setActive(true)
+        p.numberOfLoops = -1
+        p.volume = 1
+        p.play()
+        player = p
+    }
+
+    static func stop() {
+        player?.stop()
+        player = nil
+        try? AVAudioSession.sharedInstance().setActive(false, options: [.notifyOthersOnDeactivation])
+    }
+}
+
 /// The airy gum pop (Sounds/pop.wav, made for Pop In). Ambient: stays quiet when the silent switch is on and
 /// mixes with whatever else is playing. Off when the owner turns off "Pop sound".
 @MainActor

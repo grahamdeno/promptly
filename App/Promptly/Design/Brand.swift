@@ -21,6 +21,21 @@ enum Brand {
     }
 }
 
+/// A glass card: keeps text readable when the bubble rises behind it.
+struct GlassCard: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 20)
+            .glassEffect(.regular, in: .rect(cornerRadius: 24))
+    }
+}
+
+extension View {
+    func glassCard() -> some View { modifier(GlassCard()) }
+}
+
 /// The lowercase wordmark with its coral dot.
 struct Wordmark: View {
     var body: some View {

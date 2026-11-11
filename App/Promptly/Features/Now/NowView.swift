@@ -7,6 +7,7 @@ struct NowView: View {
     @Environment(\.openURL) private var openURL
     @Environment(\.dismiss) private var dismiss
     @State private var pops = 0
+    @ScaledMetric(relativeTo: .largeTitle) private var titleSize: CGFloat = 40
 
     var body: some View {
         TimelineView(.periodic(from: .now, by: 1)) { context in
@@ -29,38 +30,40 @@ struct NowView: View {
                 )
                 .ignoresSafeArea()
 
-                VStack(alignment: .leading, spacing: 10) {
+                VStack(alignment: .leading, spacing: 14) {
                     Text(status(now))
                         .font(.system(size: 14, weight: .medium))
                         .foregroundStyle(Brand.secondary)
                     Text(meeting.title)
-                        .font(Brand.display(40))
+                        .font(.system(size: titleSize, weight: .semibold))
                         .tracking(-1)
                         .foregroundStyle(Brand.ink)
                         .lineLimit(4)
                     Text([Countdown.span(meeting), meeting.service?.rawValue].compactMap { $0 }.joined(separator: " · "))
                         .font(.system(size: 16))
                         .foregroundStyle(Brand.secondary)
+                }
+                .glassCard()
+                .overlay(alignment: .bottomLeading) {
                     Button("Not going") {
                         pops += 1
                         model.clear(meeting)
                         leave {}
                     }
                     .font(.system(size: 15, weight: .medium))
-                    .foregroundStyle(Brand.secondary)
-                    .underline()
+                    .foregroundStyle(Brand.ink)
+                    .padding(.horizontal, 18)
                     .frame(minHeight: 44)
+                    .glassEffect(.regular, in: .capsule)
+                    .offset(y: 56)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 18)
-                .padding(.vertical, 14)
-                .glassEffect(.regular, in: .rect(cornerRadius: 26))
                 .padding(.horizontal, 12)
                 .padding(.top, 60)
                 .frame(maxHeight: .infinity, alignment: .top)
             }
         }
         .hapticRamp(until: meeting.start, enabled: model.buzz)
+        .onDisappear { AlarmLoop.stop() }
     }
 
     /// Let the pop play, then leave.

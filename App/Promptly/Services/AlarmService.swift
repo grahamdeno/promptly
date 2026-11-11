@@ -49,11 +49,7 @@ final class AlarmService {
         ownedIDs = owned.intersection(Set(wanted.keys))
     }
 
-    /// A test alarm for `meeting`, ringing at `fire`, optionally with the Lock Screen countdown card first.
-    func scheduleTest(_ meeting: Meeting, fire: Date, countdown: TimeInterval?) async throws {
-        let planned = PlannedAlarm(id: UUID(), meeting: meeting, fireDate: fire, countdownSeconds: countdown)
-        try await schedule(planned)
-    }
+
 
     /// Silences any alarm that is ringing right now (the owner has opened Pop In or popped the bubble).
     func stopAlerting() {
@@ -99,7 +95,7 @@ final class AlarmService {
             stopIntent: nil,
             secondaryIntent: OpenMeetingIntent(meetingID: meeting.id, joinURL: meeting.joinURL?.absoluteString ?? "",
                                                alarmID: planned.id.uuidString),
-            sound: sound == .appleDefault ? .default : .named("bubble_blow_alarm.wav")
+            sound: sound == .appleDefault ? .default : .named(sound.fileName)
         )
         _ = try await manager.schedule(id: planned.id, configuration: configuration)
     }

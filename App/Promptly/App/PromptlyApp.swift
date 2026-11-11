@@ -11,7 +11,11 @@ struct PromptlyApp: App {
                 .environment(model)
         }
         .onChange(of: scenePhase) { _, phase in
-            if phase == .active { Task { await model.becameActive() } }
+            switch phase {
+            case .active: Task { await model.becameActive() }
+            case .inactive, .background: Task { await model.wentToBackground() }
+            default: break
+            }
         }
         .backgroundTask(.appRefresh(AppModel.refreshTaskID)) {
             await model.backgroundRefresh()
