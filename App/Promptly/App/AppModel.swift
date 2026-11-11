@@ -119,6 +119,7 @@ final class AppModel {
         let live = Set(meetings.map(\.id))
         let pruned = cleared.intersection(live)
         if pruned != cleared { cleared = pruned; prefs.clearedMeetingIDs = pruned }
+        writeWidgetSnapshot()
         await syncAlarms()
     }
 
@@ -165,13 +166,33 @@ final class AppModel {
         }
     }
 
-    /// From the Lock Screen or Dynamic Island card: promptly://meeting?id=…
+    /// From the Lock Screen or Dynamic Island card (promptly://meeting?id=…) or the Home Screen widget's bubble
+    /// (promptly://pop?id=…, which pops it on Home and then opens the meeting link).
     func open(_ url: URL) async {
-        guard url.scheme == "promptly", url.host == "meeting",
+        guard url.scheme == "promptly", url.host == "meeting" || url.host == "pop",
               let id = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems?.first(where: { $0.name == "id" })?.value
         else { return }
         if meetings.first(where: { $0.id == id }) == nil { await refresh() }
-        if let meeting = meetings.first(where: { $0.id == id }), !cleared.contains(id) { show(meeting) }
+        guard let meeting = meetings.first(where: { $0.id == id }), !cleared.contains(id) else { return }
+        if url.host == "meeting" {
+            show(meeting)
+            return
+        }
+        // Let Home appear, pop the bubble there, then open the link once the pop has played.
+        shownNowFor.insert(meeting.id)
+        arrived = nil
+        try? await Task.sleep(for: .milliseconds(450))
+        let link = join(meeting)
+        try? await Task.sleep(for: .milliseconds(450))
+        if let link { linkToOpen = link }
+    }
+
+    private func writeWidgetSnapshot() {
+        let items = meetings.filter { !cleared.contains($0.id) }.prefix(12).map {
+            WidgetSnapshot.Item(id: $0.id, title: $0.title, start: $0.start, end: $0.end,
+                                service: $0.service?.rawValue ?? "", hasLink: $0.joinURL != nil)
+        }
+        WidgetSnapshot(items: Array(items)).save()
     }
 
     private func show(_ meeting: Meeting) {
@@ -195,6 +216,7 @@ final class AppModel {
         cleared.insert(meeting.id)
         prefs.clearedMeetingIDs = cleared
         popCount += 1
+        writeWidgetSnapshot()
         Task { await syncAlarms() }
     }
 }

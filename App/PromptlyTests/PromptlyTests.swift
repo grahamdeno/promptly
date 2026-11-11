@@ -132,3 +132,40 @@ final class CountdownCardAndBuzzTests: XCTestCase {
         XCTAssertEqual(URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems?.first?.value, "ABC:12/3@1800000000")
     }
 }
+
+final class WidgetTimelineTests: XCTestCase {
+    private let now = Date(timeIntervalSince1970: 1_800_000_000)
+
+    func testMinuteStepsInTheLastHourAndFiveMinuteStepsBefore() {
+        let start = now.addingTimeInterval(90 * 60)
+        let dates = WidgetTimeline.entryDates(now: now, start: start, end: start.addingTimeInterval(1800))
+        XCTAssertEqual(dates.first, now)
+        XCTAssertTrue(dates.contains(start))
+        XCTAssertTrue(dates.contains(start.addingTimeInterval(1800)))
+        XCTAssertEqual(dates[1].timeIntervalSince(dates[0]), 300)
+        let lastHour = dates.filter { $0 > start.addingTimeInterval(-3600) && $0 < start }
+        XCTAssertGreaterThanOrEqual(lastHour.count, 55)
+        XCTAssertLessThanOrEqual(dates.count, 92)
+    }
+
+    func testNothingUpcoming() {
+        XCTAssertEqual(WidgetTimeline.entryDates(now: now, start: nil, end: nil), [now])
+    }
+
+    func testPopLink() {
+        let url = WidgetTimeline.popURL(meetingID: "A:1@2")!
+        XCTAssertEqual(url.host, "pop")
+        XCTAssertEqual(URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems?.first?.value, "A:1@2")
+    }
+
+    func testSnapshotRoundTripAndUpcoming() {
+        let defaults = UserDefaults(suiteName: "promptly.tests.\(UUID().uuidString)")!
+        let past = WidgetSnapshot.Item(id: "p", title: "Done", start: now.addingTimeInterval(-7200),
+                                       end: now.addingTimeInterval(-3600), service: "", hasLink: false)
+        let next = WidgetSnapshot.Item(id: "n", title: "Sync", start: now.addingTimeInterval(600),
+                                       end: now.addingTimeInterval(2400), service: "Zoom", hasLink: true)
+        WidgetSnapshot(items: [next, past]).save(defaults: defaults)
+        let loaded = WidgetSnapshot.load(defaults: defaults)
+        XCTAssertEqual(loaded.upcoming(at: now).map(\.id), ["n"])
+    }
+}

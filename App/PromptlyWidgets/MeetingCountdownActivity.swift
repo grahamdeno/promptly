@@ -7,6 +7,7 @@ import WidgetKit
 struct PromptlyWidgetsBundle: WidgetBundle {
     var body: some Widget {
         MeetingCountdownActivity()
+        NextMeetingWidget()
     }
 }
 

@@ -47,6 +47,7 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.grahamdeno.promptly.widgets
+        CODE_SIGN_ENTITLEMENTS: Config/PromptlyWidgets.entitlements
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_FILE: Config/Widgets-Info.plist
         INFOPLIST_KEY_CFBundleDisplayName: Promptly

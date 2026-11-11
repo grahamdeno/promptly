@@ -92,15 +92,19 @@ struct BubbleView: View {
         .accessibilityHidden(onPop == nil)
     }
 
-    /// Slow swelling near the start; a fine tremble at the start. No bounce.
+    /// Slow swelling near the start, a tremble that builds over the last few minutes, strongest at the start.
+    /// No bounce.
     private func idleMotion(_ t: TimeInterval) -> (sx: CGFloat, sy: CGFloat, dx: CGFloat, dy: CGFloat) {
         guard style == .bubble, !reduceMotion, !popping else { return (1, 1, 0, 0) }
         if progress >= 1 {
-            return (1.02, 1.03, CGFloat(0.7 * sin(t * 45)), CGFloat(0.5 * sin(t * 53 + 1)))
+            return (1.02, 1.03, CGFloat(1.2 * sin(t * 45)), CGFloat(0.9 * sin(t * 53 + 1)))
         }
         if progress > 0.7 {
             let s = (1 - cos(t * 2 * .pi / 2.8)) / 2
-            return (CGFloat(1 + 0.012 * s), CGFloat(1 + 0.022 * s), 0, 0)
+            // From 90 percent the tremble fades in and grows toward the start.
+            let shake = progress > 0.9 ? 0.9 * (progress - 0.9) / 0.1 : 0
+            return (CGFloat(1 + 0.012 * s), CGFloat(1 + 0.022 * s),
+                    CGFloat(shake * sin(t * 45)), CGFloat(shake * 0.7 * sin(t * 53 + 1)))
         }
         return (1, 1, 0, 0)
     }
