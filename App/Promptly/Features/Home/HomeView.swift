@@ -51,10 +51,12 @@ struct HomeView: View {
                 }
             }
         }
-        .hapticRamp(until: model.upcoming(at: .now).first?.start, enabled: model.buzz)
+        .hapticRamp(until: model.upcoming(at: .now).first?.start, enabled: model.buzz && model.arrived == nil)
         .sheet(isPresented: $showCalendars) {
             CalendarsView(firstRun: false)
                 .environment(model)
+                .onAppear { model.settingsOpen = true }
+                .onDisappear { model.settingsOpen = false }
         }
     }
 

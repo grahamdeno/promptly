@@ -117,6 +117,15 @@ Design canvas: https://claude.ai/artifact/6dpuMwrhhPZNf3aAZSfAEh
       the bubble grows, the Now screen takes over at ring time, and extra bubbles bud after the start. Unlocked with
       Pop In closed, iOS shows only the banner; locked, Apple's full-screen alarm.
 
+## Sprint 12 (owner: no alarm banner while the app is open; holistic pass, 2026-11-11)
+- [x] While Pop In is on screen, Apple's alarms for anything in the next 20 min are held back (re-checked every 30 s);
+      Pop In takes over itself at ring time with its own looping gum-pops alarm sound. The moment Pop In leaves the
+      screen or the phone locks, all alarms are put back (background task). Test alarms follow the same rules.
+- [x] Holistic fixes: no double buzz (Home's buzz pauses under the Now screen); a takeover waits while settings are
+      open instead of being lost; the in-app alarm stops on pop, "Not going", or leaving the Now screen.
+- [x] Glint is a small stretched highlight along the curve, not a perfect dot.
+- Known limit: the in-app alarm always uses Gum pops (Apple's default tone can't be played by an app).
+
 ## Later
 - iPad screenshots in App Store Connect before public release (Grok).
 - Smart filters: travel-time buffer, a second alert for chosen meetings, quiet hours.

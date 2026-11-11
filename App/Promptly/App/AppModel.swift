@@ -19,6 +19,15 @@ final class AppModel {
     var meetings: [Meeting] = []
     /// Pretend meetings from the "Check the alarm" buttons, so the test also shows the bubble and the takeover.
     var testMeetings: [Meeting] = []
+    /// Alarms for the test meetings (kept with the meeting alarms so the same open/closed rules apply).
+    @ObservationIgnored private var testPlanned: [PlannedAlarm] = []
+    /// True while Pop In is on screen. Then Pop In itself takes over at ring time, so Apple's alarm (and its banner
+    /// and Lock Screen card) is held back for meetings in the next 20 minutes, and put back the moment Pop In leaves
+    /// the screen or the phone locks.
+    @ObservationIgnored private var isForeground = false
+    static let openQuietWindow: TimeInterval = 20 * 60
+    /// Set while the settings sheet is open, so a takeover waits until it closes.
+    @ObservationIgnored var settingsOpen = false
     var calendars: [CalendarInfo] = []
     var calendarAuthorized = false
     var alarmsAuthorized = false
@@ -151,6 +160,7 @@ final class AppModel {
     }
 
     func becameActive() async {
+        isForeground = true
         applyKeepAwake()
         calendarAuthorized = calendarService.isAuthorized
         alarmsAuthorized = alarmService.isAuthorized
@@ -166,18 +176,33 @@ final class AppModel {
     /// meeting's alarm time arrives, like In Your Face. Apple's alarm still rings alongside.
     @ObservationIgnored private var watcher: Task<Void, Never>?
 
+    /// Pop In left the screen or the phone locked: put Apple's alarms back for everything, right away.
+    func wentToBackground() async {
+        isForeground = false
+        watcher?.cancel()
+        AlarmLoop.stop()
+        let task = UIApplication.shared.beginBackgroundTask(withName: "restore-alarms")
+        await syncAlarms()
+        UIApplication.shared.endBackgroundTask(task)
+    }
+
     private func startWatching() {
         watcher?.cancel()
         watcher = Task { @MainActor [weak self] in
+            var tick = 0
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(2))
-                guard let self, UIApplication.shared.applicationState == .active, self.arrived == nil else { continue }
+                tick += 1
+                // Every half minute, hold back any alarm that has come within the quiet window.
+                if tick % 15 == 0 { await self?.syncAlarms() }
+                guard let self, UIApplication.shared.applicationState == .active, self.arrived == nil,
+                      !self.settingsOpen else { continue }
                 let now = Date.now
                 let lead = TimeInterval(self.leadMinutes * 60)
                 if let due = self.upcoming(at: now).first(where: {
                     now >= $0.start.addingTimeInterval(-lead) && now <= $0.start.addingTimeInterval(5 * 60)
                 }), !self.shownNowFor.contains(due.id) {
-                    self.show(due)
+                    self.show(due, ring: true)
                 }
             }
         }
@@ -204,12 +229,17 @@ final class AppModel {
         guard alarmsAuthorized else { return }
         let alarmMeetings = meetings.filter { !gentleCalendarIDs.contains($0.calendarID) }
         let gentleMeetings = meetings.filter { gentleCalendarIDs.contains($0.calendarID) }
-        let planned = AlarmPlanner.plan(meetings: alarmMeetings, leadMinutes: leadMinutes, now: .now, cleared: cleared,
+        let now = Date.now
+        let planned = AlarmPlanner.plan(meetings: alarmMeetings, leadMinutes: leadMinutes, now: now, cleared: cleared,
                                         countdown: countdownCard)
-        let gentlePlanned = AlarmPlanner.plan(meetings: gentleMeetings, leadMinutes: leadMinutes, now: .now, cleared: cleared)
-        nextAlarm = planned.first?.fireDate
+        let gentlePlanned = AlarmPlanner.plan(meetings: gentleMeetings, leadMinutes: leadMinutes, now: now, cleared: cleared)
+        testPlanned = testPlanned.filter { $0.fireDate > now && !cleared.contains($0.meeting.id) }
+        let all = (planned + testPlanned).sorted { $0.fireDate < $1.fireDate }
+        nextAlarm = all.first?.fireDate
+        // While Pop In is open it handles anything soon itself; Apple's alarm only covers later meetings.
+        let toSchedule = isForeground ? all.filter { $0.scheduleDate > now.addingTimeInterval(Self.openQuietWindow) } : all
         do {
-            try await alarmService.sync(planned)
+            try await alarmService.sync(toSchedule)
             syncProblem = nil
             scheduledAlarms = alarmService.scheduledCount
         } catch {
@@ -232,14 +262,11 @@ final class AppModel {
             let meeting = Meeting(id: "test-\(UUID().uuidString)", eventID: "test", title: "Test meeting",
                                   start: start, end: start.addingTimeInterval(10 * 60), calendarID: "test", joinURL: nil)
             testMeetings = [meeting]
-            if withCountdown {
-                try await alarmService.scheduleTest(meeting, fire: fire, countdown: 60)
-                testMessage = "Lock your phone to see Apple's alarm screen: the card in about 30 seconds, the ring 60 seconds later. Or close this and leave Pop In open to watch the bubble take over."
-            } else {
-                try await alarmService.scheduleTest(meeting, fire: fire, countdown: nil)
-                testMessage = "Lock your phone to see Apple's alarm screen in 20 seconds. Or close this and leave Pop In open to watch the bubble take over."
-            }
-            scheduledAlarms = alarmService.scheduledCount
+            testPlanned = [PlannedAlarm(id: UUID(), meeting: meeting, fireDate: fire, countdownSeconds: withCountdown ? 60 : nil)]
+            await syncAlarms()
+            testMessage = withCountdown
+                ? "Close this and either leave Pop In open (the bubble takes over in about 90 seconds) or lock your phone (Apple's card in about 30 seconds, then the alarm)."
+                : "Close this and either leave Pop In open (the bubble takes over in 20 seconds) or lock your phone (Apple's alarm in 20 seconds)." 
         } catch {
             testMessage = "Couldn't set the test alarm: \(error.localizedDescription)"
         }
@@ -304,9 +331,13 @@ final class AppModel {
         WidgetSnapshot(items: Array(items)).save()
     }
 
-    private func show(_ meeting: Meeting) {
+    /// `ring`: Pop In was open at ring time, so Apple's alarm was held back and Pop In rings itself until the
+    /// bubble is popped. Arriving from Apple's alarm (already heard) doesn't ring again.
+    private func show(_ meeting: Meeting, ring: Bool = false) {
+        guard !settingsOpen else { return }   // the watcher tries again once settings close
         shownNowFor.insert(meeting.id)
         arrived = meeting
+        if ring && isForeground { AlarmLoop.start() }
     }
 
     // MARK: Join and clear
@@ -323,6 +354,7 @@ final class AppModel {
 
     private func markCleared(_ meeting: Meeting) {
         alarmService.stopAlerting()
+        AlarmLoop.stop()
         cleared.insert(meeting.id)
         prefs.clearedMeetingIDs = cleared
         popCount += 1

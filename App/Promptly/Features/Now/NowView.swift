@@ -61,6 +61,7 @@ struct NowView: View {
             }
         }
         .hapticRamp(until: meeting.start, enabled: model.buzz)
+        .onDisappear { AlarmLoop.stop() }
     }
 
     /// Let the pop play, then leave.

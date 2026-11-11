@@ -392,10 +392,12 @@ struct GumBubbleShape: View {
                     .rotationEffect(.degrees(-32))
                     .blur(radius: 1)
                     .position(x: w * 0.31, y: h * 0.25)
-                // A sharp pinpoint glint.
-                Circle()
-                    .fill(.white.opacity(0.95))
-                    .frame(width: max(6, w * 0.032), height: max(6, w * 0.032))
+                // A small glint, stretched along the curve like the other highlights.
+                Ellipse()
+                    .fill(.white.opacity(0.85))
+                    .frame(width: max(10, w * 0.055), height: max(4, w * 0.02))
+                    .rotationEffect(.degrees(24))
+                    .blur(radius: 1.2)
                     .position(x: w * 0.6, y: h * 0.1)
                 // A thin rim of light on the far edge.
                 Ellipse()

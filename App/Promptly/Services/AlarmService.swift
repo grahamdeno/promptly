@@ -49,11 +49,7 @@ final class AlarmService {
         ownedIDs = owned.intersection(Set(wanted.keys))
     }
 
-    /// A test alarm for `meeting`, ringing at `fire`, optionally with the Lock Screen countdown card first.
-    func scheduleTest(_ meeting: Meeting, fire: Date, countdown: TimeInterval?) async throws {
-        let planned = PlannedAlarm(id: UUID(), meeting: meeting, fireDate: fire, countdownSeconds: countdown)
-        try await schedule(planned)
-    }
+
 
     /// Silences any alarm that is ringing right now (the owner has opened Pop In or popped the bubble).
     func stopAlerting() {
