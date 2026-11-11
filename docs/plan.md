@@ -45,6 +45,13 @@ Design canvas: https://claude.ai/artifact/6dpuMwrhhPZNf3aAZSfAEh
 - [ ] On-device check: the card appears ten minutes before the ring and the alarm rings at meeting minus lead. If
       it rings ten minutes early instead, set `AlarmPlanner.countdownStartsAtSchedule = false`.
 
+## Sprint 3 (owner said build and ship, 2026-11-11)
+- [x] Realistic pop: the film tears near the top into eight ragged sheets that part, snap back down toward the
+      bottom edge and crumple into a small lump; a few tiny bits come off the tear; the next bubble inflates out of
+      the lump. Replaces the flying dots.
+- Answered: no third-party app can show its own full-screen alert over the Lock Screen; AlarmKit's alarm is the only
+  full-screen option (Critical Alerts and fake incoming calls ruled out).
+
 ## Later
 - Small and medium Home Screen widgets (designs on the canvas).
 - Smart filters: travel-time buffer, a second alert for chosen meetings, quiet hours.
