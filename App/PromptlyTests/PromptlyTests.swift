@@ -84,3 +84,51 @@ final class PendingJoinTests: XCTestCase {
         XCTAssertNil(PendingJoin.take(now: Date().addingTimeInterval(700), defaults: defaults))
     }
 }
+
+final class CountdownCardAndBuzzTests: XCTestCase {
+    private let now = Date(timeIntervalSince1970: 1_800_000_000)
+
+    private func meeting(inMinutes m: Double) -> Meeting {
+        let start = now.addingTimeInterval(m * 60)
+        return Meeting(id: Meeting.makeID(eventID: "e", start: start), eventID: "e", title: "Sync",
+                       start: start, end: start.addingTimeInterval(1800), calendarID: "c", joinURL: nil)
+    }
+
+    func testCountdownStartsTenMinutesBeforeTheRing() {
+        let m = meeting(inMinutes: 60)
+        let plan = AlarmPlanner.plan(meetings: [m], leadMinutes: 1, now: now, cleared: [], countdown: true)
+        XCTAssertEqual(plan.first?.countdownSeconds, AlarmPlanner.countdownWindow)
+        XCTAssertEqual(plan.first?.fireDate, m.start.addingTimeInterval(-60))
+        XCTAssertEqual(plan.first?.scheduleDate, m.start.addingTimeInterval(-60 - AlarmPlanner.countdownWindow))
+    }
+
+    func testNoCountdownWhenTooClose() {
+        let plan = AlarmPlanner.plan(meetings: [meeting(inMinutes: 8)], leadMinutes: 1, now: now, cleared: [], countdown: true)
+        XCTAssertNil(plan.first?.countdownSeconds)
+        XCTAssertEqual(plan.first?.scheduleDate, plan.first?.fireDate)
+    }
+
+    func testCountdownChangesTheAlarmID() {
+        let m = meeting(inMinutes: 60)
+        XCTAssertNotEqual(AlarmPlanner.stableID(for: m, leadMinutes: 1, countdown: true),
+                          AlarmPlanner.stableID(for: m, leadMinutes: 1, countdown: false))
+    }
+
+    func testBuzzBuildsTowardTheStart() {
+        XCTAssertNil(HapticCurve.at(remaining: 11 * 60))
+        let early = HapticCurve.at(remaining: 9 * 60)!
+        let late = HapticCurve.at(remaining: 30)!
+        XCTAssertLessThan(early.intensity, late.intensity)
+        XCTAssertGreaterThan(early.interval, late.interval)
+        XCTAssertEqual(HapticCurve.at(remaining: 0)?.intensity, 1)
+        XCTAssertNil(HapticCurve.at(remaining: -61))
+    }
+
+    func testMetadataLinkCarriesTheMeetingID() {
+        let meta = MeetingAlarmMetadata(meetingID: "ABC:12/3@1800000000", title: "Sync", start: now, service: "Teams",
+                                        countdownSeconds: 600)
+        let url = meta.openURL!
+        XCTAssertEqual(url.scheme, "promptly")
+        XCTAssertEqual(URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems?.first?.value, "ABC:12/3@1800000000")
+    }
+}

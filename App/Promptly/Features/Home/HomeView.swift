@@ -1,7 +1,7 @@
 import SwiftUI
 import UIKit
 
-/// Home: the next meeting and how long until it, with the bubble growing underneath.
+/// Home: the next meeting and how long until it. The gum bubble inflates underneath; tap it to pop it and join.
 struct HomeView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.openURL) private var openURL
@@ -11,34 +11,40 @@ struct HomeView: View {
         TimelineView(.periodic(from: .now, by: 1)) { context in
             let now = context.date
             let upcoming = model.upcoming(at: now)
-            let next = upcoming.first
+            let next = model.calendarAuthorized && model.alarmsAuthorized ? upcoming.first : nil
             let progress = next.map { Countdown.progress(now: now, start: $0.start) } ?? 0
 
             ZStack {
                 Color.white.ignoresSafeArea()
 
-                BubbleView(progress: progress, style: model.ballStyle, popCount: model.popCount)
-                    .ignoresSafeArea()
+                BubbleView(
+                    progress: progress,
+                    style: model.ballStyle,
+                    popCount: model.popCount,
+                    hint: next.map { $0.joinURL == nil ? "Pop when ready" : "Pop to join" },
+                    accessibilityTitle: next.map { ($0.joinURL == nil ? "Pop the bubble to clear " : "Pop the bubble to join ") + $0.title } ?? "",
+                    onPop: next.map { meeting -> () -> Void in
+                        { if let url = model.join(meeting) { openURL(url) } }
+                    }
+                )
+                .ignoresSafeArea()
 
                 VStack(alignment: .leading, spacing: 0) {
                     header
-                    Spacer(minLength: 24)
+                    Spacer(minLength: 24).frame(maxHeight: 64)
                     if !model.calendarAuthorized || !model.alarmsAuthorized {
                         permissionNotice
                     } else if let next {
-                        meetingBlock(next, now: now)
+                        meetingBlock(next, now: now, then: upcoming.dropFirst().first)
                     } else {
                         emptyBlock
                     }
                     Spacer()
-                    if let next {
-                        actionPane(next, then: upcoming.dropFirst().first)
-                    }
                 }
                 .padding(.horizontal, 28)
-                .padding(.bottom, 40)
             }
         }
+        .hapticRamp(until: model.upcoming(at: .now).first?.start, enabled: model.buzz)
         .sheet(isPresented: $showCalendars) {
             CalendarsView(firstRun: false)
                 .environment(model)
@@ -60,10 +66,10 @@ struct HomeView: View {
         .padding(.top, 8)
     }
 
-    private func meetingBlock(_ meeting: Meeting, now: Date) -> some View {
+    private func meetingBlock(_ meeting: Meeting, now: Date, then: Meeting?) -> some View {
         let parts = Countdown.parts(now: now, start: meeting.start)
         let started = meeting.start <= now
-        return VStack(alignment: .leading, spacing: 10) {
+        return VStack(alignment: .leading, spacing: 8) {
             Text(started ? "Happening now" : "Next")
                 .font(.system(size: 14, weight: .medium))
                 .foregroundStyle(Brand.secondary)
@@ -77,19 +83,34 @@ struct HomeView: View {
                 .foregroundStyle(Brand.secondary)
             HStack(alignment: .lastTextBaseline, spacing: 8) {
                 Text(parts.big)
-                    .font(.system(size: 76, weight: .medium))
-                    .tracking(-3)
+                    .font(.system(size: 64, weight: .medium))
+                    .tracking(-2.5)
                     .monospacedDigit()
                     .contentTransition(.numericText())
                 if !parts.unit.isEmpty {
                     Text(parts.unit)
-                        .font(.system(size: 28, weight: .medium))
+                        .font(.system(size: 24, weight: .medium))
                         .foregroundStyle(Brand.secondary)
                 }
             }
             .foregroundStyle(Brand.ink)
-            .padding(.top, 18)
+            .padding(.top, 14)
             .accessibilityElement(children: .combine)
+
+            HStack(spacing: 4) {
+                Button("Not going") { model.clear(meeting) }
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundStyle(Brand.secondary)
+                    .underline()
+                    .frame(minHeight: 44)
+                if let then {
+                    Text("·  Then \(Countdown.time(then.start)) \(then.title)")
+                        .font(.system(size: 15))
+                        .foregroundStyle(Brand.secondary)
+                        .lineLimit(1)
+                }
+            }
+            .padding(.top, 6)
         }
     }
 
@@ -123,39 +144,7 @@ struct HomeView: View {
         }
     }
 
-    private func actionPane(_ meeting: Meeting, then: Meeting?) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            if let then {
-                HStack(spacing: 6) {
-                    Text("Then").foregroundStyle(Brand.secondary)
-                    Text("\(Countdown.time(then.start)) \(then.title)")
-                        .fontWeight(.medium)
-                        .foregroundStyle(Brand.ink)
-                        .lineLimit(1)
-                }
-                .font(.system(size: 15))
-                .padding(.horizontal, 6)
-            }
-            HStack(spacing: 10) {
-                if meeting.joinURL != nil {
-                    Button(joinTitle(meeting)) {
-                        if let url = model.join(meeting) { openURL(url) }
-                    }
-                    .buttonStyle(PrimaryButtonStyle())
-                }
-                Button("Clear") { model.clear(meeting) }
-                    .buttonStyle(SecondaryButtonStyle(fill: meeting.joinURL == nil))
-            }
-        }
-        .padding(14)
-        .glassEffect(.regular, in: .rect(cornerRadius: 28))
-    }
-
     private func subtitle(_ meeting: Meeting) -> String {
         [Countdown.span(meeting), meeting.service?.rawValue].compactMap { $0 }.joined(separator: " · ")
-    }
-
-    private func joinTitle(_ meeting: Meeting) -> String {
-        meeting.service.map { "Join \($0.rawValue)" } ?? "Join"
     }
 }

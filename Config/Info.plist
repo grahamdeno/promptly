@@ -6,6 +6,21 @@
 	<!-- Xcode has no INFOPLIST_KEY_ mapping for this one, so it lives here. Without it AlarmKit won't schedule. -->
 	<key>NSAlarmKitUsageDescription</key>
 	<string>Promptly rings before your meetings, even in Silent and Focus, so you don't miss them.</string>
+	<!-- The Lock Screen and Dynamic Island countdown card (PromptlyWidgets). -->
+	<key>NSSupportsLiveActivities</key>
+	<true/>
+	<!-- promptly://meeting?id=… opens the Now screen from the card. -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.grahamdeno.promptly</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>promptly</string>
+			</array>
+		</dict>
+	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>

@@ -81,10 +81,11 @@ jobs:
       - name: Check usage descriptions in the archived app
         run: |
           PLIST="$RUNNER_TEMP/Promptly.xcarchive/Products/Applications/Promptly.app/Info.plist"
-          for key in NSCalendarsFullAccessUsageDescription NSAlarmKitUsageDescription BGTaskSchedulerPermittedIdentifiers; do
+          for key in NSCalendarsFullAccessUsageDescription NSAlarmKitUsageDescription BGTaskSchedulerPermittedIdentifiers NSSupportsLiveActivities; do
             /usr/libexec/PlistBuddy -c "Print :$key" "$PLIST" >/dev/null || { echo "::error::$key missing from Info.plist"; exit 1; }
           done
-          echo "::notice::Calendar, alarm and background refresh keys present"
+          [ -d "$RUNNER_TEMP/Promptly.xcarchive/Products/Applications/Promptly.app/PlugIns/PromptlyWidgets.appex" ] || { echo "::error::Lock Screen card extension is not embedded"; exit 1; }
+          echo "::notice::Calendar, alarm, background refresh and Live Activity keys present; card extension embedded"
 
       - name: Export and upload
         env:

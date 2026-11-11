@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// The meeting that just rang, full screen: the bubble has risen, one decision to make.
+/// The meeting that just rang, full screen: the bubble has risen. Pop it to join, or say you're not going.
 struct NowView: View {
     let meeting: Meeting
     @Environment(AppModel.self) private var model
@@ -14,9 +14,19 @@ struct NowView: View {
             ZStack {
                 Color.white.ignoresSafeArea()
 
-                BubbleView(progress: 1, style: model.ballStyle, popCount: pops,
-                           minSize: 760, maxSize: 760, steadySize: 520)
-                    .ignoresSafeArea()
+                BubbleView(
+                    progress: 1,
+                    style: model.ballStyle,
+                    popCount: pops,
+                    hint: meeting.joinURL == nil ? "Pop when ready" : "Pop to join",
+                    accessibilityTitle: (meeting.joinURL == nil ? "Pop the bubble to clear " : "Pop the bubble to join ") + meeting.title,
+                    minSize: 760, maxSize: 760, steadySize: 520,
+                    onPop: {
+                        let url = model.join(meeting)
+                        leave { if let url { openURL(url) } }
+                    }
+                )
+                .ignoresSafeArea()
 
                 VStack(alignment: .leading, spacing: 10) {
                     Text(status(now))
@@ -30,42 +40,28 @@ struct NowView: View {
                     Text([Countdown.span(meeting), meeting.service?.rawValue].compactMap { $0 }.joined(separator: " · "))
                         .font(.system(size: 16))
                         .foregroundStyle(Brand.secondary)
+                    Button("Not going") {
+                        pops += 1
+                        model.clear(meeting)
+                        leave {}
+                    }
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundStyle(Brand.secondary)
+                    .underline()
+                    .frame(minHeight: 44)
                     Spacer()
-                    pane
                 }
                 .padding(.horizontal, 28)
                 .padding(.top, 72)
-                .padding(.bottom, 40)
             }
         }
+        .hapticRamp(until: meeting.start, enabled: model.buzz)
     }
 
-    private var pane: some View {
-        VStack(spacing: 10) {
-            if meeting.joinURL != nil {
-                Button {
-                    let url = model.join(meeting)
-                    finish { if let url { openURL(url) } }
-                } label: {
-                    Label(meeting.service.map { "Join \($0.rawValue)" } ?? "Join", systemImage: "video.fill")
-                }
-                .buttonStyle(PrimaryButtonStyle(height: 56))
-            }
-            Button(meeting.joinURL == nil ? "Got it" : "Not going") {
-                model.clear(meeting)
-                finish {}
-            }
-            .buttonStyle(SecondaryButtonStyle(height: 48, fill: true))
-        }
-        .padding(16)
-        .glassEffect(.regular, in: .rect(cornerRadius: 30))
-    }
-
-    /// Pop the bubble, then leave.
-    private func finish(_ then: @escaping () -> Void) {
-        pops += 1
+    /// Let the pop play, then leave.
+    private func leave(_ then: @escaping () -> Void) {
         Task { @MainActor in
-            try? await Task.sleep(for: .milliseconds(550))
+            try? await Task.sleep(for: .milliseconds(500))
             dismiss()
             then()
         }
