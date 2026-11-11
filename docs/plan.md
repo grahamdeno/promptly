@@ -52,6 +52,10 @@ Design canvas: https://claude.ai/artifact/6dpuMwrhhPZNf3aAZSfAEh
 - Answered: no third-party app can show its own full-screen alert over the Lock Screen; AlarmKit's alarm is the only
   full-screen option (Critical Alerts and fake incoming calls ruled out).
 
+## Sprint 4 (owner feedback, 2026-11-11)
+- [x] Pop scraps fly higher and farther (up to ~400 pt up, ~220 pt out), tumble, then fall and fade; oddly shaped
+      lumpy scraps with torn notches plus stretched strands instead of triangles; the pop lasts about 1.2 s.
+
 ## Later
 - Small and medium Home Screen widgets (designs on the canvas).
 - Smart filters: travel-time buffer, a second alert for chosen meetings, quiet hours.

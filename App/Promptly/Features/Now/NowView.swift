@@ -61,7 +61,7 @@ struct NowView: View {
     /// Let the pop play, then leave.
     private func leave(_ then: @escaping () -> Void) {
         Task { @MainActor in
-            try? await Task.sleep(for: .milliseconds(500))
+            try? await Task.sleep(for: .milliseconds(1000))
             dismiss()
             then()
         }
