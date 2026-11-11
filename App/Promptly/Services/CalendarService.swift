@@ -30,7 +30,7 @@ final class CalendarService {
                                                  calendars: calendars)
         return store.events(matching: predicate).compactMap { event -> Meeting? in
             guard !event.isAllDay, event.status != .canceled else { return nil }
-            if let me = event.attendees?.first(where: { $0.isCurrentUser }), me.participationStatus == .declined {
+            if let me = event.attendees?.first(where: { $0.isCurrentUser }), me.participantStatus == .declined {
                 return nil
             }
             let link = MeetingLinkDetector.firstMeetingLink(in: [event.url?.absoluteString, event.location, event.notes])
