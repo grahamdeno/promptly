@@ -9,6 +9,9 @@ import SwiftUI
 /// It also pops when `popCount` changes (for "Not going"). Anchored to the bottom edge, mostly below the screen.
 struct BubbleView: View {
     var progress: Double
+    /// Seconds since the meeting started (0 before it). Past the start, new bubbles bud off the first one about a
+    /// minute apart, then everything swells into one bubble that fills the screen.
+    var overdue: TimeInterval = 0
     var style: BallStyle
     var popCount: Int
     /// Kept for callers; the bubble no longer shows text.
@@ -50,11 +53,12 @@ struct BubbleView: View {
                     let t = context.date.timeIntervalSinceReferenceDate
                     let m = idleMotion(t)
                     bubbleButton
-                        .scaleEffect(x: m.sx * popScale.width * regrowScale, y: m.sy * popScale.height * regrowScale,
+                        .scaleEffect(x: m.sx * popScale.width * regrowScale * merge, y: m.sy * popScale.height * regrowScale * merge,
                                      anchor: .bottom)
                         .offset(x: m.dx, y: m.dy)
                         .opacity(opacity)
                 }
+                if style == .bubble && !popping && overdue > 0 { sprouts }
                 if showPieces { pieces }
                 if showLump { lump }
             }
@@ -62,6 +66,7 @@ struct BubbleView: View {
             .offset(y: height * 0.42)
         }
         .animation(.timingCurve(0.2, 0.7, 0.3, 1, duration: 0.9), value: puff)
+        .animation(.timingCurve(0.2, 0.7, 0.3, 1, duration: 1.8), value: overdueStep)
         .onChange(of: popCount) { _, _ in
             if !popping { burst(then: nil) }
         }
@@ -132,6 +137,47 @@ struct BubbleView: View {
                     CGFloat(shake * sin(t * 45)), CGFloat(shake * 0.7 * sin(t * 53 + 1)))
         }
         return (1, 1, 0, 0)
+    }
+
+    // MARK: Overdue: more bubbles, then one big one
+
+    /// Overdue time in 2-second steps, so growth eases in small puffs like the main bubble.
+    private var overdueStep: Double {
+        guard style == .bubble, !reduceMotion else { return 0 }
+        return (overdue / 2).rounded(.down) * 2
+    }
+
+    /// Where each new bubble buds from (share of the main bubble's frame) and how big it gets (share of its width).
+    private static let buds: [(x: CGFloat, y: CGFloat, size: CGFloat, startsAt: Double)] = [
+        (x: 0.16, y: 0.16, size: 0.42, startsAt: 60),
+        (x: 0.86, y: 0.20, size: 0.48, startsAt: 120),
+        (x: 0.52, y: -0.06, size: 0.56, startsAt: 180),
+    ]
+
+    /// Four minutes past the start, everything swells into one bubble over the next minute.
+    private var mergeProgress: CGFloat {
+        CGFloat(min(1, max(0, (overdueStep - 240) / 60)))
+    }
+
+    /// The main bubble's extra scale while merging: big enough to cover the whole screen.
+    private var merge: CGFloat { 1 + mergeProgress * 1.7 }
+
+    private var sprouts: some View {
+        ZStack(alignment: .topLeading) {
+            ForEach(0..<Self.buds.count, id: \.self) { i in
+                let bud = Self.buds[i]
+                let grow = CGFloat(min(1, max(0, (overdueStep - bud.startsAt) / 45)))
+                let side = width * bud.size * max(0.001, grow) * (1 + mergeProgress * 0.8)
+                GumBubbleShape(thinness: 0.6 + 0.3 * Double(grow))
+                    .frame(width: side, height: side * 1.05)
+                    .position(x: width * bud.x, y: height * bud.y)
+                    .opacity(grow > 0 ? Double(1 - mergeProgress) : 0)
+            }
+        }
+        .frame(width: width, height: height)
+        .scaleEffect(merge, anchor: .bottom)
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
     }
 
     // MARK: Pop

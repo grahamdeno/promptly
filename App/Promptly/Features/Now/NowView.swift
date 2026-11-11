@@ -16,6 +16,7 @@ struct NowView: View {
 
                 BubbleView(
                     progress: 1,
+                    overdue: max(0, now.timeIntervalSince(meeting.start)),
                     style: model.ballStyle,
                     popCount: pops,
                     hint: meeting.joinURL == nil ? "Pop when ready" : "Pop to join",

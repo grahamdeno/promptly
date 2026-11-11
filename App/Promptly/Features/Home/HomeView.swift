@@ -15,6 +15,7 @@ struct HomeView: View {
             let upcoming = model.upcoming(at: now)
             let next = model.calendarAuthorized && model.alarmsAuthorized ? upcoming.first : nil
             let progress = next.map { Countdown.progress(now: now, start: $0.start) } ?? 0
+            let overdue = next.map { max(0, now.timeIntervalSince($0.start)) } ?? 0
 
             if sizeClass == .regular {
                 // iPad: the meeting and the rest of today on the left, the bubble on the right.
@@ -30,7 +31,7 @@ struct HomeView: View {
                         }
                         .frame(maxWidth: 480, alignment: .leading)
                         .padding(.horizontal, 48)
-                        bubble(next: next, progress: progress, maxSize: 760)
+                        bubble(next: next, progress: progress, overdue: overdue, maxSize: 760)
                             .frame(maxWidth: .infinity)
                             .ignoresSafeArea()
                     }
@@ -38,7 +39,7 @@ struct HomeView: View {
             } else {
                 ZStack {
                     Color.white.ignoresSafeArea()
-                    bubble(next: next, progress: progress, maxSize: 880)
+                    bubble(next: next, progress: progress, overdue: overdue, maxSize: 880)
                         .ignoresSafeArea()
                     VStack(alignment: .leading, spacing: 0) {
                         header
@@ -57,9 +58,10 @@ struct HomeView: View {
         }
     }
 
-    private func bubble(next: Meeting?, progress: Double, maxSize: CGFloat) -> some View {
+    private func bubble(next: Meeting?, progress: Double, overdue: TimeInterval, maxSize: CGFloat) -> some View {
         BubbleView(
             progress: progress,
+            overdue: overdue,
             style: model.ballStyle,
             popCount: model.popCount,
             accessibilityTitle: next.map { ($0.joinURL == nil ? "Pop the bubble to clear " : "Pop the bubble to join ") + $0.title } ?? "",
