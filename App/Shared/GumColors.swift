@@ -6,15 +6,23 @@ enum GumPalette: String, CaseIterable, Sendable {
     case bubblegum
     /// The original coral.
     case coral
+    /// Pro: a pastel rainbow bubble that bursts into confetti.
+    case unicorn
+
+    var isPro: Bool { self == .unicorn }
+
+    /// Unicorn mode's pastel rainbow: pink, lilac, sky, mint, lemon.
+    static let rainbow: [Color] = [rgb(0xFFB3D9), rgb(0xD7B8FF), rgb(0xAEDBFF), rgb(0xB5F2D6), rgb(0xFFF0A8)]
 
     var label: String {
         switch self {
         case .bubblegum: "Bubblegum"
         case .coral: "Coral"
+        case .unicorn: "Unicorn"
         }
     }
 
-    private static func rgb(_ hex: UInt32) -> Color {
+    static func rgb(_ hex: UInt32) -> Color {
         Color(red: Double((hex >> 16) & 0xFF) / 255, green: Double((hex >> 8) & 0xFF) / 255, blue: Double(hex & 0xFF) / 255)
     }
 
@@ -22,6 +30,7 @@ enum GumPalette: String, CaseIterable, Sendable {
         switch self {
         case .bubblegum: Self.rgb(0xFF7FB0)
         case .coral: Self.rgb(0xE8553A)
+        case .unicorn: Self.rgb(0xC9A7FF)
         }
     }
 
@@ -29,6 +38,7 @@ enum GumPalette: String, CaseIterable, Sendable {
         switch self {
         case .bubblegum: Self.rgb(0xFFD3E5)
         case .coral: Self.rgb(0xFFB8A0)
+        case .unicorn: Self.rgb(0xFFF4FB)
         }
     }
 
@@ -36,6 +46,7 @@ enum GumPalette: String, CaseIterable, Sendable {
         switch self {
         case .bubblegum: Self.rgb(0xE04F8C)
         case .coral: Self.rgb(0xC8361C)
+        case .unicorn: Self.rgb(0xE07AC0)
         }
     }
 
@@ -60,9 +71,15 @@ struct GumBall: View {
         GeometryReader { geo in
             let s = geo.size.width
             ZStack {
-                Ellipse()
-                    .fill(RadialGradient(colors: [GumColors.light, GumColors.coral, GumColors.dark],
-                                         center: UnitPoint(x: 0.38, y: 0.26), startRadius: 0, endRadius: s * 0.8))
+                if GumPalette.current == .unicorn {
+                    Ellipse().fill(AngularGradient(colors: GumPalette.rainbow + [GumPalette.rainbow[0]], center: .center))
+                    Ellipse().fill(RadialGradient(colors: [.white.opacity(0.7), .white.opacity(0)],
+                                                  center: UnitPoint(x: 0.38, y: 0.26), startRadius: 0, endRadius: s * 0.6))
+                } else {
+                    Ellipse()
+                        .fill(RadialGradient(colors: [GumColors.light, GumColors.coral, GumColors.dark],
+                                             center: UnitPoint(x: 0.38, y: 0.26), startRadius: 0, endRadius: s * 0.8))
+                }
                 Ellipse()
                     .fill(.white.opacity(0.5))
                     .frame(width: s * 0.32, height: s * 0.18)

@@ -169,7 +169,8 @@ struct BubbleView: View {
                 let bud = Self.buds[i]
                 let grow = CGFloat(min(1, max(0, (overdueStep - bud.startsAt) / 30)))
                 let side = width * bud.size * max(0.001, grow) * (1 + mergeProgress * 0.8)
-                GumBubbleShape(thinness: 0.6 + 0.3 * Double(grow))
+                GumBubbleShape(thinness: 0.6 + 0.3 * Double(grow),
+                               tint: GumPalette.current == .unicorn ? GumPalette.rainbow.at(i + 1) : nil)
                     .frame(width: side, height: side * 1.05)
                     .position(x: width * bud.x, y: height * bud.y)
                     .opacity(grow > 0 ? Double(1 - mergeProgress) : 0)
@@ -218,8 +219,14 @@ struct BubbleView: View {
                 let scrap = Self.scraps[i]
                 let side = width * scrap.size
                 let fallScale: CGFloat = 1.25
-                GumScrap(seed: scrap.seed, strand: scrap.strand)
-                    .frame(width: scrap.strand ? side * 1.9 : side, height: scrap.strand ? side * 0.42 : side * 0.82)
+                Group {
+                    if GumPalette.current == .unicorn {
+                        ConfettiPiece(index: i).frame(width: max(18, side * 0.45), height: max(18, side * 0.45))
+                    } else {
+                        GumScrap(seed: scrap.seed, strand: scrap.strand)
+                            .frame(width: scrap.strand ? side * 1.9 : side, height: scrap.strand ? side * 0.42 : side * 0.82)
+                    }
+                }
                     .rotationEffect(.degrees(piecesDown ? scrap.spin : (piecesUp ? scrap.spin * 0.45 : 0)))
                     .scaleEffect(piecesDown ? 0.55 : (piecesUp ? 0.9 : 1))
                     .position(x: width * scrap.start.x, y: height * scrap.start.y)
@@ -364,6 +371,9 @@ struct ScrapShape: Shape {
 struct GumBubbleShape: View {
     /// 0 when small and thick, 1 when fully stretched.
     var thinness: Double
+    /// Unicorn buds each take one rainbow color.
+    var tint: Color? = nil
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         GeometryReader { geo in
@@ -371,10 +381,26 @@ struct GumBubbleShape: View {
             let h = geo.size.height
             let streak = min(26, max(5, w * 0.03))
             ZStack {
-                // Solid, saturated gum with a soft lit side.
-                Ellipse()
-                    .fill(RadialGradient(colors: [GumColors.light, GumColors.coral, GumColors.dark],
-                                         center: UnitPoint(x: 0.36, y: 0.24), startRadius: 0, endRadius: max(w, h) * 0.78))
+                if GumPalette.current == .unicorn {
+                    // Unicorn: a pastel rainbow film whose sheen drifts slowly around the bubble.
+                    if let tint {
+                        Ellipse().fill(RadialGradient(colors: [.white, tint], center: UnitPoint(x: 0.36, y: 0.24),
+                                                      startRadius: 0, endRadius: max(w, h) * 0.8))
+                    } else {
+                        TimelineView(.animation(minimumInterval: 1.0 / 20, paused: reduceMotion)) { ctx in
+                            let angle = reduceMotion ? 0 : ctx.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 45) * 8
+                            Ellipse().fill(AngularGradient(colors: GumPalette.rainbow + [GumPalette.rainbow[0]], center: .center,
+                                                           angle: .degrees(angle)))
+                        }
+                        Ellipse().fill(RadialGradient(colors: [.white.opacity(0.75), .white.opacity(0)],
+                                                      center: UnitPoint(x: 0.36, y: 0.24), startRadius: 0, endRadius: max(w, h) * 0.55))
+                    }
+                } else {
+                    // Solid, saturated gum with a soft lit side.
+                    Ellipse()
+                        .fill(RadialGradient(colors: [GumColors.light, tint ?? GumColors.coral, GumColors.dark],
+                                             center: UnitPoint(x: 0.36, y: 0.24), startRadius: 0, endRadius: max(w, h) * 0.78))
+                }
                 // Depth: the edge falls into shadow, strongest at the lower right.
                 Ellipse()
                     .stroke(GumColors.dark.opacity(0.55), lineWidth: max(6, w * 0.05))
@@ -409,4 +435,23 @@ struct GumBubbleShape: View {
             .shadow(color: GumColors.coral.opacity(0.3), radius: 30, y: -12)
         }
     }
+}
+
+/// Unicorn confetti: stars, hearts, sparkles and dots in the pastel rainbow.
+struct ConfettiPiece: View {
+    var index: Int
+    private static let symbols = ["star.fill", "heart.fill", "sparkle", "circle.fill"]
+
+    var body: some View {
+        Image(systemName: Self.symbols.at(index % 4) ?? "star.fill")
+            .resizable()
+            .scaledToFit()
+            .foregroundStyle(GumPalette.rainbow.at(index % 5) ?? .pink)
+            .shadow(color: .black.opacity(0.08), radius: 1, y: 1)
+    }
+}
+
+extension Array {
+    /// Safe lookup: nil when out of range.
+    func at(_ i: Int) -> Element? { indices.contains(i) ? self[i] : nil }
 }

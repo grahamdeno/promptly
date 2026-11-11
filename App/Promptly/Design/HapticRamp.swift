@@ -76,17 +76,22 @@ enum AlarmLoop {
 /// mixes with whatever else is playing. Off when the owner turns off "Pop sound".
 @MainActor
 enum PopSound {
-    private static var player: AVAudioPlayer? = {
-        guard let url = Bundle.main.url(forResource: "pop", withExtension: "wav") else { return nil }
+    private static var gum: AVAudioPlayer? = load("pop")
+    private static var chime: AVAudioPlayer? = load("unicorn_pop")
+
+    private static func load(_ name: String) -> AVAudioPlayer? {
+        guard let url = Bundle.main.url(forResource: name, withExtension: "wav") else { return nil }
         let p = try? AVAudioPlayer(contentsOf: url)
         p?.prepareToPlay()
         return p
-    }()
+    }
 
+    /// The gum pop, or a sparkle chime in Unicorn mode.
     static func play() {
         guard Prefs().popSound else { return }
         try? AVAudioSession.sharedInstance().setCategory(.ambient, options: [.mixWithOthers])
         try? AVAudioSession.sharedInstance().setActive(true)
+        let player = GumPalette.current == .unicorn ? chime : gum
         player?.currentTime = 0
         player?.play()
     }
