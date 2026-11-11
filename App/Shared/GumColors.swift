@@ -4,15 +4,12 @@ import SwiftUI
 enum GumPalette: String, CaseIterable, Sendable {
     /// Classic bubblegum pink.
     case bubblegum
-    /// Bright hot pink.
-    case hotPink
     /// The original coral.
     case coral
 
     var label: String {
         switch self {
         case .bubblegum: "Bubblegum"
-        case .hotPink: "Hot pink"
         case .coral: "Coral"
         }
     }
@@ -24,7 +21,6 @@ enum GumPalette: String, CaseIterable, Sendable {
     var base: Color {
         switch self {
         case .bubblegum: Self.rgb(0xFF7FB0)
-        case .hotPink: Self.rgb(0xFF2E88)
         case .coral: Self.rgb(0xE8553A)
         }
     }
@@ -32,7 +28,6 @@ enum GumPalette: String, CaseIterable, Sendable {
     var light: Color {
         switch self {
         case .bubblegum: Self.rgb(0xFFD3E5)
-        case .hotPink: Self.rgb(0xFFB0D4)
         case .coral: Self.rgb(0xFFB8A0)
         }
     }
@@ -40,7 +35,6 @@ enum GumPalette: String, CaseIterable, Sendable {
     var dark: Color {
         switch self {
         case .bubblegum: Self.rgb(0xE04F8C)
-        case .hotPink: Self.rgb(0xC41168)
         case .coral: Self.rgb(0xC8361C)
         }
     }
