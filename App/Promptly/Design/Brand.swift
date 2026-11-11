@@ -5,8 +5,8 @@ enum Brand {
     static var coralLight: Color { GumColors.light }
     static var coralDark: Color { GumColors.dark }
     static let ink = Color(red: 0x14 / 255, green: 0x14 / 255, blue: 0x14 / 255)
-    /// 5.3:1 on white.
-    static let secondary = Color(red: 0x6B / 255, green: 0x6B / 255, blue: 0x6B / 255)
+    /// 8:1 on white; stays readable on the glass pane over the bubble.
+    static let secondary = Color(red: 0x4A / 255, green: 0x4A / 255, blue: 0x4A / 255)
     static let hairline = Color(red: 0xEF / 255, green: 0xEF / 255, blue: 0xEF / 255)
 
     static func display(_ size: CGFloat, _ weight: Font.Weight = .semibold) -> Font {

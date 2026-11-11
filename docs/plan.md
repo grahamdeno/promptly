@@ -102,6 +102,16 @@ Design canvas: https://claude.ai/artifact/6dpuMwrhhPZNf3aAZSfAEh
       puffs), then from +4 min everything swells into one bubble covering the screen over a minute. In-app only.
 - [x] Bubble larger at its max: 880 pt on iPhone (was 710), 760 on iPad, 920 on the Now screen.
 
+## Sprint 10 (owner's on-device feedback, 2026-11-11)
+- [x] Extra bubbles start sooner: bud at +15, +40, +70 s past the start (grow over 30 s), merge into one screen-filling
+      bubble from +110 s over 50 s. (The first test was at about +1 min, before the old +60 s start.)
+- [x] Louder alarm: bubble-blow rebuilt higher (380 to 900 Hz with harmonics, which phone speakers carry) and limited
+      for loudness (RMS about 0.33).
+- [x] Readable text: the meeting text sits on a glass pane; secondary text darker. Now screen text was centered by
+      mistake (VStack not full width); now left-aligned.
+- [x] Gloss: solid gum with a crisp curved highlight streak, a small window reflection, a pinpoint glint, a thin rim
+      light and shadowed edges, replacing the large faded white blur.
+
 ## Later
 - iPad screenshots in App Store Connect before public release (Grok).
 - Smart filters: travel-time buffer, a second alert for chosen meetings, quiet hours.

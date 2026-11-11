@@ -149,14 +149,14 @@ struct BubbleView: View {
 
     /// Where each new bubble buds from (share of the main bubble's frame) and how big it gets (share of its width).
     private static let buds: [(x: CGFloat, y: CGFloat, size: CGFloat, startsAt: Double)] = [
-        (x: 0.16, y: 0.16, size: 0.42, startsAt: 60),
-        (x: 0.86, y: 0.20, size: 0.48, startsAt: 120),
-        (x: 0.52, y: -0.06, size: 0.56, startsAt: 180),
+        (x: 0.16, y: 0.16, size: 0.42, startsAt: 15),
+        (x: 0.86, y: 0.20, size: 0.48, startsAt: 40),
+        (x: 0.52, y: -0.06, size: 0.56, startsAt: 70),
     ]
 
-    /// Four minutes past the start, everything swells into one bubble over the next minute.
+    /// From about two minutes past the start, everything swells into one bubble over the next 50 seconds.
     private var mergeProgress: CGFloat {
-        CGFloat(min(1, max(0, (overdueStep - 240) / 60)))
+        CGFloat(min(1, max(0, (overdueStep - 110) / 50)))
     }
 
     /// The main bubble's extra scale while merging: big enough to cover the whole screen.
@@ -166,7 +166,7 @@ struct BubbleView: View {
         ZStack(alignment: .topLeading) {
             ForEach(0..<Self.buds.count, id: \.self) { i in
                 let bud = Self.buds[i]
-                let grow = CGFloat(min(1, max(0, (overdueStep - bud.startsAt) / 45)))
+                let grow = CGFloat(min(1, max(0, (overdueStep - bud.startsAt) / 30)))
                 let side = width * bud.size * max(0.001, grow) * (1 + mergeProgress * 0.8)
                 GumBubbleShape(thinness: 0.6 + 0.3 * Double(grow))
                     .frame(width: side, height: side * 1.05)
@@ -368,28 +368,42 @@ struct GumBubbleShape: View {
         GeometryReader { geo in
             let w = geo.size.width
             let h = geo.size.height
-            let fill = 0.98 - thinness * 0.16
+            let streak = min(26, max(5, w * 0.03))
             ZStack {
+                // Solid, saturated gum with a soft lit side.
                 Ellipse()
-                    .fill(RadialGradient(colors: [GumColors.light.opacity(fill), GumColors.coral.opacity(fill),
-                                                  GumColors.dark.opacity(min(1, fill + 0.04))],
-                                         center: UnitPoint(x: 0.38, y: 0.26), startRadius: 0, endRadius: max(w, h) * 0.75))
+                    .fill(RadialGradient(colors: [GumColors.light, GumColors.coral, GumColors.dark],
+                                         center: UnitPoint(x: 0.36, y: 0.24), startRadius: 0, endRadius: max(w, h) * 0.78))
+                // Depth: the edge falls into shadow, strongest at the lower right.
                 Ellipse()
-                    .stroke(.white.opacity(0.10 + thinness * 0.2), lineWidth: max(2, w * 0.02))
-                    .blur(radius: w * 0.02)
-                    .padding(w * 0.03)
+                    .stroke(GumColors.dark.opacity(0.55), lineWidth: max(6, w * 0.05))
+                    .blur(radius: max(6, w * 0.03))
+                    .mask(Ellipse())
+                // Gloss: a crisp curved streak along the upper left, the way light wraps a stretched bubble.
                 Ellipse()
-                    .fill(.white.opacity(0.42 + thinness * 0.25))
-                    .frame(width: w * (0.26 + 0.1 * thinness), height: h * (0.14 + 0.06 * thinness))
-                    .rotationEffect(.degrees(-24))
-                    .blur(radius: w * 0.008)
-                    .position(x: w * 0.32, y: h * 0.2)
+                    .trim(from: 0.56, to: 0.71)
+                    .stroke(.white.opacity(0.9), style: StrokeStyle(lineWidth: streak, lineCap: .round))
+                    .padding(w * 0.075)
+                    .blur(radius: 1.2)
+                // A small bright window reflection beside it.
+                Ellipse()
+                    .fill(.white.opacity(0.8))
+                    .frame(width: w * 0.1, height: h * 0.055)
+                    .rotationEffect(.degrees(-32))
+                    .blur(radius: 1)
+                    .position(x: w * 0.31, y: h * 0.25)
+                // A sharp pinpoint glint.
                 Circle()
-                    .fill(.white.opacity(0.7))
-                    .frame(width: w * 0.07, height: w * 0.05)
-                    .position(x: w * 0.58, y: h * 0.1)
+                    .fill(.white.opacity(0.95))
+                    .frame(width: max(6, w * 0.032), height: max(6, w * 0.032))
+                    .position(x: w * 0.6, y: h * 0.1)
+                // A thin rim of light on the far edge.
+                Ellipse()
+                    .trim(from: 0.84, to: 0.97)
+                    .stroke(.white.opacity(0.35 + thinness * 0.15), style: StrokeStyle(lineWidth: max(2, w * 0.006), lineCap: .round))
+                    .padding(w * 0.012)
             }
-            .shadow(color: GumColors.coral.opacity(0.25), radius: 30, y: -12)
+            .shadow(color: GumColors.coral.opacity(0.3), radius: 30, y: -12)
         }
     }
 }
