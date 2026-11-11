@@ -37,6 +37,9 @@ struct RootView: View {
             NowView(meeting: meeting)
                 .environment(model)
         }
+        .onOpenURL { url in
+            Task { await model.open(url) }
+        }
         .onChange(of: model.linkToOpen) { _, url in
             guard let url else { return }
             openURL(url)

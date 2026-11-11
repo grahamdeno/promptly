@@ -38,6 +38,14 @@ struct CalendarsView: View {
                         model.leadMinutes = $0
                     }
 
+                    sectionLabel("Before it rings")
+                    settingToggle("Countdown on Lock Screen", detail: "A card with the bubble for the last ten minutes",
+                                  isOn: Binding(get: { model.countdownCard }, set: { model.countdownCard = $0 }))
+                    settingToggle("Buzz as it gets close", detail: "Builds while Promptly is open",
+                                  isOn: Binding(get: { model.buzz }, set: { model.buzz = $0 }))
+                    settingToggle("Nudges at 5 and 2 minutes", detail: "One buzz each, even when locked",
+                                  isOn: Binding(get: { model.nudges }, set: { model.nudges = $0 }))
+
                     sectionLabel("Ball")
                     choiceRow(options: BallStyle.allCases, selected: model.ballStyle,
                               label: { $0 == .bubble ? "Bubble" : "Steady" }) {
@@ -74,6 +82,19 @@ struct CalendarsView: View {
                     Text(calendar.title).font(.system(size: 17)).foregroundStyle(Brand.ink)
                     Text(calendar.source).font(.system(size: 13)).foregroundStyle(Brand.secondary)
                 }
+            }
+        }
+        .tint(Brand.ink)
+        .padding(.horizontal, 8)
+        .frame(minHeight: 60)
+        .overlay(alignment: .bottom) { Rectangle().fill(Brand.hairline).frame(height: 1) }
+    }
+
+    private func settingToggle(_ title: String, detail: String, isOn: Binding<Bool>) -> some View {
+        Toggle(isOn: isOn) {
+            VStack(alignment: .leading, spacing: 1) {
+                Text(title).font(.system(size: 17)).foregroundStyle(Brand.ink)
+                Text(detail).font(.system(size: 13)).foregroundStyle(Brand.secondary)
             }
         }
         .tint(Brand.ink)

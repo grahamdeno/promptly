@@ -2,13 +2,9 @@ import ActivityKit
 import AlarmKit
 import SwiftUI
 
-/// What each alarm carries back to the app.
-struct MeetingAlarmMetadata: AlarmMetadata {
-    var meetingID: String
-}
-
 /// Makes AlarmKit's scheduled alarms match the planner's list. AlarmKit alarms ring like the Clock app:
-/// full screen on the Lock Screen, in the Dynamic Island, and through Silent and Focus.
+/// full screen on the Lock Screen, in the Dynamic Island, and through Silent and Focus. With a countdown,
+/// AlarmKit also shows Promptly's card (PromptlyWidgets) on the Lock Screen and in the Dynamic Island first.
 @MainActor
 final class AlarmService {
     private let manager = AlarmManager.shared
@@ -46,14 +42,25 @@ final class AlarmService {
                                          systemImageName: meeting.joinURL == nil ? "arrow.up.forward.app" : "video.fill"),
             secondaryButtonBehavior: .custom
         )
-        let attributes = AlarmAttributes<MeetingAlarmMetadata>(
-            presentation: AlarmPresentation(alert: alert),
-            metadata: MeetingAlarmMetadata(meetingID: meeting.id),
-            tintColor: Brand.coral
-        )
-        let configuration = AlarmManager.AlarmConfiguration<MeetingAlarmMetadata>.alarm(
-            schedule: .fixed(planned.fireDate),
+        let presentation: AlarmPresentation
+        if planned.countdownSeconds != nil {
+            presentation = AlarmPresentation(
+                alert: alert,
+                countdown: AlarmPresentation.Countdown(title: LocalizedStringResource(stringLiteral: meeting.title))
+            )
+        } else {
+            presentation = AlarmPresentation(alert: alert)
+        }
+        let metadata = MeetingAlarmMetadata(meetingID: meeting.id, title: meeting.title, start: meeting.start,
+                                            service: meeting.service?.rawValue ?? "",
+                                            countdownSeconds: planned.countdownSeconds ?? 0)
+        let attributes = AlarmAttributes<MeetingAlarmMetadata>(presentation: presentation, metadata: metadata,
+                                                               tintColor: Brand.coral)
+        let configuration = AlarmManager.AlarmConfiguration<MeetingAlarmMetadata>(
+            countdownDuration: planned.countdownSeconds.map { Alarm.CountdownDuration(preAlert: $0, postAlert: nil) },
+            schedule: .fixed(planned.scheduleDate),
             attributes: attributes,
+            stopIntent: nil,
             secondaryIntent: OpenMeetingIntent(meetingID: meeting.id, joinURL: meeting.joinURL?.absoluteString ?? ""),
             sound: .default
         )

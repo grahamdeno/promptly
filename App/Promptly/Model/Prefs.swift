@@ -32,6 +32,24 @@ final class Prefs: @unchecked Sendable {
         set { defaults.set(newValue.rawValue, forKey: "ballStyle") }
     }
 
+    /// Countdown card on the Lock Screen and in the Dynamic Island for ten minutes before the alarm. Default on.
+    var countdownCard: Bool {
+        get { defaults.object(forKey: "countdownCard") as? Bool ?? true }
+        set { defaults.set(newValue, forKey: "countdownCard") }
+    }
+
+    /// Buzz that builds while Promptly is open in the last ten minutes. Default on.
+    var buzz: Bool {
+        get { defaults.object(forKey: "buzz") as? Bool ?? true }
+        set { defaults.set(newValue, forKey: "buzz") }
+    }
+
+    /// One-buzz nudges at 5 and 2 minutes before. Default off.
+    var nudges: Bool {
+        get { defaults.bool(forKey: "nudges") }
+        set { defaults.set(newValue, forKey: "nudges") }
+    }
+
     /// Calendars switched off. Everything else rings, so a newly added calendar is on by default.
     var disabledCalendarIDs: Set<String> {
         get { Set(defaults.stringArray(forKey: "disabledCalendarIDs") ?? []) }

@@ -11,6 +11,7 @@ final class AppModel {
 
     @ObservationIgnored let calendarService = CalendarService()
     @ObservationIgnored let alarmService = AlarmService()
+    @ObservationIgnored let nudgeService = NudgeService()
     @ObservationIgnored let prefs: Prefs
     @ObservationIgnored private var storeObserver: NSObjectProtocol?
 
@@ -34,6 +35,21 @@ final class AppModel {
     var ballStyle: BallStyle {
         didSet { prefs.ballStyle = ballStyle }
     }
+    var countdownCard: Bool {
+        didSet { prefs.countdownCard = countdownCard; Task { await syncAlarms() } }
+    }
+    var buzz: Bool {
+        didSet { prefs.buzz = buzz }
+    }
+    var nudges: Bool {
+        didSet {
+            prefs.nudges = nudges
+            Task {
+                if nudges, !(await nudgeService.requestAccess()) { nudges = false; return }
+                await syncAlarms()
+            }
+        }
+    }
     var disabledCalendarIDs: Set<String> {
         didSet { prefs.disabledCalendarIDs = disabledCalendarIDs; Task { await refresh() } }
     }
@@ -47,6 +63,9 @@ final class AppModel {
         leadMinutes = prefs.leadMinutes
         ballStyle = prefs.ballStyle
         disabledCalendarIDs = prefs.disabledCalendarIDs
+        countdownCard = prefs.countdownCard
+        buzz = prefs.buzz
+        nudges = prefs.nudges
         cleared = prefs.clearedMeetingIDs
         calendarAuthorized = calendarService.isAuthorized
         alarmsAuthorized = alarmService.isAuthorized
@@ -105,13 +124,15 @@ final class AppModel {
 
     func syncAlarms() async {
         guard alarmsAuthorized else { return }
-        let planned = AlarmPlanner.plan(meetings: meetings, leadMinutes: leadMinutes, now: .now, cleared: cleared)
+        let planned = AlarmPlanner.plan(meetings: meetings, leadMinutes: leadMinutes, now: .now, cleared: cleared,
+                                        countdown: countdownCard)
         do {
             try await alarmService.sync(planned)
             syncProblem = nil
         } catch {
             syncProblem = "Couldn't set an alarm: \(error.localizedDescription)"
         }
+        await nudgeService.sync(planned, enabled: nudges)
     }
 
     private func scheduleBackgroundRefresh() {
@@ -142,6 +163,15 @@ final class AppModel {
         }), !shownNowFor.contains(due.id) {
             show(due)
         }
+    }
+
+    /// From the Lock Screen or Dynamic Island card: promptly://meeting?id=…
+    func open(_ url: URL) async {
+        guard url.scheme == "promptly", url.host == "meeting",
+              let id = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems?.first(where: { $0.name == "id" })?.value
+        else { return }
+        if meetings.first(where: { $0.id == id }) == nil { await refresh() }
+        if let meeting = meetings.first(where: { $0.id == id }), !cleared.contains(id) { show(meeting) }
     }
 
     private func show(_ meeting: Meeting) {

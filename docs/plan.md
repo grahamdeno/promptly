@@ -33,9 +33,20 @@ Design canvas: https://claude.ai/artifact/6dpuMwrhhPZNf3aAZSfAEh
 - [x] Unit tests for links, planning, countdown, pending join; read-only guard in CI
 - [ ] On-device check: alarm rings through Silent/Focus; Join opens Teams/Zoom; intent reaches the app
 
-## Sprint 2
-- Widget extension: Lock Screen Live Activity countdown, Dynamic Island, small and medium Home Screen widgets
-  (designs on the canvas). The bubble grows there too.
+## Sprint 2 (owner said go and ship, 2026-11-11)
+- [x] Gum motion: inflates in puffs that ease out (no bounce), stretches up and thins as it grows, swells near the
+      start, trembles at the start; pops into falling gum shreds; a new bubble inflates from nothing, no spring
+- [x] The bubble is the button: "Pop to join" (or "Pop when ready" with no link); "Not going" is a quiet link
+- [x] Buzz that builds in the last ten minutes while Promptly is open (Settings: on by default)
+- [x] Lock Screen and Dynamic Island countdown card via AlarmKit countdown (PromptlyWidgets extension): still ball
+      with a coral ring that fills, live countdown, tap opens the Now screen. Apple draws and updates it, so the
+      bubble can't grow there. Settings: on by default
+- [x] Nudges at 5 and 2 minutes, one buzz each (Settings: off by default)
+- [ ] On-device check: the card appears ten minutes before the ring and the alarm rings at meeting minus lead. If
+      it rings ten minutes early instead, set `AlarmPlanner.countdownStartsAtSchedule = false`.
+
+## Later
+- Small and medium Home Screen widgets (designs on the canvas).
 - Smart filters: travel-time buffer, a second alert for chosen meetings, quiet hours.
 - Apple Watch.
 

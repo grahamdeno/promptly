@@ -33,7 +33,7 @@ def scan(text: str):
 
 def check(root: Path) -> int:
     failures = 0
-    for path in sorted((root / "App" / "Promptly").rglob("*.swift")):
+    for path in sorted(p for d in ("Promptly", "Shared", "PromptlyWidgets") for p in (root / "App" / d).rglob("*.swift")):
         for line, why in scan(path.read_text(encoding="utf-8")):
             print(f"::error file={path},line={line}::{why} is not allowed in Promptly")
             failures += 1

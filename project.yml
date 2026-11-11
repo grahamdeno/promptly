@@ -19,6 +19,9 @@ targets:
     platform: iOS
     sources:
       - App/Promptly
+      - App/Shared
+    dependencies:
+      - target: PromptlyWidgets
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.grahamdeno.promptly
@@ -35,6 +38,20 @@ targets:
         TARGETED_DEVICE_FAMILY: "1"
         SUPPORTS_MACCATALYST: NO
         SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: NO
+  PromptlyWidgets:
+    type: app-extension
+    platform: iOS
+    sources:
+      - App/PromptlyWidgets
+      - App/Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.grahamdeno.promptly.widgets
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_FILE: Config/Widgets-Info.plist
+        INFOPLIST_KEY_CFBundleDisplayName: Promptly
+        SKIP_INSTALL: YES
+        TARGETED_DEVICE_FAMILY: "1"
   PromptlyTests:
     type: bundle.unit-test
     platform: iOS
