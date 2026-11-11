@@ -17,6 +17,8 @@ final class AppModel {
     @ObservationIgnored private var storeObserver: NSObjectProtocol?
 
     var meetings: [Meeting] = []
+    /// Pretend meetings from the "Check the alarm" buttons, so the test also shows the bubble and the takeover.
+    var testMeetings: [Meeting] = []
     var calendars: [CalendarInfo] = []
     var calendarAuthorized = false
     var alarmsAuthorized = false
@@ -125,7 +127,7 @@ final class AppModel {
 
     /// Meetings not yet cleared that haven't ended.
     func upcoming(at now: Date) -> [Meeting] {
-        meetings.filter { !cleared.contains($0.id) && $0.end > now }
+        (meetings + testMeetings).filter { !cleared.contains($0.id) && $0.end > now }.sorted { $0.start < $1.start }
     }
 
     // MARK: Permissions and first run
@@ -224,12 +226,18 @@ final class AppModel {
             return
         }
         do {
+            // A pretend meeting that starts one lead time after the ring, like a real one.
+            let fire = Date.now.addingTimeInterval(withCountdown ? 90 : 20)
+            let start = fire.addingTimeInterval(TimeInterval(max(1, leadMinutes) * 60))
+            let meeting = Meeting(id: "test-\(UUID().uuidString)", eventID: "test", title: "Test meeting",
+                                  start: start, end: start.addingTimeInterval(10 * 60), calendarID: "test", joinURL: nil)
+            testMeetings = [meeting]
             if withCountdown {
-                try await alarmService.scheduleTest(in: 90, countdown: 60)
-                testMessage = "Lock your phone now. The countdown card shows in about 30 seconds, then it rings 60 seconds later."
+                try await alarmService.scheduleTest(meeting, fire: fire, countdown: 60)
+                testMessage = "Lock your phone to see Apple's alarm screen: the card in about 30 seconds, the ring 60 seconds later. Or close this and leave Pop In open to watch the bubble take over."
             } else {
-                try await alarmService.scheduleTest(in: 20, countdown: nil)
-                testMessage = "Lock your phone now. It rings in 20 seconds."
+                try await alarmService.scheduleTest(meeting, fire: fire, countdown: nil)
+                testMessage = "Lock your phone to see Apple's alarm screen in 20 seconds. Or close this and leave Pop In open to watch the bubble take over."
             }
             scheduledAlarms = alarmService.scheduledCount
         } catch {

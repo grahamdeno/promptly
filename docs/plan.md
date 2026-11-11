@@ -112,6 +112,11 @@ Design canvas: https://claude.ai/artifact/6dpuMwrhhPZNf3aAZSfAEh
 - [x] Gloss: solid gum with a crisp curved highlight streak, a small window reflection, a pinpoint glint, a thin rim
       light and shadowed edges, replacing the large faded white blur.
 
+## Sprint 11 (owner: the test showed only the banner, 2026-11-11)
+- [x] Test alarms now add a pretend "Test meeting" to Home (starting one lead time after the ring), so with Pop In open
+      the bubble grows, the Now screen takes over at ring time, and extra bubbles bud after the start. Unlocked with
+      Pop In closed, iOS shows only the banner; locked, Apple's full-screen alarm.
+
 ## Later
 - iPad screenshots in App Store Connect before public release (Grok).
 - Smart filters: travel-time buffer, a second alert for chosen meetings, quiet hours.
