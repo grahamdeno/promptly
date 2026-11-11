@@ -8,6 +8,9 @@ struct HomeView: View {
     @State private var showCalendars = false
 
     @Environment(\.horizontalSizeClass) private var sizeClass
+    @ScaledMetric(relativeTo: .largeTitle) private var titleSize: CGFloat = 32
+    @ScaledMetric(relativeTo: .largeTitle) private var countSize: CGFloat = 60
+    @ScaledMetric(relativeTo: .title2) private var unitSize: CGFloat = 22
 
     var body: some View {
         TimelineView(.periodic(from: .now, by: 1)) { context in
@@ -52,6 +55,7 @@ struct HomeView: View {
             }
         }
         .hapticRamp(until: model.upcoming(at: .now).first?.start, enabled: model.buzz && model.arrived == nil)
+        .overlay(alignment: .bottom) { undoToast }
         .sheet(isPresented: $showCalendars) {
             CalendarsView(firstRun: false)
                 .environment(model)
@@ -133,19 +137,27 @@ struct HomeView: View {
         let started = meeting.start <= now
         return VStack(alignment: .leading, spacing: 18) {
             VStack(alignment: .leading, spacing: 12) {
-                Text(started ? "Happening now" : "Next")
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(Brand.secondary)
-                Text(meeting.title)
-                    .font(Brand.display(32))
-                    .tracking(-0.8)
-                    .foregroundStyle(Brand.ink)
-                    .lineLimit(3)
-                Text(subtitle(meeting, now: now))
-                    .font(.system(size: 16))
-                    .foregroundStyle(Brand.secondary)
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(started ? "Happening now" : "Next")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(Brand.secondary)
+                    Text(meeting.title)
+                        .font(.system(size: titleSize, weight: .semibold))
+                        .tracking(-0.8)
+                        .foregroundStyle(Brand.ink)
+                        .lineLimit(4)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Text(subtitle(meeting, now: now))
+                        .font(.callout)
+                        .foregroundStyle(Brand.secondary)
+                }
+                .accessibilityElement(children: .combine)
+                .accessibilityAction(named: meeting.joinURL == nil ? "Clear" : "Join") {
+                    if let url = model.join(meeting) { openURL(url) }
+                }
+                .accessibilityAction(named: "Not going") { model.clear(meeting) }
                 Button("Not going") { model.clear(meeting) }
-                    .font(.system(size: 15, weight: .medium))
+                    .font(.subheadline.weight(.medium))
                     .foregroundStyle(Brand.secondary)
                     .underline()
                     .frame(minHeight: 44)
@@ -155,13 +167,15 @@ struct HomeView: View {
             VStack(alignment: .leading, spacing: 10) {
                 HStack(alignment: .lastTextBaseline, spacing: 8) {
                     Text(parts.big)
-                        .font(.system(size: 60, weight: .medium))
+                        .font(.system(size: countSize, weight: .medium))
                         .tracking(-2.5)
                         .monospacedDigit()
                         .contentTransition(.numericText())
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
                     if !parts.unit.isEmpty {
                         Text(parts.unit)
-                            .font(.system(size: 22, weight: .medium))
+                            .font(.system(size: unitSize, weight: .medium))
                             .foregroundStyle(Brand.secondary)
                     }
                 }
@@ -169,7 +183,7 @@ struct HomeView: View {
                 .accessibilityElement(children: .combine)
                 if !model.taughtPop {
                     Text("Tap the bubble to pop it and join.")
-                        .font(.system(size: 15, weight: .medium))
+                        .font(.subheadline.weight(.medium))
                         .foregroundStyle(Brand.ink)
                         .transition(.opacity)
                 }
@@ -179,10 +193,10 @@ struct HomeView: View {
             if let then {
                 HStack(spacing: 8) {
                     Text("Then")
-                        .font(.system(size: 14, weight: .medium))
+                        .font(.subheadline.weight(.medium))
                         .foregroundStyle(Brand.secondary)
                     Text("\(Countdown.time(then.start, now: now))  \(then.title)")
-                        .font(.system(size: 15))
+                        .font(.subheadline)
                         .foregroundStyle(Brand.ink)
                         .lineLimit(1)
                 }
@@ -192,14 +206,42 @@ struct HomeView: View {
     }
 
     private var emptyBlock: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             Text("Nothing coming up")
-                .font(Brand.display(34))
+                .font(.system(size: titleSize, weight: .semibold))
                 .tracking(-0.8)
                 .foregroundStyle(Brand.ink)
             Text("Your next two days are clear on the calendars Pop In watches.")
-                .font(.system(size: 16))
+                .font(.callout)
                 .foregroundStyle(Brand.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            Button("Try a pop") { model.startDemo() }
+                .buttonStyle(SecondaryButtonStyle(height: 44))
+        }
+    }
+
+    /// Five seconds to take back a pop or a "Not going".
+    @ViewBuilder
+    private var undoToast: some View {
+        if let last = model.lastCleared {
+            HStack(spacing: 12) {
+                Text("Cleared \(last.title)")
+                    .font(.subheadline)
+                    .foregroundStyle(Brand.ink)
+                    .lineLimit(1)
+                Button("Undo") { model.undoClear() }
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Brand.ink)
+                    .frame(minHeight: 44)
+            }
+            .padding(.horizontal, 18)
+            .glassEffect(.regular, in: .capsule)
+            .padding(.bottom, 28)
+            .transition(.move(edge: .bottom).combined(with: .opacity))
+            .task(id: last.id) {
+                try? await Task.sleep(for: .seconds(5))
+                if model.lastCleared?.id == last.id { model.lastCleared = nil }
+            }
         }
     }
 

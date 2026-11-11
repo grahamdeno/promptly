@@ -179,3 +179,30 @@ final class DayLabelTests: XCTestCase {
         XCTAssertFalse(Countdown.day(now.addingTimeInterval(3 * 86400), now: now).isEmpty)
     }
 }
+
+final class MergeAndBackupTests: XCTestCase {
+    private let now = Date(timeIntervalSince1970: 1_800_000_000)
+
+    private func meeting(_ id: String, inMinutes m: Double, title: String) -> Meeting {
+        let start = now.addingTimeInterval(m * 60)
+        return Meeting(id: Meeting.makeID(eventID: id, start: start), eventID: id, title: title,
+                       start: start, end: start.addingTimeInterval(1800), calendarID: "c", joinURL: nil)
+    }
+
+    func testSameMinuteMeetingsShareOneAlarm() {
+        let a = meeting("a", inMinutes: 30, title: "Sprint review")
+        let b = meeting("b", inMinutes: 30, title: "Customer sync")
+        let c = meeting("c", inMinutes: 60, title: "Later")
+        let plan = AlarmPlanner.plan(meetings: [a, b, c], leadMinutes: 1, now: now, cleared: [])
+        XCTAssertEqual(plan.count, 2)
+        XCTAssertEqual(plan.first?.meeting.title, "Sprint review + Customer sync")
+    }
+
+    func testBackupRingsOneMinuteLaterWithItsOwnID() {
+        let plan = AlarmPlanner.plan(meetings: [meeting("a", inMinutes: 30, title: "A")], leadMinutes: 1, now: now, cleared: [])
+        let backup = AlarmPlanner.safetyBackup(for: plan[0])
+        XCTAssertEqual(backup.fireDate, plan[0].fireDate.addingTimeInterval(60))
+        XCTAssertNotEqual(backup.id, plan[0].id)
+        XCTAssertEqual(backup.id, AlarmPlanner.safetyBackup(for: plan[0]).id)
+    }
+}

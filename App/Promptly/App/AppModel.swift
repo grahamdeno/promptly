@@ -65,6 +65,11 @@ final class AppModel {
     var gumColor: GumPalette {
         didSet {
             prefs.gumColor = gumColor
+            // The app icon follows the bubble color (iOS shows a one-line notice when it changes).
+            let icon: String? = gumColor == .coral ? "AppIcon-Coral" : nil
+            if UIApplication.shared.alternateIconName != icon {
+                UIApplication.shared.setAlternateIconName(icon) { _ in }
+            }
             alarmService.cancelOwned()
             writeWidgetSnapshot()
             Task { await syncAlarms() }
@@ -118,6 +123,7 @@ final class AppModel {
         alarmSound = prefs.alarmSound
         gumColor = prefs.gumColor
         gentleCalendarIDs = prefs.gentleCalendarIDs
+        alarmCalendarIDs = prefs.alarmCalendarIDs
         keepAwake = prefs.keepAwake
         alarmService.sound = prefs.alarmSound
         nudges = prefs.nudges
@@ -129,6 +135,12 @@ final class AppModel {
             forName: .EKEventStoreChanged, object: calendarService.store, queue: .main
         ) { [weak self] _ in
             Task { @MainActor in await self?.refresh() }
+        }
+        // Travel and clock changes: re-plan so alarms follow each meeting's real time.
+        for name in [Notification.Name.NSSystemTimeZoneDidChange, UIApplication.significantTimeChangeNotification] {
+            NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
+                Task { @MainActor in await self?.refresh() }
+            }
         }
     }
 
@@ -142,9 +154,75 @@ final class AppModel {
     // MARK: Permissions and first run
 
     func requestPermissions() async {
+        await requestCalendarAccess()
+        await requestAlarmAccess()
+    }
+
+    func requestCalendarAccess() async {
         calendarAuthorized = await calendarService.requestAccess()
+        await refresh()
+    }
+
+    func requestAlarmAccess() async {
         alarmsAuthorized = await alarmService.requestAccess()
         await refresh()
+    }
+
+    // MARK: Alert rules
+
+    enum AlertRule: String, CaseIterable { case smart, alarm, gentle }
+
+    /// Per calendar: Smart (the default: a full alarm for meetings with a video link, a gentle notification for the
+    /// rest), Always alarm, or Gentle.
+    func rule(forCalendar id: String) -> AlertRule {
+        if alarmCalendarIDs.contains(id) { return .alarm }
+        if gentleCalendarIDs.contains(id) { return .gentle }
+        return .smart
+    }
+
+    func setRule(_ rule: AlertRule, forCalendar id: String) {
+        var alarms = alarmCalendarIDs, gentles = gentleCalendarIDs
+        alarms.remove(id); gentles.remove(id)
+        if rule == .alarm { alarms.insert(id) }
+        if rule == .gentle { gentles.insert(id) }
+        alarmCalendarIDs = alarms
+        gentleCalendarIDs = gentles
+    }
+
+    /// Whether this meeting gets the full alarm (and Pop In's takeover) rather than a gentle notification.
+    func ringsFully(_ meeting: Meeting) -> Bool {
+        if meeting.calendarID == "test" { return true }
+        switch rule(forCalendar: meeting.calendarID) {
+        case .alarm: return true
+        case .gentle: return false
+        case .smart: return meeting.joinURL != nil
+        }
+    }
+
+    var alarmCalendarIDs: Set<String> {
+        didSet { prefs.alarmCalendarIDs = alarmCalendarIDs; Task { await syncAlarms() } }
+    }
+
+    // MARK: Demo and undo
+
+    /// A pretend meeting so a new user can feel the bubble and the pop right away. No Apple alarm, just Pop In.
+    func startDemo() {
+        let start = Date.now.addingTimeInterval(TimeInterval(leadMinutes * 60) + 12)
+        testMeetings = [Meeting(id: "demo-\(UUID().uuidString)", eventID: "demo", title: "Try a pop", start: start,
+                                end: start.addingTimeInterval(5 * 60), calendarID: "test", joinURL: nil)]
+    }
+
+    /// The last meeting popped or marked Not going, for the 5-second Undo.
+    var lastCleared: Meeting?
+
+    func undoClear() {
+        guard let meeting = lastCleared else { return }
+        lastCleared = nil
+        cleared.remove(meeting.id)
+        prefs.clearedMeetingIDs = cleared
+        shownNowFor.remove(meeting.id)
+        writeWidgetSnapshot()
+        Task { await syncAlarms() }
     }
 
     func finishOnboarding() {
@@ -200,7 +278,7 @@ final class AppModel {
                 let now = Date.now
                 let lead = TimeInterval(self.leadMinutes * 60)
                 if let due = self.upcoming(at: now).first(where: {
-                    now >= $0.start.addingTimeInterval(-lead) && now <= $0.start.addingTimeInterval(5 * 60)
+                    self.ringsFully($0) && now >= $0.start.addingTimeInterval(-lead) && now <= $0.start.addingTimeInterval(5 * 60)
                 }), !self.shownNowFor.contains(due.id) {
                     self.show(due, ring: true)
                 }
@@ -227,8 +305,8 @@ final class AppModel {
 
     func syncAlarms() async {
         guard alarmsAuthorized else { return }
-        let alarmMeetings = meetings.filter { !gentleCalendarIDs.contains($0.calendarID) }
-        let gentleMeetings = meetings.filter { gentleCalendarIDs.contains($0.calendarID) }
+        let alarmMeetings = meetings.filter { ringsFully($0) }
+        let gentleMeetings = meetings.filter { !ringsFully($0) }
         let now = Date.now
         let planned = AlarmPlanner.plan(meetings: alarmMeetings, leadMinutes: leadMinutes, now: now, cleared: cleared,
                                         countdown: countdownCard)
@@ -236,8 +314,18 @@ final class AppModel {
         testPlanned = testPlanned.filter { $0.fireDate > now && !cleared.contains($0.meeting.id) }
         let all = (planned + testPlanned).sorted { $0.fireDate < $1.fireDate }
         nextAlarm = all.first?.fireDate
-        // While Pop In is open it handles anything soon itself; Apple's alarm only covers later meetings.
-        let toSchedule = isForeground ? all.filter { $0.scheduleDate > now.addingTimeInterval(Self.openQuietWindow) } : all
+        // While Pop In is open it handles anything soon itself; Apple's alarm covers later meetings, and a backup one
+        // minute after each soon ring covers Pop In being killed. A meeting Pop In has already taken over gets none.
+        let toSchedule: [PlannedAlarm]
+        if isForeground {
+            let soonCutoff = now.addingTimeInterval(Self.openQuietWindow)
+            let later = all.filter { $0.scheduleDate > soonCutoff }
+            let backups = all.filter { $0.scheduleDate <= soonCutoff && !shownNowFor.contains($0.meeting.id) }
+                .map(AlarmPlanner.safetyBackup)
+            toSchedule = later + backups
+        } else {
+            toSchedule = all
+        }
         do {
             try await alarmService.sync(toSchedule)
             syncProblem = nil
@@ -296,7 +384,7 @@ final class AppModel {
         }
         let lead = TimeInterval(leadMinutes * 60)
         if let due = upcoming(at: now).first(where: {
-            now >= $0.start.addingTimeInterval(-lead - 60) && now <= $0.start.addingTimeInterval(5 * 60)
+            ringsFully($0) && now >= $0.start.addingTimeInterval(-lead - 60) && now <= $0.start.addingTimeInterval(5 * 60)
         }), !shownNowFor.contains(due.id) {
             show(due)
         }
@@ -338,6 +426,7 @@ final class AppModel {
         shownNowFor.insert(meeting.id)
         arrived = meeting
         if ring && isForeground { AlarmLoop.start() }
+        Task { await syncAlarms() }   // drops the backup alarm for this meeting
     }
 
     // MARK: Join and clear
@@ -357,6 +446,7 @@ final class AppModel {
         AlarmLoop.stop()
         cleared.insert(meeting.id)
         prefs.clearedMeetingIDs = cleared
+        lastCleared = meeting
         popCount += 1
         if !taughtPop { taughtPop = true; prefs.taughtPop = true }
         writeWidgetSnapshot()

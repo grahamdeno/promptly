@@ -119,6 +119,7 @@ struct BubbleView: View {
         .buttonStyle(.plain)
         .disabled(onPop == nil)
         .accessibilityLabel(accessibilityTitle)
+        .accessibilityHint("Pops the bubble")
         .accessibilityHidden(onPop == nil)
     }
 

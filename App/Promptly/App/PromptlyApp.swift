@@ -13,7 +13,7 @@ struct PromptlyApp: App {
         .onChange(of: scenePhase) { _, phase in
             switch phase {
             case .active: Task { await model.becameActive() }
-            case .background: Task { await model.wentToBackground() }
+            case .inactive, .background: Task { await model.wentToBackground() }
             default: break
             }
         }

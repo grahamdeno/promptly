@@ -5,6 +5,24 @@ enum AlarmSoundChoice: String, CaseIterable, Sendable {
     case bubbleBlow
     /// Apple's standard alarm sound. AlarmKit can't pick a named system tone such as Mercury.
     case appleDefault
+    /// The owner's own recorded pops, cleaned up and made louder (Sounds/recorded_pops_alarm.wav).
+    case recorded
+
+    var label: String {
+        switch self {
+        case .bubbleBlow: "Gum pops"
+        case .recorded: "Recorded"
+        case .appleDefault: "Apple"
+        }
+    }
+
+    /// The bundled file for this sound; Apple's default has none, so Pop In's own ring uses Gum pops for it.
+    var fileName: String {
+        switch self {
+        case .recorded: "recorded_pops_alarm.wav"
+        default: "bubble_blow_alarm.wav"
+        }
+    }
 }
 
 enum BallStyle: String, CaseIterable, Sendable {
@@ -77,6 +95,12 @@ final class Prefs: @unchecked Sendable {
     var alarmSound: AlarmSoundChoice {
         get { AlarmSoundChoice(rawValue: defaults.string(forKey: "alarmSound") ?? "") ?? .bubbleBlow }
         set { defaults.set(newValue.rawValue, forKey: "alarmSound") }
+    }
+
+    /// Calendars that always get a full alarm, even for events without a video link.
+    var alarmCalendarIDs: Set<String> {
+        get { Set(defaults.stringArray(forKey: "alarmCalendarIDs") ?? []) }
+        set { defaults.set(Array(newValue).sorted(), forKey: "alarmCalendarIDs") }
     }
 
     /// Calendars that get a gentle notification instead of a full alarm.

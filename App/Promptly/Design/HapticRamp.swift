@@ -53,8 +53,9 @@ enum AlarmLoop {
     private static var player: AVAudioPlayer?
 
     static func start() {
+        let file = Prefs().alarmSound.fileName
         guard player?.isPlaying != true,
-              let url = Bundle.main.url(forResource: "bubble_blow_alarm", withExtension: "wav"),
+              let url = Bundle.main.url(forResource: (file as NSString).deletingPathExtension, withExtension: "wav"),
               let p = try? AVAudioPlayer(contentsOf: url) else { return }
         try? AVAudioSession.sharedInstance().setCategory(.playback, options: [.duckOthers])
         try? AVAudioSession.sharedInstance().setActive(true)

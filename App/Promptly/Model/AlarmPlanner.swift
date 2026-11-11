@@ -41,8 +41,38 @@ enum AlarmPlanner {
             }
             .filter { $0.fireDate > now }
             .sorted { $0.fireDate < $1.fireDate }
+            .reduce(into: [PlannedAlarm]()) { merged, next in
+                // Meetings ringing in the same minute share one alarm: "Sprint review + Customer sync".
+                if let last = merged.last, abs(last.fireDate.timeIntervalSince(next.fireDate)) < 60 {
+                    merged[merged.count - 1] = combine(last, next, leadMinutes: leadMinutes)
+                } else {
+                    merged.append(next)
+                }
+            }
             .prefix(limit)
             .map { $0 }
+    }
+
+    /// One alarm for two meetings at the same minute. Join opens the first one that has a link.
+    static func combine(_ a: PlannedAlarm, _ b: PlannedAlarm, leadMinutes: Int) -> PlannedAlarm {
+        let first = a.meeting
+        let meeting = Meeting(id: first.id, eventID: first.eventID, title: "\(first.title) + \(b.meeting.title)",
+                              start: min(first.start, b.meeting.start), end: max(first.end, b.meeting.end),
+                              calendarID: first.calendarID, joinURL: first.joinURL ?? b.meeting.joinURL)
+        return PlannedAlarm(id: stableID(for: meeting, leadMinutes: leadMinutes, countdown: a.countdownSeconds != nil),
+                            meeting: meeting, fireDate: a.fireDate, countdownSeconds: a.countdownSeconds)
+    }
+
+    /// While Pop In is open it rings by itself; a quiet backup alarm one minute after the ring covers the case where
+    /// Pop In is killed before it can. Pop In cancels the backup the moment it takes over.
+    static func safetyBackup(for alarm: PlannedAlarm) -> PlannedAlarm {
+        let key = alarm.id.uuidString + "|safety"
+        var b = Array(SHA256.hash(data: Data(key.utf8)).prefix(16))
+        b[6] = (b[6] & 0x0F) | 0x50
+        b[8] = (b[8] & 0x3F) | 0x80
+        let id = UUID(uuid: (b[0], b[1], b[2], b[3], b[4], b[5], b[6], b[7],
+                             b[8], b[9], b[10], b[11], b[12], b[13], b[14], b[15]))
+        return PlannedAlarm(id: id, meeting: alarm.meeting, fireDate: alarm.fireDate.addingTimeInterval(60), countdownSeconds: nil)
     }
 
     /// Same meeting, title, link, lead time and countdown gives the same ID, so re-syncing never duplicates an alarm,

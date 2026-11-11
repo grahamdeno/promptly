@@ -1,0 +1,10 @@
+body{margin:0;font:17px/1.55 -apple-system,BlinkMacSystemFont,"Inter",system-ui,sans-serif;color:#141414;background:#fff}
+main{max-width:640px;margin:0 auto;padding:56px 24px 80px}
+h1{font-size:34px;letter-spacing:-.6px;margin:0 0 8px}
+h2{font-size:20px;margin:36px 0 8px}
+p,li{color:#333}
+a{color:#C8146A}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#FF7FB0;margin-left:3px}
+.muted{color:#4A4A4A;font-size:15px}
+nav{margin-top:40px;font-size:15px}
+nav a{margin-right:16px}

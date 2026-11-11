@@ -7,6 +7,7 @@ struct NowView: View {
     @Environment(\.openURL) private var openURL
     @Environment(\.dismiss) private var dismiss
     @State private var pops = 0
+    @ScaledMetric(relativeTo: .largeTitle) private var titleSize: CGFloat = 40
 
     var body: some View {
         TimelineView(.periodic(from: .now, by: 1)) { context in
@@ -34,7 +35,7 @@ struct NowView: View {
                         .font(.system(size: 14, weight: .medium))
                         .foregroundStyle(Brand.secondary)
                     Text(meeting.title)
-                        .font(Brand.display(40))
+                        .font(.system(size: titleSize, weight: .semibold))
                         .tracking(-1)
                         .foregroundStyle(Brand.ink)
                         .lineLimit(4)
