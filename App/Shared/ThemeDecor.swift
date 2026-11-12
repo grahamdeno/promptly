@@ -62,16 +62,29 @@ struct ThemeMarks: View {
                     .frame(width: w * 0.98, height: h * 0.16)
                     .position(x: w / 2, y: h * 0.22)
             case .disco:
-                // Mirror tiles, some catching the light.
-                Canvas { ctx, size in
-                    let n = 14
-                    let tile = size.width / CGFloat(n)
-                    var rng = SeededRandom(seed: 11)
-                    for row in 0..<n { for col in 0..<n {
-                        let r = CGRect(x: CGFloat(col) * tile + 1, y: CGFloat(row) * tile + 1, width: tile - 2, height: tile - 2)
-                        let v = rng.next()
-                        ctx.fill(Path(r), with: .color(v > 0.85 ? .white.opacity(0.9) : (v < 0.25 ? .black.opacity(0.25) : .white.opacity(0.12))))
-                    } }
+                // Mirror tiles turning: rows slide sideways, faster across the middle where the ball faces you,
+                // and the bright tiles travel with them (one turn every 10 seconds; still with Reduce Motion).
+                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { tl in
+                    let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
+                    Canvas { ctx, size in
+                        let n = 14
+                        let tile = size.width / CGFloat(n)
+                        let turn = CGFloat((t / 10).truncatingRemainder(dividingBy: 1))
+                        for row in 0..<n {
+                            var rng = SeededRandom(seed: UInt64(11 + row))
+                            let bright = (0..<n).map { _ in rng.next() }
+                            for col in 0..<(n + 1) {
+                                let base = (CGFloat(col) / CGFloat(n) + turn).truncatingRemainder(dividingBy: 1)
+                                // Squeeze toward the edges, like tiles curving around a sphere.
+                                let u = base * 2 - 1
+                                let x = (CGFloat(asin(Double(u))) / .pi + 0.5) * size.width
+                                let wTile = max(1, tile * CGFloat(cos(Double(u) * .pi / 2)) - 1.5)
+                                let v = bright[col % n]
+                                let r = CGRect(x: x - wTile / 2, y: CGFloat(row) * tile + 1, width: wTile, height: tile - 2)
+                                ctx.fill(Path(r), with: .color(v > 0.85 ? .white.opacity(0.95) : (v < 0.25 ? .black.opacity(0.25) : .white.opacity(0.12))))
+                            }
+                        }
+                    }
                 }
             case .soap:
                 // A thin, swirling rainbow film.
