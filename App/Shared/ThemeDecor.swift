@@ -11,7 +11,10 @@ struct ThemeMarks: View {
     let h: CGFloat
     /// How close the meeting is, 0 to 1 (the bubble's thinness); Mood ring turns from blue to green to red with it.
     var level: Double = 0.5
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
+    @Environment(\.themeStill) private var themeStill
+    /// Still with Reduce Motion, and in quiet mode or when the phone is warm (themeStill).
+    private var reduceMotion: Bool { systemReduceMotion || themeStill }
 
     var body: some View {
         ZStack {
@@ -19,7 +22,7 @@ struct ThemeMarks: View {
             case .moon:
                 // Soft craters, darker on their lower right with a lit rim on the upper left, carried slowly round as
                 // the moon turns (once every 40 seconds), narrowing toward the edge.
-                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { tl in
+                TimelineView(.animation(minimumInterval: 1.0 / 15, paused: reduceMotion)) { tl in
                     let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
                     ZStack {
                         ForEach(0..<(Self.craters.count * 2), id: \.self) { i in
@@ -29,7 +32,7 @@ struct ThemeMarks: View {
                 }
             case .snowball:
                 // Snow drifting down inside, swaying and turning as it falls.
-                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { tl in
+                TimelineView(.animation(minimumInterval: 1.0 / 15, paused: reduceMotion)) { tl in
                     let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
                     ZStack {
                         ForEach(0..<14, id: \.self) { i in
@@ -63,7 +66,7 @@ struct ThemeMarks: View {
             case .disco:
                 // Mirror tiles turning: rows slide sideways, faster across the middle where the ball faces you,
                 // and the bright tiles travel with them (one turn every 10 seconds; still with Reduce Motion).
-                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { tl in
+                TimelineView(.animation(minimumInterval: 1.0 / 15, paused: reduceMotion)) { tl in
                     let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
                     Canvas { ctx, size in
                         let n = 14
@@ -87,7 +90,7 @@ struct ThemeMarks: View {
                 }
             case .soap:
                 // A thin rainbow film that swirls and shimmers while it rests.
-                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { tl in
+                TimelineView(.animation(minimumInterval: 1.0 / 15, paused: reduceMotion)) { tl in
                     let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
                     Ellipse()
                         .fill(AngularGradient(colors: [GumPalette.rgb(0xFFB3D9), GumPalette.rgb(0xB8E0FF), GumPalette.rgb(0xC8F5D8),
@@ -100,7 +103,7 @@ struct ThemeMarks: View {
                 Ellipse().stroke(GumPalette.rgb(0xB9AEE6).opacity(0.8), lineWidth: max(1.5, w * 0.006))
             case .planet:
                 // Cloud bands drifting sideways as the planet turns, each at its own speed.
-                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { tl in
+                TimelineView(.animation(minimumInterval: 1.0 / 15, paused: reduceMotion)) { tl in
                     let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
                     VStack(spacing: h * 0.06) {
                         ForEach(0..<6, id: \.self) { i in
@@ -121,7 +124,7 @@ struct ThemeMarks: View {
                 }
             case .basketball:
                 // Seams, and the ball rolls to a new random angle now and then.
-                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { tl in
+                TimelineView(.animation(minimumInterval: 1.0 / 15, paused: reduceMotion)) { tl in
                     ZStack {
                         Rectangle().fill(Color.black.opacity(0.75)).frame(width: max(2, w * 0.012), height: h * 1.2)
                         Rectangle().fill(Color.black.opacity(0.75)).frame(width: w * 1.2, height: max(2, w * 0.012))
@@ -136,7 +139,7 @@ struct ThemeMarks: View {
                 ZStack {
                     Ellipse().fill(GumPalette.rgb(0xF48FB1)).frame(width: w * 0.86, height: h * 0.62).offset(y: -h * 0.12)
                     // Sprinkles that shimmer, each catching the light in turn.
-                    TimelineView(.animation(minimumInterval: 1.0 / 20, paused: reduceMotion)) { tl in
+                    TimelineView(.animation(minimumInterval: 1.0 / 15, paused: reduceMotion)) { tl in
                         let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
                         ZStack {
                             ForEach(0..<18, id: \.self) { i in
@@ -150,7 +153,7 @@ struct ThemeMarks: View {
                 Ellipse().fill(.white.opacity(0.25)).frame(width: w * 0.5, height: h * 0.7).offset(x: -w * 0.15, y: -h * 0.05).blur(radius: w * 0.05)
             case .eyeball:
                 // The eye looks around slowly: it glances to a new spot, holds, then glances again.
-                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { ctx in
+                TimelineView(.animation(minimumInterval: 1.0 / 15, paused: reduceMotion)) { ctx in
                     let t = reduceMotion ? 0 : ctx.date.timeIntervalSinceReferenceDate
                     let gaze = Self.gaze(t)
                     ZStack {
@@ -168,7 +171,7 @@ struct ThemeMarks: View {
             case .fishbowl:
                 // Water. Food sprinkles in on one side, the fish swims over and gobbles it, then the other side.
                 Rectangle().fill(GumPalette.rgb(0x7CC4E8).opacity(0.45)).frame(width: w, height: h * 0.72).position(x: w / 2, y: h * 0.64)
-                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { ctx in
+                TimelineView(.animation(minimumInterval: 1.0 / 15, paused: reduceMotion)) { ctx in
                     let t = reduceMotion ? 0 : ctx.date.timeIntervalSinceReferenceDate
                     let f = Self.fish(t)
                     ZStack {
@@ -194,7 +197,7 @@ struct ThemeMarks: View {
                 Ellipse().fill(RadialGradient(colors: [.white.opacity(0.35), .clear], center: UnitPoint(x: 0.35, y: 0.3), startRadius: 0, endRadius: w * 0.5))
             case .soccer:
                 // Black pentagon patches, smaller toward the edge, and the ball rolls to a new random angle now and then.
-                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { tl in
+                TimelineView(.animation(minimumInterval: 1.0 / 15, paused: reduceMotion)) { tl in
                     ZStack {
                         ForEach(0..<Self.patches.count, id: \.self) { i in
                             let p = Self.patches[i]
@@ -311,7 +314,7 @@ struct ThemeMarks: View {
                     .frame(width: w).position(x: w / 2, y: h * 0.57)
             case .cakePop:
                 // Sprinkles that glisten, each catching the light in turn.
-                TimelineView(.animation(minimumInterval: 1.0 / 20, paused: reduceMotion)) { tl in
+                TimelineView(.animation(minimumInterval: 1.0 / 15, paused: reduceMotion)) { tl in
                     let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
                     Canvas { ctx, size in
                         var rng = SeededRandom(seed: 12)
@@ -350,7 +353,7 @@ struct ThemeMarks: View {
                 }
             case .sun:
                 // Hot spots carried round as the sun turns, flaring as they go.
-                TimelineView(.animation(minimumInterval: 1.0 / 20, paused: reduceMotion)) { ctx in
+                TimelineView(.animation(minimumInterval: 1.0 / 15, paused: reduceMotion)) { ctx in
                     let t = reduceMotion ? 0 : ctx.date.timeIntervalSinceReferenceDate
                     let turn = (t / 14).truncatingRemainder(dividingBy: 1)
                     ZStack {
@@ -370,7 +373,7 @@ struct ThemeMarks: View {
                 }
             case .dandelion:
                 // Seeds radiating from the middle, each swaying slowly on its stalk.
-                TimelineView(.animation(minimumInterval: 1.0 / 20, paused: reduceMotion)) { tl in
+                TimelineView(.animation(minimumInterval: 1.0 / 15, paused: reduceMotion)) { tl in
                     let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
                     Canvas { ctx, size in
                         let c = CGPoint(x: size.width / 2, y: size.height * 0.55)
@@ -393,7 +396,7 @@ struct ThemeMarks: View {
                     }
                 }
             case .atom:
-                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { ctx in
+                TimelineView(.animation(minimumInterval: 1.0 / 15, paused: reduceMotion)) { ctx in
                     let t = reduceMotion ? 0 : ctx.date.timeIntervalSinceReferenceDate
                     ZStack {
                         Circle().fill(GumPalette.rgb(0x8AB4FF)).frame(width: w * 0.12, height: w * 0.12).blur(radius: w * 0.02)
@@ -468,7 +471,7 @@ struct ThemeMarks: View {
                         }
                     }
                 }
-                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { tl in
+                TimelineView(.animation(minimumInterval: 1.0 / 15, paused: reduceMotion)) { tl in
                     let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
                     Path { p in
                         p.move(to: CGPoint(x: w * 0.42, y: h * 0.16))
@@ -481,7 +484,7 @@ struct ThemeMarks: View {
                 }
             case .valentine:
                 // A heart that gives a double beat every few seconds.
-                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { tl in
+                TimelineView(.animation(minimumInterval: 1.0 / 15, paused: reduceMotion)) { tl in
                     let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
                     Image(systemName: "heart.fill").font(.system(size: w * 0.3)).foregroundStyle(.white.opacity(0.35 + 0.2 * HeartBeat.beat(t)))
                         .scaleEffect(1 + 0.14 * HeartBeat.beat(t))
@@ -524,7 +527,7 @@ struct ThemeMarks: View {
                     ctx.fill(Path(ellipseIn: CGRect(x: c.x - size.width * 0.06, y: c.y - size.width * 0.04, width: size.width * 0.12, height: size.width * 0.08)),
                              with: .color(palette.dark.opacity(0.8)))
                 }
-                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { tl in
+                TimelineView(.animation(minimumInterval: 1.0 / 15, paused: reduceMotion)) { tl in
                     let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
                     let k = t.truncatingRemainder(dividingBy: 9)
                     ZStack {
@@ -543,7 +546,7 @@ struct ThemeMarks: View {
                 // and a pool of wax sitting at the bottom.
                 Ellipse().fill(RadialGradient(colors: [GumPalette.rgb(0xFFB347).opacity(0.55), .clear],
                                               center: UnitPoint(x: 0.5, y: 1.0), startRadius: 0, endRadius: h * 0.75))
-                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { ctx in
+                TimelineView(.animation(minimumInterval: 1.0 / 15, paused: reduceMotion)) { ctx in
                     let t = reduceMotion ? 0 : ctx.date.timeIntervalSinceReferenceDate
                     ZStack {
                         Self.lava(t: t, w: w, h: h, color: GumPalette.rgb(0xFF9F1C), grow: 1)
@@ -774,7 +777,7 @@ struct RestSpin: ViewModifier {
 
     func body(content: Content) -> some View {
         if on {
-            TimelineView(.animation(minimumInterval: 1.0 / 30, paused: paused)) { tl in
+            TimelineView(.animation(minimumInterval: 1.0 / 15, paused: paused)) { tl in
                 let t = paused ? 0 : tl.date.timeIntervalSinceReferenceDate
                 content.rotationEffect(.degrees(150 * sin(t / 11 + seed) + 90 * sin(t / 6.3 + seed * 2.1)))
             }
@@ -830,6 +833,11 @@ struct EggShape: Shape {
     }
 }
 
+extension EnvironmentValues {
+    /// Hold the theme decoration still: quiet mode after a while untouched, or when the phone is warm or in Low Power Mode.
+    @Entry var themeStill: Bool = false
+}
+
 struct GlitterDots: View {
     var body: some View {
         Canvas { ctx, size in
@@ -847,7 +855,10 @@ struct ThemeTopper: View {
     let palette: GumPalette
     let w: CGFloat
     var h: CGFloat? = nil
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
+    @Environment(\.themeStill) private var themeStill
+    /// Still with Reduce Motion, and in quiet mode or when the phone is warm (themeStill).
+    private var reduceMotion: Bool { systemReduceMotion || themeStill }
 
     var body: some View {
         ZStack {
@@ -864,7 +875,7 @@ struct ThemeTopper: View {
                         .rotationEffect(.degrees(32))
                         .offset(x: w * 0.13, y: w * 0.06)
                     // The pin's ring sways a little, inviting a pull.
-                    TimelineView(.animation(minimumInterval: 1.0 / 20, paused: reduceMotion)) { ctx in
+                    TimelineView(.animation(minimumInterval: 1.0 / 15, paused: reduceMotion)) { ctx in
                         let t = reduceMotion ? 0 : ctx.date.timeIntervalSinceReferenceDate
                         Circle()
                             .stroke(GumPalette.rgb(0xC9A33A), lineWidth: max(2, w * 0.014))
@@ -925,7 +936,7 @@ struct ThemeTopper: View {
             case .planet:
                 // The ring, tilted across the ball.
                 // The ring wobbles: its tilt and openness sway slowly.
-                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { tl in
+                TimelineView(.animation(minimumInterval: 1.0 / 15, paused: reduceMotion)) { tl in
                     let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
                     Ellipse()
                         .stroke(LinearGradient(colors: [GumPalette.rgb(0xF5DEB3), GumPalette.rgb(0xC8A06A), GumPalette.rgb(0xF5DEB3)], startPoint: .leading, endPoint: .trailing),
@@ -936,7 +947,7 @@ struct ThemeTopper: View {
                 }
             case .soap:
                 // Tiny bubbles drifting up off the top, wobbling as they rise and fading away.
-                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { tl in
+                TimelineView(.animation(minimumInterval: 1.0 / 15, paused: reduceMotion)) { tl in
                     let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
                     ZStack {
                         ForEach(0..<9, id: \.self) { i in
@@ -946,7 +957,7 @@ struct ThemeTopper: View {
                 }
             case .donut:
                 // Sprinkles raining down onto the donut from above, tumbling as they fall.
-                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { tl in
+                TimelineView(.animation(minimumInterval: 1.0 / 15, paused: reduceMotion)) { tl in
                     let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
                     ZStack {
                         ForEach(0..<12, id: \.self) { i in
@@ -956,7 +967,7 @@ struct ThemeTopper: View {
                 }
             case .dandelion:
                 // A ragged, fluffy rim: wisps poking out past the edge, swaying with the seeds.
-                TimelineView(.animation(minimumInterval: 1.0 / 20, paused: reduceMotion)) { tl in
+                TimelineView(.animation(minimumInterval: 1.0 / 15, paused: reduceMotion)) { tl in
                     let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
                     let hh = h ?? w
                     Canvas { ctx, size in
@@ -976,7 +987,7 @@ struct ThemeTopper: View {
                 }
             case .valentine:
                 // Little hearts slip out on each beat and float slowly up and away.
-                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { tl in
+                TimelineView(.animation(minimumInterval: 1.0 / 15, paused: reduceMotion)) { tl in
                     let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
                     ZStack {
                         ForEach(0..<6, id: \.self) { i in

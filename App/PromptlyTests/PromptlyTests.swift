@@ -321,3 +321,19 @@ final class PackTests: XCTestCase {
         }
     }
 }
+
+
+final class QuietModeTests: XCTestCase {
+    func testQuietAfterTwoMinutesUntouchedWhenMeetingIsFar() {
+        let now = Date()
+        XCTAssertFalse(QuietMode.isQuiet(now: now, lastTouch: now.addingTimeInterval(-60), nextStart: nil))
+        XCTAssertTrue(QuietMode.isQuiet(now: now, lastTouch: now.addingTimeInterval(-121), nextStart: nil))
+        XCTAssertTrue(QuietMode.isQuiet(now: now, lastTouch: now.addingTimeInterval(-300), nextStart: now.addingTimeInterval(40 * 60)))
+    }
+
+    func testWakesWithinFifteenMinutesOfAMeeting() {
+        let now = Date()
+        XCTAssertFalse(QuietMode.isQuiet(now: now, lastTouch: now.addingTimeInterval(-600), nextStart: now.addingTimeInterval(14 * 60)))
+        XCTAssertFalse(QuietMode.isQuiet(now: now, lastTouch: now.addingTimeInterval(-600), nextStart: now.addingTimeInterval(-60)))
+    }
+}

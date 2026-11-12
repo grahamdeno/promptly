@@ -12,6 +12,9 @@ struct HomeView: View {
     @ScaledMetric(relativeTo: .largeTitle) private var countSize: CGFloat = 60
     @ScaledMetric(relativeTo: .title2) private var unitSize: CGFloat = 22
 
+    @State private var lastTouch = Date()
+    @State private var quiet = false
+
     var body: some View {
         TimelineView(.periodic(from: .now, by: 1)) { context in
             let now = context.date
@@ -19,7 +22,9 @@ struct HomeView: View {
             let next = model.calendarAuthorized && model.alarmsAuthorized ? upcoming.first : nil
             let progress = next.map { Countdown.progress(now: now, start: $0.start) } ?? 0
             let overdue = next.map { model.sinceRing($0, now: now) } ?? 0
+            let quietNow = QuietMode.isQuiet(now: now, lastTouch: lastTouch, nextStart: next?.start)
 
+            Group {
             if sizeClass == .regular {
                 // iPad: the meeting and the rest of today on the left, the bubble on the right.
                 ZStack {
@@ -53,9 +58,17 @@ struct HomeView: View {
                     .padding(.horizontal, 28)
                 }
             }
+            }
+            .onChange(of: quietNow, initial: true) { _, q in quiet = q }
         }
+        .environment(\.themeStill, quiet || PowerWatch.shared.strained)
+        .modifier(QuietBrightness(quiet: quiet))
+        .simultaneousGesture(DragGesture(minimumDistance: 0).onChanged { _ in
+            lastTouch = .now
+            quiet = false
+        })
         .hapticRamp(until: model.upcoming(at: .now).first?.start, enabled: model.buzz && model.arrived == nil)
-        .overlay { DiscoLights().ignoresSafeArea() }
+        .overlay { DiscoLights().ignoresSafeArea().environment(\.themeStill, quiet || PowerWatch.shared.strained) }
         .overlay(alignment: .bottom) { undoToast }
         .sheet(isPresented: $showCalendars) {
             SettingsView()

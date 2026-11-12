@@ -5,14 +5,15 @@ import SwiftUI
 /// Shows nothing for other themes, with Reduce Motion, or in screenshots.
 struct DiscoLights: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.themeStill) private var themeStill
 
     private static let colors: [Color] = [
         .white, GumPalette.rgb(0xFF7FD1), GumPalette.rgb(0x7FE3FF), GumPalette.rgb(0xFFD66B), GumPalette.rgb(0xB79BFF),
     ]
 
     var body: some View {
-        if GumPalette.current == .disco && !reduceMotion && !ScreenshotMode.isOn {
-            TimelineView(.animation(minimumInterval: 1.0 / 30)) { tl in
+        if GumPalette.current == .disco && !reduceMotion && !themeStill && !ScreenshotMode.isOn {
+            TimelineView(.animation(minimumInterval: 1.0 / 20)) { tl in
                 let t = tl.date.timeIntervalSinceReferenceDate
                 Canvas { ctx, size in
                     Self.draw(ctx: &ctx, size: size, t: t)

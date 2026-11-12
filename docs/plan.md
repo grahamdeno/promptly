@@ -327,3 +327,8 @@ Principles (owner agreed):
 | 2027-11-01 | Grenade, Yarn | Veterans Day, Nov 11; first cold weeks |
 
 Code needed after approval (Sonnet): per-theme release dates replacing the single seasonsInStore switch; one-day Try it; monthly What's new card with the two-dismissal stop; hide pack UI if Pro only. Icons wait until the themes are refined (owner, 2026-11-12).
+
+## Sprint 24: theme polish and keeping the phone cool (owner, 2026-11-12)
+- Disco light flecks across the screen; Moon turns; Fortune words surface inside the ball (15 min, alarm screen, Practice).
+- Cooler: quiet mode (2 min untouched and meeting over 15 min away: decoration still, screen dims to 60 percent; touch or the meeting nearing wakes it), resting animation at 15 fps (gumball shake 30), decoration still when the phone is warm or in Low Power Mode, the ball's glow drawn on a plain shape instead of every animated layer.
+- Not done (owner chose 1-4 only): keep screen on only within the hour or while charging.
