@@ -617,13 +617,20 @@ struct ThemeMarks: View {
         let period: Double = 4.5 + d.truncatingRemainder(dividingBy: 3) * 1.3
         let phase: Double = ((t + d * 0.83) / period).truncatingRemainder(dividingBy: 1)
         let size: CGFloat = w * (0.025 + 0.012 * CGFloat(i % 4))
-        let x: CGFloat = w * (0.25 + 0.5 * CGFloat((d * 0.37).truncatingRemainder(dividingBy: 1))) + w * 0.04 * CGFloat(sin(t * 2 + d))
+        let lane: CGFloat = CGFloat((d * 0.37).truncatingRemainder(dividingBy: 1))
+        let wobble: CGFloat = CGFloat(sin(t * 2 + d))
+        let x: CGFloat = w * (0.25 + 0.5 * lane) + w * 0.04 * wobble
         let y: CGFloat = w * 0.12 - w * 0.75 * CGFloat(phase)
         let fade: Double = hidden ? 0 : (phase < 0.1 ? phase * 10 : 1 - phase)
+        let line: CGFloat = max(1, size * 0.12)
+        let dot: CGFloat = size * 0.25
+        let nudge: CGFloat = -size * 0.2
+        let rim = AngularGradient(colors: soapColors, center: .center)
+        let glint = Circle().fill(Color.white.opacity(0.9)).frame(width: dot, height: dot).offset(x: nudge, y: nudge)
         return Circle()
-            .stroke(AngularGradient(colors: soapColors, center: .center), lineWidth: max(1, size * 0.12))
+            .stroke(rim, lineWidth: line)
             .background(Circle().fill(Color.white.opacity(0.35)))
-            .overlay(Circle().fill(Color.white.opacity(0.9)).frame(width: size * 0.25, height: size * 0.25).offset(x: -size * 0.2, y: -size * 0.2))
+            .overlay(glint)
             .frame(width: size, height: size)
             .position(x: x, y: y)
             .opacity(fade)
