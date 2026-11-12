@@ -17,7 +17,7 @@ struct NowView: View {
 
                 BubbleView(
                     progress: 1,
-                    overdue: max(0, now.timeIntervalSince(meeting.start)),
+                    overdue: model.sinceRing(meeting, now: now),
                     style: model.ballStyle,
                     popCount: pops,
                     hint: meeting.joinURL == nil ? "Pop when ready" : "Pop to join",
@@ -32,7 +32,7 @@ struct NowView: View {
 
                 VStack(alignment: .leading, spacing: 14) {
                     Text(status(now))
-                        .font(.system(size: 14, weight: .medium))
+                        .font(.subheadline.weight(.medium))
                         .foregroundStyle(Brand.secondary)
                     Text(meeting.title)
                         .font(.system(size: titleSize, weight: .semibold))
@@ -40,22 +40,27 @@ struct NowView: View {
                         .foregroundStyle(Brand.ink)
                         .lineLimit(4)
                     Text([Countdown.span(meeting), meeting.service?.rawValue].compactMap { $0 }.joined(separator: " · "))
-                        .font(.system(size: 16))
+                        .font(.callout)
                         .foregroundStyle(Brand.secondary)
                 }
                 .glassCard()
+                .frame(maxWidth: 680, alignment: .leading)
                 .overlay(alignment: .bottomLeading) {
-                    Button("Not going") {
+                    Button {
                         pops += 1
                         model.clear(meeting)
                         leave {}
+                    } label: {
+                        Text("Not going")
+                            .font(.subheadline.weight(.medium))
+                            .foregroundStyle(Brand.ink)
+                            .padding(.horizontal, 20)
+                            .frame(minHeight: 48)
+                            .contentShape(Capsule())
                     }
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundStyle(Brand.ink)
-                    .padding(.horizontal, 18)
-                    .frame(minHeight: 44)
+                    .buttonStyle(.plain)
                     .glassEffect(.regular, in: .capsule)
-                    .offset(y: 56)
+                    .offset(y: 60)
                 }
                 .padding(.horizontal, 12)
                 .padding(.top, 60)

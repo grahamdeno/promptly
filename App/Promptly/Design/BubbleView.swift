@@ -60,6 +60,7 @@ struct BubbleView: View {
                 }
                 if style == .bubble && !popping && overdue > 0 { sprouts }
                 if showPieces { pieces }
+                if showPieces && GumPalette.current == .unicorn && !reduceMotion { sprinkles }
                 if showLump { lump }
             }
             .frame(width: geo.size.width, height: geo.size.height, alignment: .bottom)
@@ -212,6 +213,50 @@ struct BubbleView: View {
         Scrap(start: .init(x: 0.66, y: 0.40), size: 0.08, fly: .init(width: 120, height: -300), fall: 280, spin: 260, strand: true, seed: 12),
     ]
 
+    /// Unicorn mode: which confetti pieces are unicorns.
+    private static let unicornSlots: Set<Int> = [0, 4, 9]
+
+    /// Cake sprinkles for Unicorn mode: little rounded rods in the rainbow, flung out with the confetti.
+    private struct Sprinkle {
+        let start: UnitPoint
+        let fly: CGSize
+        let fall: CGFloat
+        let spin: Double
+        let angle: Double
+        let color: Int
+    }
+
+    private static let sprinkleSet: [Sprinkle] = {
+        var rng = SeededRandom(seed: 42)
+        return (0..<36).map { i in
+            let a = Double(i) / 36 * 2 * .pi + rng.next() * 0.4
+            let reach = 140 + rng.next() * 260
+            return Sprinkle(start: UnitPoint(x: 0.3 + rng.next() * 0.4, y: 0.08 + rng.next() * 0.35),
+                            fly: CGSize(width: cos(a) * reach, height: -abs(sin(a)) * reach - 80),
+                            fall: 220 + rng.next() * 180, spin: (rng.next() - 0.5) * 720,
+                            angle: rng.next() * 180, color: i % 5)
+        }
+    }()
+
+    private var sprinkles: some View {
+        ZStack(alignment: .topLeading) {
+            ForEach(0..<Self.sprinkleSet.count, id: \.self) { i in
+                let sp = Self.sprinkleSet[i]
+                Capsule()
+                    .fill(GumPalette.rainbow.at(sp.color) ?? .pink)
+                    .frame(width: 14, height: 4.5)
+                    .rotationEffect(.degrees(sp.angle + (piecesDown ? sp.spin : (piecesUp ? sp.spin * 0.4 : 0))))
+                    .position(x: width * sp.start.x, y: height * sp.start.y)
+                    .offset(x: piecesDown ? sp.fly.width * 1.2 : (piecesUp ? sp.fly.width : 0),
+                            y: piecesDown ? sp.fly.height + sp.fall : (piecesUp ? sp.fly.height : 0))
+                    .opacity(piecesDown ? 0 : 1)
+            }
+        }
+        .frame(width: width, height: height)
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
+    }
+
     /// The scraps fly up and outward, tumbling, then fall away and fade.
     private var pieces: some View {
         ZStack(alignment: .topLeading) {
@@ -221,7 +266,11 @@ struct BubbleView: View {
                 let fallScale: CGFloat = 1.25
                 Group {
                     if GumPalette.current == .unicorn {
-                        ConfettiPiece(index: i).frame(width: max(18, side * 0.45), height: max(18, side * 0.45))
+                        if Self.unicornSlots.contains(i) {
+                            Text("🦄").font(.system(size: max(26, side * 0.5)))
+                        } else {
+                            ConfettiPiece(index: i).frame(width: max(18, side * 0.45), height: max(18, side * 0.45))
+                        }
                     } else {
                         GumScrap(seed: scrap.seed, strand: scrap.strand)
                             .frame(width: scrap.strand ? side * 1.9 : side, height: scrap.strand ? side * 0.42 : side * 0.82)
@@ -268,10 +317,8 @@ struct BubbleView: View {
             return
         }
         Task { @MainActor in
-            // A last stretch at the weak spot.
-            withAnimation(.easeOut(duration: 0.08)) { popScale = CGSize(width: 1.03, height: 1.045) }
-            try? await Task.sleep(for: .milliseconds(80))
-            // It tears: the bubble becomes scraps that fly up and out...
+            // It tears on the touch, in the same frame as the sound and the tap haptic (a stretch before it read as
+            // a hesitation): the bubble becomes scraps that fly up and out...
             piecesUp = false
             piecesDown = false
             showPieces = true
@@ -281,9 +328,10 @@ struct BubbleView: View {
             showLump = true
             lumpScale = 0.4
             withAnimation(.easeOut(duration: 0.25)) { lumpScale = 1 }
-            try? await Task.sleep(for: .milliseconds(300))
+            // The meeting clears while the pieces are still flying, so the card changes with the pop, not after it.
+            try? await Task.sleep(for: .milliseconds(60))
             action?()
-            try? await Task.sleep(for: .milliseconds(200))
+            try? await Task.sleep(for: .milliseconds(440))
             // ...then tumble down and fade, like gravity took over.
             withAnimation(.timingCurve(0.5, 0, 0.85, 0.6, duration: 0.65)) { piecesDown = true }
             try? await Task.sleep(for: .milliseconds(450))
@@ -389,7 +437,7 @@ struct GumBubbleShape: View {
                     // Unicorn: a holographic rainbow band slides slowly across the gum.
                     TimelineView(.animation(minimumInterval: 1.0 / 20, paused: reduceMotion)) { ctx in
                         let t = ctx.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 9) / 9
-                        UnicornSheen(phase: reduceMotion ? 0.5 : t)
+                        UnicornSheen(phase: reduceMotion || ScreenshotMode.isOn ? 0.5 : t)
                     }
                     .clipShape(Ellipse())
                 }
@@ -449,4 +497,15 @@ struct ConfettiPiece: View {
 extension Array {
     /// Safe lookup: nil when out of range.
     func at(_ i: Int) -> Element? { indices.contains(i) ? self[i] : nil }
+}
+
+/// A tiny repeatable random source, so the sprinkles land the same way every pop.
+struct SeededRandom {
+    private var state: UInt64
+    init(seed: UInt64) { state = seed &* 0x9E3779B97F4A7C15 | 1 }
+    /// 0..<1
+    mutating func next() -> Double {
+        state ^= state << 13; state ^= state >> 7; state ^= state << 17
+        return Double(state % 1_000_000) / 1_000_000
+    }
 }

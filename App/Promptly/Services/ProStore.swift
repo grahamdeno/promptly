@@ -59,8 +59,8 @@ final class ProStore {
         #endif
     }
 
-    /// Screenshot mode only: show every Pro feature without touching StoreKit.
-    func forceBetaAccess() { betaAccess = true }
+    /// Screenshot and audit mode only: show every Pro feature (true) or the App Store version (false), without StoreKit.
+    func setDemoAccess(_ on: Bool) { betaAccess = on }
 
     func load() async {
         await checkBetaAccess()

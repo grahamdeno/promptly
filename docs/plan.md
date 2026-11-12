@@ -177,3 +177,20 @@ Review: https://claude.ai/artifact/Xs4CqLSRPxh6u4VgfZJpko (App Store readiness r
 - Done: `docs/app-store-listing.md` (name, subtitle, keywords, description, captions).
 - Next: check the screenshots; if the pop frame misses the burst, tune the 0.3 s delay in `ScreenshotTests.test6Pop`.
   Grok uploads the listing and pictures; Graham presses Submit for Review.
+
+## Sprint 16: sounds, buds, Unicorn sprinkles, card spacing, settings rebuilt (owner, 2026-11-11)
+- Sounds: the recorded alarm is now "Popcorn" (rebuilt from the 12 strongest pops, high-passed, evened out, no room
+  tone; the quiet boomy first pops were the "hollow" start). The bubble's pop is one real pop from that recording.
+  Unicorn's pop is a new Sparkle (pop plus a shower of tiny bells). Pop sound is its own setting (Pop, Sparkle, Off);
+  Sparkle is the default in Unicorn mode until the owner picks.
+- Pop In's own ring starts at 25% volume and rises over the last two minutes to full at the start. Apple's Lock Screen
+  alarm volume is the phone's ringer volume; AlarmKit gives no control over it.
+- Extra bubbles bud from the ring time (first at about 15 s), not from the start time.
+- Unicorn confetti adds 36 cake sprinkles and three unicorns.
+- Home card: more space between label, title, countdown and time.
+- Settings rebuilt like Scales and Shoebox: Pro row; Meetings (Calendars, Ring before); Alarm (Sound, Lock Screen
+  countdown, Heads-up buzzes); Bubble (color balls, Pop sound, Buzz, Keep screen on); Help. Each row shows its answer
+  and opens one screen. Calendars grouped by account, big accounts folded, search past 8, "Turn all on/off" per
+  account, per-calendar Smart / Always rings / Quiet. Gear icon on Home instead of the calendar icon.
+- Next: the friction audit (model: Shoebox docs/audit/08-ux-audit.md). Grok's review notes say "calendar button";
+  update to "settings button (gear)".

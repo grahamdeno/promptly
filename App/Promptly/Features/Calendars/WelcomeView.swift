@@ -14,27 +14,35 @@ struct WelcomeView: View {
     var body: some View {
         switch step {
         case .choose:
-            CalendarsView(firstRun: true, onDone: { step = .covered })
+            CalendarsView(onDone: { step = .covered })
         default:
             ZStack {
                 Color.white.ignoresSafeArea()
                 BubbleView(progress: bubbleProgress, style: .bubble, popCount: 0).ignoresSafeArea()
-                VStack(alignment: .leading, spacing: 16) {
-                    Wordmark().padding(.top, 8)
-                    Spacer()
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text(title)
-                            .font(.system(size: titleSize, weight: .semibold))
-                            .tracking(-0.9)
-                            .foregroundStyle(Brand.ink)
-                            .fixedSize(horizontal: false, vertical: true)
-                        Text(message)
-                            .font(.system(size: bodySize))
-                            .foregroundStyle(Brand.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
+                // The words scroll if they're large (big text sizes); the button always stays on screen.
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        Wordmark().padding(.top, 8)
+                        Spacer(minLength: 24)
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text(title)
+                                .font(.system(size: titleSize, weight: .semibold))
+                                .tracking(-0.9)
+                                .foregroundStyle(Brand.ink)
+                                .fixedSize(horizontal: false, vertical: true)
+                            Text(message)
+                                .font(.system(size: bodySize))
+                                .foregroundStyle(Brand.secondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        .glassCard()
+                        Spacer(minLength: 24)
                     }
-                    .glassCard()
-                    Spacer()
+                    .frame(minHeight: 520)
+                    .padding(.horizontal, 24)
+                }
+                .scrollBounceBehavior(.basedOnSize)
+                .safeAreaInset(edge: .bottom) {
                     VStack(spacing: 10) {
                         Button(asking ? "One moment…" : buttonTitle) { advance() }
                             .buttonStyle(PrimaryButtonStyle(height: 56))
@@ -49,9 +57,9 @@ struct WelcomeView: View {
                     }
                     .padding(14)
                     .glassEffect(.regular, in: .rect(cornerRadius: 28))
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 16)
                 }
-                .padding(.horizontal, 24)
-                .padding(.bottom, 32)
             }
         }
     }

@@ -206,3 +206,48 @@ final class MergeAndBackupTests: XCTestCase {
         XCTAssertEqual(backup.id, AlarmPlanner.safetyBackup(for: plan[0]).id)
     }
 }
+
+final class CalendarGroupsTests: XCTestCase {
+    private let cals = [
+        CalendarInfo(id: "1", title: "Work", source: "Exchange", colorHex: "#000000"),
+        CalendarInfo(id: "2", title: "Home", source: "iCloud", colorHex: "#000000"),
+        CalendarInfo(id: "3", title: "Family", source: "iCloud", colorHex: "#000000"),
+        CalendarInfo(id: "4", title: "Holidays", source: "", colorHex: "#000000"),
+    ]
+
+    func testGroupsByAccountSorted() {
+        let groups = CalendarGroups.group(cals)
+        XCTAssertEqual(groups.map(\.source), ["Exchange", "iCloud", "Other"])
+        XCTAssertEqual(groups[1].calendars.map(\.title), ["Family", "Home"])
+    }
+
+    func testSearchMatchesTitleOrAccount() {
+        XCTAssertEqual(CalendarGroups.group(cals, matching: "fam").flatMap(\.calendars).map(\.id), ["3"])
+        XCTAssertEqual(CalendarGroups.group(cals, matching: "ICLOUD").flatMap(\.calendars).count, 2)
+        XCTAssertTrue(CalendarGroups.group(cals, matching: "zzz").isEmpty)
+    }
+
+    func testSummaryAndCounts() {
+        XCTAssertEqual(CalendarGroups.summary(cals, disabled: []), "All 4")
+        XCTAssertEqual(CalendarGroups.summary(cals, disabled: ["2", "4"]), "2 of 4")
+        XCTAssertEqual(CalendarGroups.summary([], disabled: []), "None")
+        XCTAssertEqual(CalendarGroups.group(cals)[1].onCount(disabled: ["2"]), 1)
+    }
+
+    func testPopChoiceFollowsColorUntilPicked() {
+        let defaults = UserDefaults(suiteName: "test-pop-\(UUID().uuidString)")!
+        let prefs = Prefs(defaults: defaults)
+        XCTAssertEqual(prefs.popChoice, .pop)
+        prefs.gumColor = .unicorn
+        XCTAssertEqual(prefs.popChoice, .sparkle)
+        prefs.popChoiceSaved = .pop
+        XCTAssertEqual(prefs.popChoice, .pop)
+    }
+
+    func testAlarmVolumeRampsOverLastTwoMinutes() {
+        let start = Date(timeIntervalSince1970: 10_000)
+        XCTAssertEqual(AlarmLoop.volume(now: start.addingTimeInterval(-300), start: start), AlarmLoop.quiet)
+        XCTAssertEqual(AlarmLoop.volume(now: start.addingTimeInterval(-60), start: start), (AlarmLoop.quiet + 1) / 2, accuracy: 0.001)
+        XCTAssertEqual(AlarmLoop.volume(now: start, start: start), 1)
+    }
+}

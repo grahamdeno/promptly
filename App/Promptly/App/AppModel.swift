@@ -62,13 +62,20 @@ final class AppModel {
     var buzz: Bool {
         didSet { prefs.buzz = buzz }
     }
-    var popSound: Bool {
-        didSet { prefs.popSound = popSound }
+    /// Pop, Sparkle or Off. Follows the bubble color (Sparkle for Unicorn) until the owner picks one.
+    var popChoice: PopChoice {
+        didSet { if !followingColor { prefs.popChoiceSaved = popChoice } }
     }
+    @ObservationIgnored private var followingColor = false
     /// Bubble color. Also tints the alarm's buttons, so a change reschedules the alarms; widgets redraw.
     var gumColor: GumPalette {
         didSet {
             prefs.gumColor = gumColor
+            if prefs.popChoiceSaved == nil {
+                followingColor = true
+                popChoice = prefs.popChoice
+                followingColor = false
+            }
             // The app icon follows the bubble color (iOS shows a one-line notice when it changes).
             let icon: String? = gumColor == .coral ? "AppIcon-Coral" : (gumColor == .unicorn ? "AppIcon-Unicorn" : nil)
             if UIApplication.shared.alternateIconName != icon {
@@ -91,7 +98,7 @@ final class AppModel {
         didSet {
             prefs.gentleCalendarIDs = gentleCalendarIDs
             Task {
-                if !gentleCalendarIDs.isEmpty { _ = await nudgeService.requestAccess() }
+                if !gentleCalendarIDs.isEmpty, !ScreenshotMode.isOn { _ = await nudgeService.requestAccess() }
                 await syncAlarms()
             }
         }
@@ -103,7 +110,7 @@ final class AppModel {
         didSet {
             prefs.nudges = nudges
             Task {
-                if nudges, !(await nudgeService.requestAccess()) { nudges = false; return }
+                if nudges, !ScreenshotMode.isOn, !(await nudgeService.requestAccess()) { nudges = false; return }
                 await syncAlarms()
             }
         }
@@ -123,7 +130,7 @@ final class AppModel {
         disabledCalendarIDs = prefs.disabledCalendarIDs
         countdownCard = prefs.countdownCard
         buzz = prefs.buzz
-        popSound = prefs.popSound
+        popChoice = prefs.popChoice
         alarmSound = prefs.alarmSound
         gumColor = prefs.gumColor
         gentleCalendarIDs = prefs.gentleCalendarIDs
@@ -143,25 +150,26 @@ final class AppModel {
             if self.leadMinutes > 5 { self.leadMinutes = 5 }
             if self.keepAwake { self.keepAwake = false }
         }
+        PopHaptics.prepare()
         if let scene = ScreenshotMode.scene {
             // App Store screenshots: demo meetings, no alarms, everything unlocked. didSet doesn't run in init,
             // so none of this is saved or scheduled.
-            onboarded = true
-            calendarAuthorized = true
-            alarmsAuthorized = true
+            onboarded = scene != .welcome
+            calendarAuthorized = scene != .welcome
+            alarmsAuthorized = scene != .welcome
             taughtPop = true
             buzz = false
-            popSound = false
+            popChoice = .off
             keepAwake = false
             gumColor = scene == .unicorn ? .unicorn : .bubblegum
             ballStyle = .bubble
             leadMinutes = 2
             cleared = []
-            calendars = ScreenshotMode.calendars
-            meetings = ScreenshotMode.meetings()
+            calendars = scene == .manycals ? ScreenshotMode.manyCalendars : ScreenshotMode.calendars
+            meetings = scene == .empty ? [] : ScreenshotMode.meetings()
             // The Pro sheet scene shows the App Store version of the sheet (price and buy button), for Apple's
             // in-app purchase review screenshot; every other scene shows Pro features unlocked.
-            if scene != .pro { store.forceBetaAccess() }
+            store.setDemoAccess(scene != .pro && !ScreenshotMode.free)
             if scene == .now || scene == .late { arrived = meetings.first }
             if scene == .pro { showPro = true }
             return
@@ -182,6 +190,13 @@ final class AppModel {
 
     // MARK: Upcoming
 
+    /// Seconds since this meeting's alarm rang (0 before it). The extra bubbles bud off from here, so the first
+    /// appears about 15 seconds after the ring rather than after the start time.
+    func sinceRing(_ meeting: Meeting, now: Date) -> TimeInterval {
+        guard ringsFully(meeting) else { return max(0, now.timeIntervalSince(meeting.start)) }
+        return max(0, now.timeIntervalSince(meeting.start.addingTimeInterval(-TimeInterval(leadMinutes * 60))))
+    }
+
     /// Meetings not yet cleared that haven't ended.
     func upcoming(at now: Date) -> [Meeting] {
         (meetings + testMeetings).filter { !cleared.contains($0.id) && $0.end > now }.sorted { $0.start < $1.start }
@@ -195,11 +210,13 @@ final class AppModel {
     }
 
     func requestCalendarAccess() async {
+        if ScreenshotMode.isOn { calendarAuthorized = true; return }   // the audit walks first run without system prompts
         calendarAuthorized = await calendarService.requestAccess()
         await refresh()
     }
 
     func requestAlarmAccess() async {
+        if ScreenshotMode.isOn { alarmsAuthorized = true; return }
         alarmsAuthorized = await alarmService.requestAccess()
         await refresh()
     }
@@ -465,7 +482,7 @@ final class AppModel {
         guard !settingsOpen else { return }   // the watcher tries again once settings close
         shownNowFor.insert(meeting.id)
         arrived = meeting
-        if ring && isForeground { AlarmLoop.start() }
+        if ring && isForeground { AlarmLoop.start(meetingStart: meeting.start) }
         Task { await syncAlarms() }   // drops the backup alarm for this meeting
     }
 
