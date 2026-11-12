@@ -55,6 +55,7 @@ struct HomeView: View {
             }
         }
         .hapticRamp(until: model.upcoming(at: .now).first?.start, enabled: model.buzz && model.arrived == nil)
+        .overlay { DiscoLights().ignoresSafeArea() }
         .overlay(alignment: .bottom) { undoToast }
         .sheet(isPresented: $showCalendars) {
             SettingsView()

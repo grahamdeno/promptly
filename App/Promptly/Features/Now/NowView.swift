@@ -32,6 +32,8 @@ struct NowView: View {
                 )
                 .ignoresSafeArea()
 
+                DiscoLights().ignoresSafeArea()
+
                 VStack(alignment: .leading, spacing: 14) {
                     Text(status(now))
                         .font(.subheadline.weight(.medium))
