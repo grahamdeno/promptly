@@ -37,8 +37,10 @@ WHAT YOU GET, FREE
 POP IN PRO ($4.99, ONE TIME)
 • Unicorn mode: a rainbow bubble that bursts into confetti
 • Fortune: black glass with a violet glow, a light meeting fortune, and a pop of glowing mist
+• Moon: a silver moon that pops into space dust, a UFO and aliens
+• Grenade: pull the pin to join
 • Rainbow unicorn app icon
-• Three more alarm sounds: Popcorn, Chimes and Oracle
+• Four more alarm sounds: Popcorn, Chimes, Oracle and Sonar
 • Ring 10 minutes before
 • Always alarm for a whole calendar, link or not
 • Desk mode: keep the screen on while Pop In is open

@@ -236,3 +236,15 @@ Review: https://claude.ai/artifact/Xs4CqLSRPxh6u4VgfZJpko (App Store readiness r
   "We're at time, but quickly..." / Today's other word: "bandwidth."
   Voice: things everyone recognizes from meetings, said lightly. No coaching, no advice.
 - Sound generator: docs/fortune/sound_samples.py.
+
+## Sprint 19: Moon and Grenade themes, Seasons pack saved for later (owner chose 2026-11-12)
+- Moon (A, silver): cratered silver ball with a soft blue glow; "Next transmission"; pops into space dust, stars,
+  a UFO and aliens; Bloop pop; Sonar alarm (radar ping that speeds up). Icon: moon on deep space blue with a UFO.
+- Grenade (A, olive drab, "pull the pin"): olive ball with a seam, fuze, spoon and gold pin ring on top; pops into
+  the pin ring and spoon flying off, a gray smoke puff and olive and gold confetti; "Pull the pin" pop (ping, clink,
+  puff). Icon: olive grenade on khaki. Owner chose this over the blue practice version knowing the age-rating and
+  review risk; nothing in it is harmed or exploded, so the age rating answers stay None.
+- Seasons pack, built and held back (`GumPalette.seasonsReady = false`): Snowball (frost, snowflakes, Snow crunch),
+  Ornament (red, gold glitter band and cap, Glass ting, Sleigh bells alarm), Pumpkin spice (ribs, stem, cinnamon,
+  Leaf thunk). Turn on by flipping seasonsReady (and add the "change with the seasons" switch if wanted).
+- All Pro. Every color has its own app icon (AppIcon-<Name>).

@@ -253,4 +253,20 @@ final class Journeys: XCTestCase {
         a.pause(0.3)
         a.shot("fortune-pop")
     }
+
+    // J11. Moon and Grenade: the ball, its marks and topper, the pop.
+    func test11_MoonAndGrenade() {
+        let a = Audit("J11-moon-grenade")
+        defer { a.finish() }
+        for theme in ["moon", "grenade"] {
+            a.launch(theme)
+            a.shot("\(theme)-home")
+            a.accessibility("\(theme)-home")
+            _ = popBubble(a)
+            a.pause(0.3)
+            a.shot("\(theme)-pop")
+        }
+        a.launch("moon")
+        a.check("Moon says Next transmission", a.any(containing: "Next transmission").exists, severity: 2)
+    }
 }

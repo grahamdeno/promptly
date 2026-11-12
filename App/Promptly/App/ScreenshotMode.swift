@@ -5,7 +5,7 @@ import Foundation
 enum ScreenshotScene: String {
     case home, now, late, unicorn, settings, pop, pro
     /// For the UX audit: first run, nothing coming up, the next meeting tomorrow, and a long list of calendars.
-    case welcome, empty, far, manycals, fortune
+    case welcome, empty, far, manycals, fortune, moon, grenade
 }
 
 enum ScreenshotMode {
@@ -28,7 +28,7 @@ enum ScreenshotMode {
         let firstStart: Date
         switch scene {
         case .now: firstStart = now.addingTimeInterval(2 * 60)
-        case .fortune: firstStart = now.addingTimeInterval(4 * 60)
+        case .fortune, .moon, .grenade: firstStart = now.addingTimeInterval(4 * 60)
         case .far: firstStart = Calendar.current.date(bySettingHour: 16, minute: 35, second: 0,
                                                       of: now.addingTimeInterval(24 * 3600)) ?? now.addingTimeInterval(20 * 3600)
         case .late: firstStart = now.addingTimeInterval(120 - 50)   // 50 s after a 2-minute-early ring

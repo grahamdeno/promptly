@@ -12,8 +12,14 @@ enum AlarmSoundChoice: String, CaseIterable, Sendable {
     case chimes
     /// "Oracle": a humming singing bowl, struck and swelling, made for Fortune (Sounds/oracle_alarm.wav). Pro.
     case oracle
+    /// "Sonar": a friendly radar ping that speeds up, made for Moon (Sounds/sonar_alarm.wav). Pro.
+    case sonar
+    /// "Sleigh bells": jingles and a bell tune, for the holiday themes; held back with them (Sounds/sleigh_alarm.wav). Pro.
+    case sleighBells
 
-    var isPro: Bool { self == .recorded || self == .chimes || self == .oracle }
+    var isPro: Bool { !(self == .bubbleBlow || self == .appleDefault) }
+    /// The sounds offered in Settings (seasonal ones wait for their themes).
+    static var available: [AlarmSoundChoice] { allCases.filter { GumPalette.seasonsReady || $0 != .sleighBells } }
 
     var label: String {
         switch self {
@@ -21,6 +27,8 @@ enum AlarmSoundChoice: String, CaseIterable, Sendable {
         case .recorded: "Popcorn"
         case .chimes: "Chimes"
         case .oracle: "Oracle"
+        case .sonar: "Sonar"
+        case .sleighBells: "Sleigh bells"
         case .appleDefault: "Apple"
         }
     }
@@ -31,6 +39,8 @@ enum AlarmSoundChoice: String, CaseIterable, Sendable {
         case .recorded: "recorded_pops_alarm.wav"
         case .chimes: "unicorn_chimes_alarm.wav"
         case .oracle: "oracle_alarm.wav"
+        case .sonar: "sonar_alarm.wav"
+        case .sleighBells: "sleigh_alarm.wav"
         default: "bubble_blow_alarm.wav"
         }
     }
@@ -44,13 +54,47 @@ enum PopChoice: String, CaseIterable, Sendable {
     case sparkle
     /// A quick swell into a bright ting with a sparkly tail (Sounds/fortune_pop.wav). Fortune's default.
     case star
+    /// Moon: a sci-fi bloop with a wobbly tail.
+    case bloop
+    /// Grenade: the pin's ping, the spoon's clink, and a soft puff.
+    case pinPull
+    /// Snowball: a soft snow crunch.
+    case crunch
+    /// Ornament: a bright glass ting.
+    case glassTing
+    /// Pumpkin spice: a soft thunk and a leafy crunch.
+    case leafThunk
     case off
+
+    /// The Pro pop sounds belong to the Pro themes.
+    var isPro: Bool { !(self == .pop || self == .sparkle || self == .off) }
+    var fileName: String? {
+        switch self {
+        case .pop: "pop"
+        case .sparkle: "unicorn_pop"
+        case .star: "fortune_pop"
+        case .bloop: "moon_pop"
+        case .pinPull: "grenade_pop"
+        case .crunch: "snow_pop"
+        case .glassTing: "ornament_pop"
+        case .leafThunk: "pumpkin_pop"
+        case .off: nil
+        }
+    }
+    static var available: [PopChoice] {
+        allCases.filter { GumPalette.seasonsReady || ![.crunch, .glassTing, .leafThunk].contains($0) }
+    }
 
     var label: String {
         switch self {
         case .pop: "Pop"
         case .sparkle: "Sparkle"
         case .star: "Star"
+        case .bloop: "Bloop"
+        case .pinPull: "Pull the pin"
+        case .crunch: "Snow crunch"
+        case .glassTing: "Glass ting"
+        case .leafThunk: "Leaf thunk"
         case .off: "Off"
         }
     }
@@ -126,6 +170,11 @@ final class Prefs: @unchecked Sendable {
         switch gumColor {
         case .unicorn: return .sparkle
         case .fortune: return .star
+        case .moon: return .bloop
+        case .grenade: return .pinPull
+        case .snowball: return .crunch
+        case .ornament: return .glassTing
+        case .pumpkin: return .leafThunk
         default: return .pop
         }
     }

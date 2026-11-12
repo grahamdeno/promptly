@@ -9,10 +9,7 @@ enum Brand {
     /// 8:1 on white; stays readable on the glass pane over the bubble.
     static let secondary = Color(red: 0x4A / 255, green: 0x4A / 255, blue: 0x4A / 255)
     /// Pink for small words on white (links, labels): the bubble pinks are too light to read at small sizes.
-    static var accentText: Color {
-        GumPalette.current == .fortune ? Color(red: 0x5B / 255, green: 0x33 / 255, blue: 0xC2 / 255)
-                                       : Color(red: 0xB0 / 255, green: 0x2E / 255, blue: 0x68 / 255)
-    }
+    static var accentText: Color { GumPalette.current.accentText }
     static let hairline = Color(red: 0xEF / 255, green: 0xEF / 255, blue: 0xEF / 255)
 
     static func display(_ size: CGFloat, _ weight: Font.Weight = .semibold) -> Font {

@@ -137,7 +137,8 @@ struct HomeView: View {
     private func meetingBlock(_ meeting: Meeting, now: Date, then: Meeting?) -> some View {
         let parts = Countdown.parts(now: now, start: meeting.start)
         let started = meeting.start <= now
-        let label = isDemo(meeting) ? "Practice" : [started ? "Happening now" : "Next", meeting.service?.rawValue].compactMap { $0 }.joined(separator: " · ")
+        let nextWord = model.gumColor == .moon ? "Next transmission" : "Next"
+        let label = isDemo(meeting) ? "Practice" : [started ? "Happening now" : nextWord, meeting.service?.rawValue].compactMap { $0 }.joined(separator: " · ")
         // How Pop In will alert, so a quiet one is never a surprise.
         let rings = model.ringsFully(meeting)
         let how = rings ? "Rings \(model.leadMinutes) min before" : "Quiet notification only"

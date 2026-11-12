@@ -79,12 +79,8 @@ final class AppModel {
                 followingColor = false
             }
             // The app icon follows the bubble color (iOS shows a one-line notice when it changes).
-            let icon: String? = switch gumColor {
-            case .coral: "AppIcon-Coral"
-            case .unicorn: "AppIcon-Unicorn"
-            case .fortune: "AppIcon-Fortune"
-            case .bubblegum: nil
-            }
+            // Each color has a matching app icon named after it (AppIcon-Coral, AppIcon-Moon…); Bubblegum is the main one.
+            let icon: String? = gumColor == .bubblegum ? nil : "AppIcon-" + gumColor.rawValue.prefix(1).uppercased() + String(gumColor.rawValue.dropFirst())
             if UIApplication.shared.alternateIconName != icon {
                 UIApplication.shared.setAlternateIconName(icon) { _ in }
             }
@@ -158,7 +154,7 @@ final class AppModel {
             guard let self else { return }
             if self.gumColor.isPro { self.gumColor = .bubblegum }
             if self.alarmSound.isPro { self.alarmSound = .bubbleBlow }
-            if self.popChoice == .star { self.popChoice = .pop }
+            if self.popChoice.isPro { self.popChoice = .pop }
             if self.leadMinutes > 5 { self.leadMinutes = 5 }
             if self.keepAwake { self.keepAwake = false }
         }
@@ -173,7 +169,13 @@ final class AppModel {
             buzz = false
             popChoice = .off
             keepAwake = false
-            gumColor = scene == .unicorn ? .unicorn : (scene == .fortune ? .fortune : .bubblegum)
+            gumColor = switch scene {
+            case .unicorn: .unicorn
+            case .fortune: .fortune
+            case .moon: .moon
+            case .grenade: .grenade
+            default: .bubblegum
+            }
             ballStyle = .bubble
             leadMinutes = 2
             cleared = []

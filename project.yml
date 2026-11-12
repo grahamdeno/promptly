@@ -31,7 +31,7 @@ targets:
         INFOPLIST_KEY_CFBundleDisplayName: Pop In
         INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription: "Pop In reads your calendars to ring before each meeting. It never changes your calendar, and nothing leaves this iPhone."
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
-        ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES: AppIcon-Coral AppIcon-Unicorn AppIcon-Fortune
+        ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES: AppIcon-Coral AppIcon-Unicorn AppIcon-Fortune AppIcon-Moon AppIcon-Grenade AppIcon-Snowball AppIcon-Ornament AppIcon-Pumpkin
         ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS: YES
         INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
         INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
