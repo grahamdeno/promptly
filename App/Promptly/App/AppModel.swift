@@ -328,9 +328,11 @@ final class AppModel {
         calendarAuthorized = calendarService.isAuthorized
         alarmsAuthorized = alarmService.isAuthorized
         await refresh()
-        // Opening Pop In while an alarm rings counts as seeing it: silence it, show the meeting full screen.
+        // Opening Pop In while an alarm rings (say by tapping the banner) counts as seeing it: silence it and show
+        // the meeting full screen, even if Pop In showed it once already.
+        let ringing = alarmService.isAlerting
         alarmService.stopAlerting()
-        handleArrival()
+        handleArrival(force: ringing)
         scheduleBackgroundRefresh()
         startWatching()
     }
@@ -381,7 +383,8 @@ final class AppModel {
         if ScreenshotMode.isOn { return }
         guard calendarAuthorized else { meetings = []; calendars = []; return }
         calendars = calendarService.calendars()
-        meetings = calendarService.upcoming(disabled: disabledCalendarIDs)
+        // One meeting in two calendars (say the invite and a forwarded copy) gets one alarm, not two.
+        meetings = MeetingMerge.merge(calendarService.upcoming(disabled: disabledCalendarIDs), preferred: { self.ringsFully($0) })
         // Forget cleared meetings that have dropped out of the window.
         let live = Set(meetings.map(\.id))
         let pruned = cleared.intersection(live)
@@ -415,7 +418,7 @@ final class AppModel {
             toSchedule = all
         }
         do {
-            try await alarmService.sync(toSchedule)
+            try await alarmService.sync(toSchedule, keep: Set(testPlanned.map(\.id)))
             syncProblem = nil
             scheduledAlarms = alarmService.scheduledCount
         } catch {
@@ -459,7 +462,7 @@ final class AppModel {
     /// After the alarm's Join button: open the link straight away, or show the Now screen when there is none.
     /// Opening Promptly near a meeting's alarm time also shows the Now screen, as a fallback in case the
     /// alarm button's intent doesn't reach the app.
-    private func handleArrival(now: Date = .now) {
+    private func handleArrival(now: Date = .now, force: Bool = false) {
         if let pending = PendingJoin.take(now: now) {
             let meeting = meetings.first { $0.id == pending.meetingID }
             if let url = URL(string: pending.joinURL), !pending.joinURL.isEmpty {
@@ -473,7 +476,7 @@ final class AppModel {
         let lead = TimeInterval(leadMinutes * 60)
         if let due = upcoming(at: now).first(where: {
             ringsFully($0) && now >= $0.start.addingTimeInterval(-lead - 60) && now <= $0.start.addingTimeInterval(5 * 60)
-        }), !shownNowFor.contains(due.id) {
+        }), force || !shownNowFor.contains(due.id) {
             show(due)
         }
     }
