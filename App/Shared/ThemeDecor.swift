@@ -100,15 +100,26 @@ struct ThemeMarks: View {
                 }
                 Ellipse().stroke(GumPalette.rgb(0xB9AEE6).opacity(0.8), lineWidth: max(1.5, w * 0.006))
             case .planet:
-                // Cloud bands.
-                VStack(spacing: h * 0.06) {
-                    ForEach(0..<6, id: \.self) { i in
-                        Capsule().fill((i % 2 == 0 ? palette.dark : palette.light).opacity(0.35))
-                            .frame(width: w * 1.1, height: h * 0.07)
+                // Cloud bands drifting sideways as the planet turns, each at its own speed.
+                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { tl in
+                    let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
+                    VStack(spacing: h * 0.06) {
+                        ForEach(0..<6, id: \.self) { i in
+                            let speed = 0.03 + 0.012 * Double(i % 3)
+                            let shift = CGFloat((t * speed).truncatingRemainder(dividingBy: 1))
+                            HStack(spacing: w * 0.08) {
+                                ForEach(0..<4, id: \.self) { k in
+                                    Capsule().fill((i % 2 == 0 ? palette.dark : palette.light).opacity(k % 2 == 0 ? 0.4 : 0.25))
+                                        .frame(width: w * 0.42, height: h * 0.07)
+                                }
+                            }
+                            .offset(x: -w * shift * 2)
+                            .frame(width: w * 1.1, alignment: .leading)
+                        }
                     }
+                    .rotationEffect(.degrees(-12))
+                    .blur(radius: max(1, w * 0.008))
                 }
-                .rotationEffect(.degrees(-12))
-                .blur(radius: max(1, w * 0.008))
             case .basketball:
                 // Seams.
                 ZStack {
@@ -525,12 +536,16 @@ struct ThemeTopper: View {
                     .frame(width: w * 0.3, height: w * 0.3).position(x: w * 0.72, y: w * 0.0)
             case .planet:
                 // The ring, tilted across the ball.
-                Ellipse()
-                    .stroke(LinearGradient(colors: [GumPalette.rgb(0xF5DEB3), GumPalette.rgb(0xC8A06A), GumPalette.rgb(0xF5DEB3)], startPoint: .leading, endPoint: .trailing),
-                            lineWidth: max(4, w * 0.035))
-                    .frame(width: w * 1.45, height: w * 0.28)
-                    .rotationEffect(.degrees(-12))
-                    .position(x: w / 2, y: (h ?? w) / 2)
+                // The ring wobbles: its tilt and openness sway slowly.
+                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { tl in
+                    let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
+                    Ellipse()
+                        .stroke(LinearGradient(colors: [GumPalette.rgb(0xF5DEB3), GumPalette.rgb(0xC8A06A), GumPalette.rgb(0xF5DEB3)], startPoint: .leading, endPoint: .trailing),
+                                lineWidth: max(4, w * 0.035))
+                        .frame(width: w * 1.45, height: w * (0.28 + 0.06 * CGFloat(sin(t * 0.9))))
+                        .rotationEffect(.degrees(-12 + 5 * sin(t * 0.7)))
+                        .position(x: w / 2, y: (h ?? w) / 2)
+                }
             case .soap:
                 // Tiny bubbles drifting up off the top, wobbling as they rise and fading away.
                 TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { tl in
