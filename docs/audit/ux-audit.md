@@ -78,3 +78,4 @@ Pro choices marked and open the Pro sheet, never a dead end.
 | Date | Commit | Result |
 |---|---|---|
 | Nov 11 | 7421ca1 | First walk, 4 configs, 36 journeys. Found UX-1 to UX-11 (findings.md), led by first run blocked at large text. |
+| Nov 11 | 87fdd95 | Final code, 4 configs, 36 journeys. UX-1 to UX-11 hold (first run completes at the largest text). New, small: at the largest text the Pro row squeezes and the Rings line cuts off (PR #19). The rest is test-side: big-text Settings walk loses its rows off screen; Skip counts the Undo tap. |
