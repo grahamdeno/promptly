@@ -210,3 +210,19 @@ Review: https://claude.ai/artifact/Xs4CqLSRPxh6u4VgfZJpko (App Store readiness r
 - App Store header image in docs/app-store-header.png (5244 x 2950, no text).
 - Owner: leave the EU out of availability for now (no DSA trader declaration). Not submitting yet; phone checks after
   this build. Still version 1.0 (not submitted), so the newer 1.0 build replaces 1024 on the version.
+
+## Next: Fortune theme (Pro), first update after 1.0 (owner chose 2026-11-12)
+- Look: mockup B ("Obsidian") without the round window (that's the Magic 8 Ball's mark; Mattel owns name and look).
+  Black glass ball, violet edge glow that slowly circles, a soft star drifting inside. Buds: small black spheres
+  with their own glow. Violet accent replaces pink; violet wordmark dot. Indigo app icon with the black ball.
+- Pop: violet mist rising and fading, tiny white and gold star sparks. No glass shards.
+- Pop sound: "Star" (docs/fortune/pop_star.wav; third Pop choice beside Pop and Sparkle; default in Fortune).
+- Alarm: "Oracle", the singing bowl (owner's favorite; preview in docs/fortune; final 28 s, swelling).
+  Selectable with any color.
+- Fortunes on the card in the last 10 minutes, one per meeting (stable), can be turned off. Owner's list (kept):
+  Bring coffee. / You'll be on mute. / This could have been an email. / Someone will say "circle back." /
+  Fix your hair. Just kidding, you look great. / Good things are on the agenda. / You'll end early. Maybe. /
+  Unmute before you talk. / Take the good notes. / Someone will share the wrong screen. / Today's word: "alignment." /
+  Stand up and stretch first. / Someone will say "can you see my screen?" / Listen twice, talk once. /
+  Your Wi-Fi will hold. Probably. / Someone will say "you're on mute."
+- Sound generator: docs/fortune/sound_samples.py.
