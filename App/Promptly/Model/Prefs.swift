@@ -64,10 +64,12 @@ enum PopChoice: String, CaseIterable, Sendable {
     case glassTing
     /// Pumpkin spice: a soft thunk and a leafy crunch.
     case leafThunk
+    /// Each theme's own sound (the default for the novelty themes).
+    case themeSound
     case off
 
     /// The Pro pop sounds belong to the Pro themes.
-    var isPro: Bool { !(self == .pop || self == .sparkle || self == .off) }
+    var isPro: Bool { !(self == .pop || self == .sparkle || self == .off || self == .themeSound) }
     var fileName: String? {
         switch self {
         case .pop: "pop"
@@ -78,6 +80,7 @@ enum PopChoice: String, CaseIterable, Sendable {
         case .crunch: "snow_pop"
         case .glassTing: "ornament_pop"
         case .leafThunk: "pumpkin_pop"
+        case .themeSound: GumPalette.current.popFile
         case .off: nil
         }
     }
@@ -95,6 +98,7 @@ enum PopChoice: String, CaseIterable, Sendable {
         case .crunch: "Snow crunch"
         case .glassTing: "Glass ting"
         case .leafThunk: "Leaf thunk"
+        case .themeSound: "Match the theme"
         case .off: "Off"
         }
     }
@@ -175,7 +179,8 @@ final class Prefs: @unchecked Sendable {
         case .snowball: return .crunch
         case .ornament: return .glassTing
         case .pumpkin: return .leafThunk
-        default: return .pop
+        case .bubblegum, .coral: return .pop
+        default: return .themeSound
         }
     }
 

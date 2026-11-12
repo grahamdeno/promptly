@@ -80,7 +80,7 @@ final class AppModel {
             }
             // The app icon follows the bubble color (iOS shows a one-line notice when it changes).
             // Each color has a matching app icon named after it (AppIcon-Coral, AppIcon-Moon…); Bubblegum is the main one.
-            let icon: String? = gumColor == .bubblegum ? nil : "AppIcon-" + gumColor.rawValue.prefix(1).uppercased() + String(gumColor.rawValue.dropFirst())
+            let icon: String? = !gumColor.hasIcon ? nil : "AppIcon-" + gumColor.rawValue.prefix(1).uppercased() + String(gumColor.rawValue.dropFirst())
             if UIApplication.shared.alternateIconName != icon {
                 UIApplication.shared.setAlternateIconName(icon) { _ in }
             }
@@ -174,7 +174,7 @@ final class AppModel {
             case .fortune: .fortune
             case .moon: .moon
             case .grenade: .grenade
-            default: .bubblegum
+            default: ScreenshotMode.theme ?? .bubblegum
             }
             ballStyle = .bubble
             leadMinutes = 2

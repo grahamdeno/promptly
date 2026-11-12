@@ -300,5 +300,12 @@ final class ThemeTests: XCTestCase {
         }
         XCTAssertFalse(GumPalette.coral.isPro)
         XCTAssertFalse(PopChoice.pop.isPro)
+        for palette in GumPalette.novelty {
+            prefs.gumColor = palette
+            XCTAssertEqual(prefs.popChoice, .themeSound)
+            XCTAssertTrue(palette.isHeld)
+            XCTAssertFalse(palette.popFile.isEmpty)
+        }
+        XCTAssertFalse(GumPalette.moon.isHeld)
     }
 }

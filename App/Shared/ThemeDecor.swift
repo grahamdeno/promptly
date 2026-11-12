@@ -9,6 +9,9 @@ struct ThemeMarks: View {
     let palette: GumPalette
     let w: CGFloat
     let h: CGFloat
+    /// How close the meeting is, 0 to 1 (the bubble's thinness); Mood ring turns from blue to green to red with it.
+    var level: Double = 0.5
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         ZStack {
@@ -58,6 +61,97 @@ struct ThemeMarks: View {
                     .stroke(palette.dark.opacity(0.35), lineWidth: max(1.5, w * 0.008))
                     .frame(width: w * 0.98, height: h * 0.16)
                     .position(x: w / 2, y: h * 0.22)
+            case .disco:
+                // Mirror tiles, some catching the light.
+                Canvas { ctx, size in
+                    let n = 14
+                    let tile = size.width / CGFloat(n)
+                    var rng = SeededRandom(seed: 11)
+                    for row in 0..<n { for col in 0..<n {
+                        let r = CGRect(x: CGFloat(col) * tile + 1, y: CGFloat(row) * tile + 1, width: tile - 2, height: tile - 2)
+                        let v = rng.next()
+                        ctx.fill(Path(r), with: .color(v > 0.85 ? .white.opacity(0.9) : (v < 0.25 ? .black.opacity(0.25) : .white.opacity(0.12))))
+                    } }
+                }
+            case .soap:
+                // A thin, swirling rainbow film.
+                Ellipse()
+                    .fill(AngularGradient(colors: [GumPalette.rgb(0xFFB3D9), GumPalette.rgb(0xB8E0FF), GumPalette.rgb(0xC8F5D8),
+                                                   GumPalette.rgb(0xFFF1A8), GumPalette.rgb(0xD7B8FF), GumPalette.rgb(0xFFB3D9)], center: .center))
+                    .opacity(0.45)
+                    .blur(radius: max(4, w * 0.03))
+                Ellipse().stroke(GumPalette.rgb(0xB9AEE6).opacity(0.8), lineWidth: max(1.5, w * 0.006))
+            case .planet:
+                // Cloud bands.
+                VStack(spacing: h * 0.06) {
+                    ForEach(0..<6, id: \.self) { i in
+                        Capsule().fill((i % 2 == 0 ? palette.dark : palette.light).opacity(0.35))
+                            .frame(width: w * 1.1, height: h * 0.07)
+                    }
+                }
+                .rotationEffect(.degrees(-12))
+                .blur(radius: max(1, w * 0.008))
+            case .basketball:
+                // Seams.
+                ZStack {
+                    Rectangle().fill(Color.black.opacity(0.75)).frame(width: max(2, w * 0.012), height: h)
+                    Rectangle().fill(Color.black.opacity(0.75)).frame(width: w, height: max(2, w * 0.012))
+                    Ellipse().stroke(Color.black.opacity(0.75), lineWidth: max(2, w * 0.012)).frame(width: w * 0.55, height: h * 1.1).offset(x: -w * 0.45)
+                    Ellipse().stroke(Color.black.opacity(0.75), lineWidth: max(2, w * 0.012)).frame(width: w * 0.55, height: h * 1.1).offset(x: w * 0.45)
+                }
+            case .donut:
+                // Pink glaze with sprinkles, and the hole.
+                ZStack {
+                    Ellipse().fill(GumPalette.rgb(0xF48FB1)).frame(width: w * 0.86, height: h * 0.62).offset(y: -h * 0.12)
+                    ForEach(0..<18, id: \.self) { i in
+                        let a = Double(i) * 0.9
+                        Capsule().fill([GumPalette.rgb(0xFFFFFF), GumPalette.rgb(0x3DA5FF), GumPalette.rgb(0xFFD43B), GumPalette.rgb(0x3DDC97)][i % 4])
+                            .frame(width: max(4, w * 0.035), height: max(1.5, w * 0.012))
+                            .rotationEffect(.radians(a * 2))
+                            .offset(x: cos(a) * w * 0.3, y: sin(a) * h * 0.18 - h * 0.12)
+                    }
+                    Ellipse().fill(palette.dark.opacity(0.85)).frame(width: w * 0.2, height: h * 0.12).offset(y: -h * 0.14)
+                }
+            case .waterBalloon:
+                Ellipse().fill(.white.opacity(0.25)).frame(width: w * 0.5, height: h * 0.7).offset(x: -w * 0.15, y: -h * 0.05).blur(radius: w * 0.05)
+            case .eyeball:
+                // The iris looks up and to the side.
+                ZStack {
+                    Ellipse().stroke(GumPalette.rgb(0xE57373).opacity(0.35), lineWidth: max(1, w * 0.004)).frame(width: w * 0.9, height: h * 0.9)
+                    Circle().fill(RadialGradient(colors: [GumPalette.rgb(0x6EC6FF), GumPalette.rgb(0x1F5FA8)], center: .center, startRadius: 0, endRadius: w * 0.14))
+                        .frame(width: w * 0.28, height: w * 0.28)
+                    Circle().fill(Color.black).frame(width: w * 0.12, height: w * 0.12)
+                    Circle().fill(.white.opacity(0.9)).frame(width: w * 0.04, height: w * 0.04).offset(x: -w * 0.04, y: -w * 0.04)
+                }
+                .position(x: w * 0.55, y: h * 0.3)
+            case .fishbowl:
+                // Water, and a goldfish swimming slowly back and forth.
+                Rectangle().fill(GumPalette.rgb(0x7CC4E8).opacity(0.45)).frame(width: w, height: h * 0.72).position(x: w / 2, y: h * 0.64)
+                TimelineView(.animation(minimumInterval: 1.0 / 20, paused: reduceMotion)) { ctx in
+                    let t = reduceMotion ? 0 : ctx.date.timeIntervalSinceReferenceDate
+                    Text("🐠").font(.system(size: max(14, w * 0.14)))
+                        .scaleEffect(x: cos(t / 3) >= 0 ? -1 : 1, y: 1)
+                        .position(x: w * (0.5 + 0.22 * sin(t / 3)), y: h * (0.42 + 0.03 * sin(t)))
+                }
+            case .moodRing:
+                // Blue when it's far off, green as it nears, red when it's time.
+                let c: Color = level < 0.5 ? GumPalette.rgb(0x2E6FD8) : (level < 0.85 ? GumPalette.rgb(0x2EA86B) : GumPalette.rgb(0xD8342E))
+                Ellipse().fill(c.opacity(0.75)).blendMode(.color)
+                Ellipse().fill(RadialGradient(colors: [.white.opacity(0.35), .clear], center: UnitPoint(x: 0.35, y: 0.3), startRadius: 0, endRadius: w * 0.5))
+            case .lavaLamp:
+                // Warm blobs rising and sinking.
+                TimelineView(.animation(minimumInterval: 1.0 / 20, paused: reduceMotion)) { ctx in
+                    let t = reduceMotion ? 0 : ctx.date.timeIntervalSinceReferenceDate
+                    ZStack {
+                        ForEach(0..<4, id: \.self) { i in
+                            let d = Double(i)
+                            Ellipse().fill(GumPalette.rgb(0xFFC23A))
+                                .frame(width: w * (0.18 + 0.06 * d), height: w * (0.22 + 0.05 * d))
+                                .position(x: w * (0.3 + 0.14 * d), y: h * (0.55 + 0.3 * sin(t / (6 + d) + d)))
+                        }
+                    }
+                    .blur(radius: max(3, w * 0.02))
+                }
             default:
                 EmptyView()
             }
@@ -148,6 +242,21 @@ struct ThemeTopper: View {
                         .offset(x: w * 0.07, y: -w * 0.05)
                 }
                 .position(x: w / 2, y: w * 0.01)
+            case .planet:
+                // The ring, tilted across the ball.
+                Ellipse()
+                    .stroke(LinearGradient(colors: [GumPalette.rgb(0xF5DEB3), GumPalette.rgb(0xC8A06A), GumPalette.rgb(0xF5DEB3)], startPoint: .leading, endPoint: .trailing),
+                            lineWidth: max(4, w * 0.035))
+                    .frame(width: w * 1.45, height: w * 0.28)
+                    .rotationEffect(.degrees(-12))
+                    .position(x: w / 2, y: (h ?? w) / 2)
+            case .waterBalloon:
+                // The tied knot.
+                Ellipse().fill(palette.dark).frame(width: w * 0.06, height: w * 0.05).position(x: w / 2, y: -w * 0.005)
+            case .fishbowl:
+                // The bowl's lip.
+                Capsule().stroke(GumPalette.rgb(0x9FD3EE), lineWidth: max(2, w * 0.012))
+                    .frame(width: w * 0.42, height: w * 0.05).position(x: w / 2, y: w * 0.02)
             default:
                 EmptyView()
             }
@@ -193,13 +302,46 @@ enum ThemeDebris {
             if i == 0 || i == 4 || i == 8 { Text("🍂").font(.system(size: emoji)) }
             else if i == 6 { Text("☕").font(.system(size: emoji)) }
             else { Ellipse().fill([GumPalette.rgb(0x96522A), GumPalette.rgb(0xC4783C), GumPalette.rgb(0x6E3C1E)][i % 3]).frame(width: small * 0.5, height: small * 0.35) }
+        case .disco:
+            if i == 0 { Text("🪩").font(.system(size: emoji)) }
+            else { Rectangle().fill(i % 3 == 0 ? GumPalette.rgb(0xFFD66B) : (i % 3 == 1 ? Color.white : GumPalette.rgb(0xB8BEC8)))
+                    .overlay(Rectangle().stroke(GumPalette.rgb(0x8A8F99), lineWidth: 0.5)).frame(width: small * 0.6, height: small * 0.6) }
+        case .soap:
+            Circle().stroke(GumPalette.rgb(0xA99EE0), lineWidth: 1.5).background(Circle().fill(.white.opacity(0.3)))
+                .frame(width: small * (i % 2 == 0 ? 1.2 : 0.7), height: small * (i % 2 == 0 ? 1.2 : 0.7))
+        case .planet:
+            if i == 0 { Ellipse().stroke(GumPalette.rgb(0xC8A06A), lineWidth: 5).frame(width: side * 1.2, height: side * 0.3) }
+            else if i % 3 == 0 { Circle().fill(GumPalette.rgb(0x9CA3AF)).frame(width: small, height: small) }
+            else { FourPointStar().fill(GumPalette.rgb(0xE0B07A)).frame(width: small * 0.8, height: small * 0.8) }
+        case .basketball:
+            if i == 0 { Text("🏀").font(.system(size: emoji)) }
+            else { Capsule().fill(i % 2 == 0 ? GumPalette.rgb(0xE8742A) : Color.black.opacity(0.8)).frame(width: small, height: small * 0.3) }
+        case .donut:
+            if i == 0 { Text("🍩").font(.system(size: emoji)) }
+            else { Capsule().fill([GumPalette.rgb(0xF48FB1), GumPalette.rgb(0x3DA5FF), GumPalette.rgb(0xFFD43B), GumPalette.rgb(0x3DDC97), Color.white][i % 5])
+                    .frame(width: small * 0.9, height: small * 0.28) }
+        case .waterBalloon:
+            if i == 0 { Text("💦").font(.system(size: emoji)) }
+            else { Circle().fill(GumPalette.rgb(0x3BA4E8).opacity(0.75)).frame(width: small * 0.7, height: small * 0.7) }
+        case .eyeball:
+            if i == 0 { Text("👁️").font(.system(size: emoji)) }
+            else if i % 2 == 0 { Capsule().fill(Color.black.opacity(0.8)).frame(width: small * 0.9, height: 2.5) }
+            else { Capsule().fill([GumPalette.rgb(0x6EC6FF), GumPalette.rgb(0xFF8A3D), GumPalette.rgb(0x3DDC97)][i % 3]).frame(width: small, height: small * 0.35) }
+        case .fishbowl:
+            if i == 0 { Text("🐠").font(.system(size: emoji)) }
+            else { Circle().stroke(GumPalette.rgb(0x5BB5E0), lineWidth: 1.5).frame(width: small * (i % 2 == 0 ? 1.0 : 0.6), height: small * (i % 2 == 0 ? 1.0 : 0.6)) }
+        case .moodRing:
+            FourPointStar().fill([GumPalette.rgb(0x2E6FD8), GumPalette.rgb(0x2EA86B), GumPalette.rgb(0xD8342E), GumPalette.rgb(0x9B5CFF)][i % 4])
+                .frame(width: small, height: small)
+        case .lavaLamp:
+            Ellipse().fill(i % 2 == 0 ? GumPalette.rgb(0xFFC23A) : GumPalette.rgb(0xFF7A3D)).frame(width: side * 0.7, height: side * 0.8).blur(radius: 3)
         default:
             EmptyView()
         }
     }
 
     static func handles(_ palette: GumPalette) -> Bool {
-        [.moon, .grenade, .snowball, .ornament, .pumpkin].contains(palette)
+        [.moon, .grenade, .snowball, .ornament, .pumpkin].contains(palette) || GumPalette.novelty.contains(palette)
     }
 }
 

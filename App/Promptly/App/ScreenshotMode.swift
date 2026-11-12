@@ -20,6 +20,11 @@ enum ScreenshotMode {
 
     static var isOn: Bool { scene != nil }
     static let args = ProcessInfo.processInfo.arguments
+    /// `-theme <name>`: any bubble color, for the audit.
+    static var theme: GumPalette? {
+        guard let i = args.firstIndex(of: "-theme"), i + 1 < args.count else { return nil }
+        return GumPalette(rawValue: args[i + 1])
+    }
     /// `-free`: show the free version (Pro choices locked), for the audit.
     static var free: Bool { args.contains("-free") }
 

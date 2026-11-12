@@ -144,11 +144,21 @@ enum PopSound {
     /// Every pop sound, loaded once.
     private static var players: [PopChoice: AVAudioPlayer] = {
         var all: [PopChoice: AVAudioPlayer] = [:]
-        for choice in PopChoice.allCases {
+        for choice in PopChoice.allCases where choice != .themeSound {
             if let name = choice.fileName, let p = load(name) { all[choice] = p }
         }
         return all
     }()
+    /// The theme sounds, by file name, loaded when first used.
+    private static var byFile: [String: AVAudioPlayer] = [:]
+    private static func player(for choice: PopChoice) -> AVAudioPlayer? {
+        guard choice == .themeSound else { return players[choice] }
+        let name = GumPalette.current.popFile
+        if let p = byFile[name] { return p }
+        let p = load(name)
+        byFile[name] = p
+        return p
+    }
 
     private static func load(_ name: String) -> AVAudioPlayer? {
         guard let url = Bundle.main.url(forResource: name, withExtension: "wav") else { return nil }
@@ -160,6 +170,7 @@ enum PopSound {
     /// Loads both sounds ahead of time (at launch), so a tap never waits on reading a file.
     static func prepare() {
         _ = players
+        _ = player(for: .themeSound)
     }
 
     /// Pop or Sparkle, as chosen in settings (Unicorn mode defaults to Sparkle). Never activates the audio session
@@ -171,7 +182,7 @@ enum PopSound {
         if session.category != .ambient, !AlarmLoop.isPlaying {
             try? session.setCategory(.ambient, options: [.mixWithOthers])
         }
-        let player = players[choice] ?? players[.pop]
+        let player = player(for: choice) ?? players[.pop]
         player?.currentTime = 0
         player?.play()
     }

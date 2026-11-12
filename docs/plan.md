@@ -248,3 +248,12 @@ Review: https://claude.ai/artifact/Xs4CqLSRPxh6u4VgfZJpko (App Store readiness r
   Ornament (red, gold glitter band and cap, Glass ting, Sleigh bells alarm), Pumpkin spice (ribs, stem, cinnamon,
   Leaf thunk). Shown in TestFlight and Xcode builds only; set `GumPalette.seasonsInStore = true` to release them in the App Store. Owner will decide later how to restrict and release each theme.
 - All Pro. Every color has its own app icon (AppIcon-<Name>).
+
+## Sprint 20: ten novelty themes (owner: "build and ship them all", 2026-11-12)
+- Disco (mirror tiles, glitter, bass bwomp), Soap bubble (rainbow film, plip), Planet (bands and ring, whoosh),
+  Basketball (seams, swish), Donut (glaze, sprinkles, boing), Water balloon (knot, splash), Eyeball (iris,
+  squish), Fishbowl (water and a swimming goldfish, blub), Mood ring (blue to green to red as the meeting nears,
+  sparkle), Lava lamp (rising blobs, gloop). Each pops into its own pieces.
+- New "Match the theme" pop sound (default for these). All Pro.
+- Held from the App Store with the holiday themes (shown in TestFlight); owner decides later how to restrict and
+  release each. No app icons yet for these ten (they keep the Bubblegum icon).

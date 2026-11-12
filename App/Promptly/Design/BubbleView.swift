@@ -468,7 +468,7 @@ struct GumBubbleShape: View {
                     }
                     .clipShape(Ellipse())
                 }
-                ThemeMarks(palette: GumPalette.current, w: w, h: h)
+                ThemeMarks(palette: GumPalette.current, w: w, h: h, level: thinness)
                 if GumPalette.current == .fortune {
                     // Fortune: a soft star of light drifts slowly inside the black glass.
                     TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion || ScreenshotMode.isOn)) { ctx in

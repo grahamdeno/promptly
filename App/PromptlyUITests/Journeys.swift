@@ -269,4 +269,18 @@ final class Journeys: XCTestCase {
         a.launch("moon")
         a.check("Moon says Next transmission", a.any(containing: "Next transmission").exists, severity: 2)
     }
+
+    // J12. Every held theme (holiday and novelty): the ball and the pop, one picture each.
+    func test12_AllThemes() {
+        let a = Audit("J12-all-themes")
+        defer { a.finish() }
+        for theme in ["snowball", "ornament", "pumpkin", "disco", "soap", "planet", "basketball", "donut",
+                      "waterBalloon", "eyeball", "fishbowl", "moodRing", "lavaLamp"] {
+            a.launch("fortune", theme: theme, settle: 2)
+            a.shot("\(theme)")
+            _ = popBubble(a)
+            a.pause(0.3)
+            a.shot("\(theme)-pop")
+        }
+    }
 }
