@@ -38,6 +38,9 @@ final class ScreenshotTests: XCTestCase {
 
     func test5Settings() { _ = launch("settings"); snap("5-settings", after: 3) }
 
+    /// For App Store Connect's in-app purchase review screenshot.
+    func test7Pro() { _ = launch("pro"); snap("7-pro", after: 4) }
+
     func test6Pop() {
         let app = launch("pop")
         Thread.sleep(forTimeInterval: 2.5)

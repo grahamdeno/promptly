@@ -6,6 +6,8 @@ Paste into App Store Connect (Grok or Graham). Character limits checked.
 **Subtitle (30):** Never miss the next meeting  (27)
 **Category:** Productivity (secondary: Business)
 **Age rating:** 4+
+**In-app purchase display name:** Pop In Pro
+**In-app purchase description (55):** Unicorn mode, more sounds, earlier alarms, desk mode  (52)
 **Price:** Free, with one in-app purchase: Pop In Pro, $4.99 (com.grahamdeno.promptly.pro)
 
 **Promotional text (170):**
@@ -23,7 +25,7 @@ Running late? The bubble notices. More bubbles bud off until the whole screen is
 
 WHAT YOU GET, FREE
 • Full-screen alarms for meetings with a video link, gentle notifications for the rest
-• Choose per calendar: Smart, Always alarm, or Gentle
+• Choose per calendar: Smart or Gentle
 • Ring 1, 2 or 5 minutes before
 • One tap to join Zoom, Microsoft Teams (including government clouds), Google Meet, Webex and more
 • Lock Screen and Dynamic Island countdown
@@ -37,6 +39,7 @@ POP IN PRO ($4.99, ONE TIME)
 • Rainbow unicorn app icon
 • Two more alarm sounds: Recorded pops and Unicorn chimes
 • Ring 10 minutes before
+• Always alarm for a whole calendar, link or not
 • Desk mode: keep the screen on while Pop In is open
 
 PRIVATE BY DESIGN

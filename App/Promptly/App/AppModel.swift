@@ -161,6 +161,7 @@ final class AppModel {
             meetings = ScreenshotMode.meetings()
             store.forceBetaAccess()
             if scene == .now || scene == .late { arrived = meetings.first }
+            if scene == .pro { showPro = true }
             return
         }
         Task { await store.load() }

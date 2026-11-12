@@ -3,7 +3,7 @@ import Foundation
 /// App Store screenshots. The Screenshots UI test launches Pop In with `-screenshots -scene <name>`; Pop In then shows
 /// made-up meetings instead of the calendar, schedules no alarms and unlocks every Pro feature. Never used otherwise.
 enum ScreenshotScene: String {
-    case home, now, late, unicorn, settings, pop
+    case home, now, late, unicorn, settings, pop, pro
 }
 
 enum ScreenshotMode {

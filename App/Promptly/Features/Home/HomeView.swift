@@ -5,7 +5,7 @@ import UIKit
 struct HomeView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.openURL) private var openURL
-    @State private var showCalendars = ScreenshotMode.scene == .settings
+    @State private var showCalendars = ScreenshotMode.scene == .settings || ScreenshotMode.scene == .pro
 
     @Environment(\.horizontalSizeClass) private var sizeClass
     @ScaledMetric(relativeTo: .largeTitle) private var titleSize: CGFloat = 32
