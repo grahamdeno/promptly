@@ -147,6 +147,68 @@ struct ThemeMarks: View {
                         .rotationEffect(.degrees(p.3))
                         .position(x: w * p.0, y: h * p.1)
                 }
+            case .hockey:
+                // Grippy knurled edge and a faint ring.
+                Ellipse().strokeBorder(Color.white.opacity(0.18), style: StrokeStyle(lineWidth: max(3, w * 0.03), dash: [max(2, w * 0.008), max(2, w * 0.008)]))
+                Ellipse().stroke(Color.white.opacity(0.12), lineWidth: max(1, w * 0.006)).frame(width: w * 0.62, height: h * 0.62)
+            case .tennis:
+                // Fuzz and the curved white seams.
+                Canvas { ctx, size in
+                    var rng = SeededRandom(seed: 5)
+                    for _ in 0..<Int(size.width * size.height / 30) {
+                        let x = rng.next() * size.width, y = rng.next() * size.height
+                        ctx.fill(Path(ellipseIn: CGRect(x: x, y: y, width: 1.5, height: 1.5)), with: .color(.white.opacity(0.18)))
+                    }
+                }
+                Ellipse().stroke(Color.white.opacity(0.95), lineWidth: max(2, w * 0.022)).frame(width: w * 0.7, height: h * 1.05).offset(x: -w * 0.42)
+                Ellipse().stroke(Color.white.opacity(0.95), lineWidth: max(2, w * 0.022)).frame(width: w * 0.7, height: h * 1.05).offset(x: w * 0.42)
+            case .golf:
+                // Dimples.
+                Canvas { ctx, size in
+                    let step = max(6, size.width / 18)
+                    var row = 0
+                    var y: CGFloat = 0
+                    while y < size.height {
+                        var x: CGFloat = row % 2 == 0 ? 0 : step / 2
+                        while x < size.width {
+                            ctx.fill(Path(ellipseIn: CGRect(x: x, y: y, width: step * 0.55, height: step * 0.55)), with: .color(.black.opacity(0.08)))
+                            ctx.fill(Path(ellipseIn: CGRect(x: x + step * 0.08, y: y + step * 0.08, width: step * 0.3, height: step * 0.3)), with: .color(.white.opacity(0.5)))
+                            x += step
+                        }
+                        y += step * 0.86
+                        row += 1
+                    }
+                }
+            case .baseball:
+                // Two seams with red stitches.
+                ForEach([-1.0, 1.0], id: \.self) { side in
+                    Ellipse().stroke(GumPalette.rgb(0xC62828).opacity(0.5), lineWidth: max(1, w * 0.006))
+                        .frame(width: w * 0.7, height: h * 1.05).offset(x: side * w * 0.42)
+                    Ellipse().stroke(GumPalette.rgb(0xC62828), style: StrokeStyle(lineWidth: max(2, w * 0.02), dash: [max(2, w * 0.012), max(3, w * 0.02)]))
+                        .frame(width: w * 0.66, height: h * 1.0).offset(x: side * w * 0.42)
+                }
+            case .bowling:
+                // A swirl and three finger holes.
+                Ellipse().fill(AngularGradient(colors: [palette.light.opacity(0.6), .clear, palette.light.opacity(0.4), .clear, palette.light.opacity(0.6)], center: UnitPoint(x: 0.4, y: 0.6)))
+                    .blur(radius: max(4, w * 0.04))
+                ForEach(0..<3, id: \.self) { i in
+                    Circle().fill(Color.black.opacity(0.85))
+                        .overlay(Circle().stroke(palette.light.opacity(0.4), lineWidth: 1))
+                        .frame(width: w * (i == 2 ? 0.09 : 0.075), height: w * (i == 2 ? 0.09 : 0.075))
+                        .position(x: w * [0.44, 0.58, 0.5][i], y: h * [0.24, 0.24, 0.38][i])
+                }
+            case .pixel:
+                // Blocky pixels with a stepped highlight.
+                Canvas { ctx, size in
+                    let n = 16
+                    let px = size.width / CGFloat(n)
+                    for row in 0..<n { for col in 0..<n {
+                        let cx = (CGFloat(col) + 0.5) / CGFloat(n) - 0.38, cy = (CGFloat(row) + 0.5) / CGFloat(n) - 0.3
+                        let d = (cx * cx + cy * cy).squareRoot()
+                        let shade: Color = d < 0.12 ? .white.opacity(0.55) : (d < 0.3 ? .white.opacity(0.18) : (d > 0.75 ? .black.opacity(0.3) : .clear))
+                        ctx.fill(Path(CGRect(x: CGFloat(col) * px, y: CGFloat(row) * px, width: px + 0.5, height: px + 0.5)), with: .color(shade))
+                    } }
+                }
             case .lavaLamp:
                 // Warm blobs rising and sinking.
                 TimelineView(.animation(minimumInterval: 1.0 / 20, paused: reduceMotion)) { ctx in
@@ -358,6 +420,26 @@ enum ThemeDebris {
             if i == 0 { Text("⚽").font(.system(size: emoji)) }
             else if i % 3 == 0 { Pentagon().fill(Color.black.opacity(0.85)).frame(width: small * 0.7, height: small * 0.7) }
             else { Capsule().fill(i % 2 == 0 ? GumPalette.rgb(0x2EA84F) : GumPalette.rgb(0x1E7A38)).frame(width: 3, height: small * 0.8) }
+        case .hockey:
+            if i == 0 { Text("🏒").font(.system(size: emoji)) }
+            else if i == 4 { Ellipse().fill(GumPalette.rgb(0x1C1C1E)).frame(width: side * 0.6, height: side * 0.25) }
+            else { Circle().fill(Color.white).overlay(Circle().stroke(GumPalette.rgb(0xA9D3F0), lineWidth: 1)).frame(width: small * 0.5, height: small * 0.5) }
+        case .tennis:
+            if i == 0 { Text("🎾").font(.system(size: emoji)) }
+            else { Circle().fill(GumPalette.rgb(0xCCE03A)).frame(width: small * 0.5, height: small * 0.5).blur(radius: 1) }
+        case .golf:
+            if i == 0 { Text("⛳").font(.system(size: emoji)) }
+            else if i % 2 == 0 { Circle().fill(Color.white).overlay(Circle().stroke(Color.gray.opacity(0.4), lineWidth: 1)).frame(width: small * 0.5, height: small * 0.5) }
+            else { Capsule().fill(GumPalette.rgb(0x2EA84F)).frame(width: 3, height: small * 0.7) }
+        case .baseball:
+            if i == 0 { Text("⚾").font(.system(size: emoji)) }
+            else { Capsule().fill(GumPalette.rgb(0xC62828)).frame(width: small * 0.6, height: 3).rotationEffect(.degrees(Double(i) * 37)) }
+        case .bowling:
+            if i == 0 { Text("🎳").font(.system(size: emoji)) }
+            else { Capsule().fill(Color.white).overlay(Capsule().fill(GumPalette.rgb(0xC62828)).frame(height: 2)).frame(width: small * 0.35, height: small).shadow(radius: 1) }
+        case .pixel:
+            if i == 0 { Text("👾").font(.system(size: emoji)) }
+            else { Rectangle().fill([GumPalette.rgb(0xFF5A5A), GumPalette.rgb(0xFFD43B), GumPalette.rgb(0x3DA5FF), GumPalette.rgb(0x3DDC97)][i % 4]).frame(width: small * 0.5, height: small * 0.5) }
         case .lavaLamp:
             Ellipse().fill(i % 2 == 0 ? GumPalette.rgb(0xFFC23A) : GumPalette.rgb(0xFF7A3D)).frame(width: side * 0.7, height: side * 0.8).blur(radius: 3)
         default:

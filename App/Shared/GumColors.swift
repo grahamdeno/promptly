@@ -24,6 +24,8 @@ enum GumPalette: String, CaseIterable, Sendable {
     case disco, soap, planet, basketball, donut, waterBalloon, eyeball, fishbowl, moodRing, lavaLamp
     /// Soccer: the classic black and white ball (held; for the big tournaments).
     case soccer
+    /// Sports and arcade set (held): hockey puck, tennis, golf, baseball, bowling, 8-bit.
+    case hockey, tennis, golf, baseball, bowling, pixel
 
     var isPro: Bool { !(self == .bubblegum || self == .coral) }
 
@@ -39,7 +41,7 @@ enum GumPalette: String, CaseIterable, Sendable {
         #endif
     }
     var isSeasonal: Bool { self == .snowball || self == .ornament || self == .pumpkin }
-    static let novelty: [GumPalette] = [.disco, .soap, .planet, .basketball, .donut, .waterBalloon, .eyeball, .fishbowl, .moodRing, .lavaLamp, .soccer]
+    static let novelty: [GumPalette] = [.disco, .soap, .planet, .basketball, .donut, .waterBalloon, .eyeball, .fishbowl, .moodRing, .lavaLamp, .soccer, .hockey, .tennis, .golf, .baseball, .bowling, .pixel]
     /// Held back from the App Store (shown in TestFlight) until the owner decides how to release it.
     var isHeld: Bool { isSeasonal || Self.novelty.contains(self) }
     /// The colors offered in Settings.
@@ -67,6 +69,12 @@ enum GumPalette: String, CaseIterable, Sendable {
         case .fishbowl: "fishbowl_pop"
         case .lavaLamp: "lava_pop"
         case .soccer: "soccer_pop"
+        case .hockey: "hockey_pop"
+        case .tennis: "tennis_pop"
+        case .golf: "golf_pop"
+        case .baseball: "baseball_pop"
+        case .bowling: "bowling_pop"
+        case .pixel: "pixel_pop"
         }
     }
 
@@ -100,6 +108,12 @@ enum GumPalette: String, CaseIterable, Sendable {
         case .moodRing: "Mood ring"
         case .lavaLamp: "Lava lamp"
         case .soccer: "Soccer"
+        case .hockey: "Hockey puck"
+        case .tennis: "Tennis ball"
+        case .golf: "Golf ball"
+        case .baseball: "Baseball"
+        case .bowling: "Bowling ball"
+        case .pixel: "8-bit"
         }
     }
 
@@ -129,6 +143,12 @@ enum GumPalette: String, CaseIterable, Sendable {
         case .moodRing: Self.rgb(0x2E6FD8)
         case .lavaLamp: Self.rgb(0xC2321F)
         case .soccer: Self.rgb(0xF2F2F0)
+        case .hockey: Self.rgb(0x1C1C1E)
+        case .tennis: Self.rgb(0xCCE03A)
+        case .golf: Self.rgb(0xF2F2F2)
+        case .baseball: Self.rgb(0xF5F1E6)
+        case .bowling: Self.rgb(0x3A1C71)
+        case .pixel: Self.rgb(0xFF5A5A)
         }
     }
 
@@ -154,6 +174,12 @@ enum GumPalette: String, CaseIterable, Sendable {
         case .moodRing: Self.rgb(0x9CC2FF)
         case .lavaLamp: Self.rgb(0xFF8A4C)
         case .soccer: Self.rgb(0xFFFFFF)
+        case .hockey: Self.rgb(0x55555A)
+        case .tennis: Self.rgb(0xF4FF9E)
+        case .golf: Self.rgb(0xFFFFFF)
+        case .baseball: Self.rgb(0xFFFFFF)
+        case .bowling: Self.rgb(0x7A4FC9)
+        case .pixel: Self.rgb(0xFF9A9A)
         }
     }
 
@@ -179,6 +205,12 @@ enum GumPalette: String, CaseIterable, Sendable {
         case .moodRing: Self.rgb(0x0E2F6B)
         case .lavaLamp: Self.rgb(0x4A0F08)
         case .soccer: Self.rgb(0x9C9C98)
+        case .hockey: Self.rgb(0x050506)
+        case .tennis: Self.rgb(0x6E7E0C)
+        case .golf: Self.rgb(0xA4A4A4)
+        case .baseball: Self.rgb(0xA8A291)
+        case .bowling: Self.rgb(0x140630)
+        case .pixel: Self.rgb(0x8A1A1A)
         }
     }
 
@@ -195,6 +227,12 @@ enum GumPalette: String, CaseIterable, Sendable {
         case .fishbowl: Self.rgb(0x1E9BD8)
         case .disco: Self.rgb(0x8A6FE0)
         case .soccer: Self.rgb(0x1E8E3E)
+        case .hockey: Self.rgb(0x2B7BB9)
+        case .tennis: Self.rgb(0x6E8A0A)
+        case .golf: Self.rgb(0x2E8B57)
+        case .baseball: Self.rgb(0xC62828)
+        case .bowling: Self.rgb(0x7A4FC9)
+        case .pixel: Self.rgb(0xFF5A5A)
         default: base
         }
     }
@@ -235,6 +273,12 @@ enum GumPalette: String, CaseIterable, Sendable {
         case .moodRing: Self.rgb(0x1E4FA8)
         case .lavaLamp: Self.rgb(0xA0280F)
         case .soccer: Self.rgb(0x15703A)
+        case .hockey: Self.rgb(0x1D5C8F)
+        case .tennis: Self.rgb(0x556B05)
+        case .golf: Self.rgb(0x1F6B40)
+        case .baseball: Self.rgb(0xA11F1F)
+        case .bowling: Self.rgb(0x5B33B0)
+        case .pixel: Self.rgb(0xB02222)
         default: Self.rgb(0xB02E68)
         }
     }

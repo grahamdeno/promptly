@@ -257,3 +257,10 @@ Review: https://claude.ai/artifact/Xs4CqLSRPxh6u4VgfZJpko (App Store readiness r
 - New "Match the theme" pop sound (default for these). All Pro.
 - Held from the App Store with the holiday themes (shown in TestFlight); owner decides later how to restrict and
   release each. No app icons yet for these ten (they keep the Bubblegum icon).
+
+## Sprint 21: Soccer and the sports and arcade set (owner: "build them all", 2026-11-12)
+- Soccer (pentagon patches; kick and crowd pop; Whistle alarm), Hockey puck (knurled edge; bar down pop: crossbar
+  ping and a thud on the ice; Skates alarm: blades carving faster, with a goal horn), Tennis ball (fuzz and seams;
+  thwock), Golf ball (dimples; drop into the cup), Baseball (red stitches; crack of the bat), Bowling ball (swirl
+  and finger holes; strike), 8-bit (pixels; arcade coin). All held from the App Store (shown in TestFlight). No
+  "World Cup" anywhere (FIFA's name); the soccer theme can be released around the tournament.
