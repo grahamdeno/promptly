@@ -166,3 +166,14 @@ Review: https://claude.ai/artifact/Xs4CqLSRPxh6u4VgfZJpko (App Store readiness r
 ## Before App Store
 - Privacy policy and support pages at promptly.tangomike.app.
 - Screenshots, description, subtitle.
+
+## Sprint 15: Beta access to Pro, screenshots, listing (owner said go, 2026-11-11)
+- Done: TestFlight and Xcode builds unlock every Pro feature (`ProStore.betaAccess`, from `AppTransaction.environment`
+  being sandbox/xcode, with a sandbox-receipt first guess). App Store copies are unaffected. The Pro sheet says it is
+  unlocked for testing and still offers "Test the purchase" so the sandbox purchase flow can be tried.
+- Done: screenshot mode (`-screenshots -scene home|now|late|unicorn|settings|pop`): demo meetings, no calendar, no alarms,
+  nothing saved. `PromptlyUITests` + `Screenshots` scheme + `screenshots.yml` (manual) shoot iPhone Pro Max and
+  iPad Pro 13" and upload them as artifacts.
+- Done: `docs/app-store-listing.md` (name, subtitle, keywords, description, captions).
+- Next: check the screenshots; if the pop frame misses the burst, tune the 0.3 s delay in `ScreenshotTests.test6Pop`.
+  Grok uploads the listing and pictures; Graham presses Submit for Review.

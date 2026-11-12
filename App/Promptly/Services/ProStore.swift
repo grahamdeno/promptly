@@ -8,7 +8,12 @@ import StoreKit
 final class ProStore {
     static let productID = "com.grahamdeno.promptly.pro"
 
-    private(set) var isPro: Bool
+    /// True when Pro is unlocked: bought, or a TestFlight / development build (beta access).
+    var isPro: Bool { purchased || betaAccess }
+    /// Bought through the App Store.
+    private(set) var purchased: Bool
+    /// TestFlight and Xcode builds unlock every Pro feature so testers can try them. Never true in the App Store.
+    private(set) var betaAccess: Bool
     private(set) var product: Product?
     private(set) var purchasing = false
     var message: String?
@@ -19,7 +24,8 @@ final class ProStore {
     @ObservationIgnored var onLost: (() -> Void)?
 
     init() {
-        isPro = defaults.bool(forKey: "isPro")
+        purchased = defaults.bool(forKey: "isPro")
+        betaAccess = Self.receiptLooksLikeBeta
         updates = Task { [weak self] in
             for await result in Transaction.updates {
                 if case .verified(let transaction) = result {
@@ -33,7 +39,31 @@ final class ProStore {
     /// The displayed price, from the App Store, in the buyer's currency.
     var price: String { product?.displayPrice ?? "$4.99" }
 
+    /// Fast first guess before StoreKit answers: TestFlight installs carry a sandbox receipt.
+    private static var receiptLooksLikeBeta: Bool {
+        #if DEBUG
+        return true
+        #else
+        return Bundle.main.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt"
+        #endif
+    }
+
+    /// Ask the App Store how this copy was installed. TestFlight reports the sandbox environment.
+    func checkBetaAccess() async {
+        #if DEBUG
+        betaAccess = true
+        #else
+        if case .verified(let app) = try? await AppTransaction.shared {
+            betaAccess = app.environment == .sandbox || app.environment == .xcode
+        }
+        #endif
+    }
+
+    /// Screenshot mode only: show every Pro feature without touching StoreKit.
+    func forceBetaAccess() { betaAccess = true }
+
     func load() async {
+        await checkBetaAccess()
         if product == nil {
             product = try? await Product.products(for: [Self.productID]).first
         }
@@ -81,12 +111,12 @@ final class ProStore {
     func restore() async {
         try? await AppStore.sync()
         await refreshEntitlement()
-        message = isPro ? "Pro restored." : "No Pro purchase found for this Apple Account."
+        message = purchased ? "Pro restored." : "No Pro purchase found for this Apple Account."
     }
 
     private func setPro(_ value: Bool) {
-        let lost = isPro && !value
-        isPro = value
+        let lost = purchased && !value && !betaAccess
+        purchased = value
         defaults.set(value, forKey: "isPro")
         if lost { onLost?() }
     }

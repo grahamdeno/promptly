@@ -1,0 +1,111 @@
+name: screenshots
+# Takes the App Store screenshots on GitHub's iPhone and iPad simulators, using Pop In's screenshot mode
+# (demo meetings, no calendar, no alarms). Run by hand; download the "app-store-screenshots" artifact.
+# Uploads nothing to App Store Connect.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  shoot:
+    runs-on: macos-26
+    timeout-minutes: 50
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - family: iPhone
+            pattern: "iPhone (17|16) Pro Max"
+          - family: iPad
+            pattern: "iPad Pro 13"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read-only guard
+        run: python3 -I scripts/read_only_guard.py check
+
+      - name: Select Xcode 26
+        run: |
+          XC=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          if [ -z "$XC" ]; then echo '::error::Xcode 26 is unavailable'; exit 1; fi
+          sudo xcode-select -s "$XC"
+          xcodebuild -version
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate project
+        run: xcodegen generate
+
+      - name: Boot the simulator and tidy the status bar
+        id: sim
+        run: |
+          LINE=$(xcrun simctl list devices available | grep -E "${{ matrix.pattern }}" | head -1)
+          if [ -z "$LINE" ]; then
+            echo "::warning::No exact match for ${{ matrix.pattern }}; using the first ${{ matrix.family }}"
+            LINE=$(xcrun simctl list devices available | grep "${{ matrix.family }}" | head -1)
+          fi
+          UDID=$(echo "$LINE" | grep -Eo '[0-9A-F]{8}-([0-9A-F]{4}-){3}[0-9A-F]{12}')
+          echo "Using: $LINE"
+          echo "udid=$UDID" >> "$GITHUB_OUTPUT"
+          xcrun simctl boot "$UDID" || true
+          xcrun simctl bootstatus "$UDID" -b
+          xcrun simctl status_bar "$UDID" override --time "9:41" --dataNetwork wifi --wifiMode active --wifiBars 3 \
+            --cellularMode active --cellularBars 4 --batteryState charged --batteryLevel 100
+          xcrun simctl ui "$UDID" appearance light
+
+      - name: Take screenshots
+        run: |
+          mkdir -p out
+          set -o pipefail
+          xcodebuild test \
+            -project Promptly.xcodeproj \
+            -scheme Screenshots \
+            -destination "id=${{ steps.sim.outputs.udid }}" \
+            -resultBundlePath out/Screenshots.xcresult \
+            -derivedDataPath build/dd \
+            CODE_SIGNING_ALLOWED=NO \
+            > out/build.log 2>&1 \
+            || { grep -E "error:|failed" out/build.log | sort -u | head -30 | while IFS= read -r l; do echo "::error::$l"; done; exit 1; }
+          grep -E "Executed|\*\* TEST" out/build.log | tail -3
+
+      - name: Export the pictures
+        if: always()
+        run: |
+          mkdir -p out/raw shots
+          xcrun xcresulttool export attachments --path out/Screenshots.xcresult --output-path out/raw || true
+          python3 -I - <<'EOF'
+          import json, os, re, shutil
+          raw, dest = "out/raw", "shots"
+          try:
+              manifest = json.load(open(os.path.join(raw, "manifest.json")))
+          except Exception as e:
+              print("no manifest:", e); manifest = []
+          for test in manifest:
+              for a in test.get("attachments", []):
+                  name = a.get("suggestedHumanReadableName") or a["exportedFileName"]
+                  m = re.match(r"(iP(?:hone|ad)-\d-[a-z]+)", name)
+                  out = (m.group(1) if m else os.path.splitext(name)[0]) + ".png"
+                  shutil.copy(os.path.join(raw, a["exportedFileName"]), os.path.join(dest, out))
+                  print("saved", out)
+          EOF
+          ls -la shots
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-store-screenshots-${{ matrix.family }}
+          path: shots/
+          retention-days: 30
+          if-no-files-found: warn
+
+      - name: Upload diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-log-${{ matrix.family }}
+          path: out/build.log
+          retention-days: 7
