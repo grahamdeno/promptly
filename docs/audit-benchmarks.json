@@ -1,0 +1,12 @@
+{
+  "jobs": {
+    "Join the next meeting": {"taps": 1},
+    "Undo a pop": {"taps": 1},
+    "Skip a meeting": {"taps": 1},
+    "Ring 2 minutes before": {"taps": 3},
+    "Find and turn off one calendar": {"taps": 3},
+    "Turn off a whole account": {"taps": 1},
+    "Pop the late bubble": {"taps": 1}
+  },
+  "responses": {"default": 1.5}
+}

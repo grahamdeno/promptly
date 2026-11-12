@@ -67,7 +67,7 @@ jobs:
           set -o pipefail
           xcodebuild test \
             -project Promptly.xcodeproj \
-            -scheme Screenshots \
+            -scheme Screenshots -only-testing:PromptlyUITests/ScreenshotTests \
             -destination "id=${{ steps.sim.outputs.udid }}" \
             -resultBundlePath out/Screenshots.xcresult \
             -derivedDataPath build/dd \

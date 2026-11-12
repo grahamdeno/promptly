@@ -98,7 +98,7 @@ final class AppModel {
         didSet {
             prefs.gentleCalendarIDs = gentleCalendarIDs
             Task {
-                if !gentleCalendarIDs.isEmpty { _ = await nudgeService.requestAccess() }
+                if !gentleCalendarIDs.isEmpty, !ScreenshotMode.isOn { _ = await nudgeService.requestAccess() }
                 await syncAlarms()
             }
         }
@@ -110,7 +110,7 @@ final class AppModel {
         didSet {
             prefs.nudges = nudges
             Task {
-                if nudges, !(await nudgeService.requestAccess()) { nudges = false; return }
+                if nudges, !ScreenshotMode.isOn, !(await nudgeService.requestAccess()) { nudges = false; return }
                 await syncAlarms()
             }
         }
@@ -153,9 +153,9 @@ final class AppModel {
         if let scene = ScreenshotMode.scene {
             // App Store screenshots: demo meetings, no alarms, everything unlocked. didSet doesn't run in init,
             // so none of this is saved or scheduled.
-            onboarded = true
-            calendarAuthorized = true
-            alarmsAuthorized = true
+            onboarded = scene != .welcome
+            calendarAuthorized = scene != .welcome
+            alarmsAuthorized = scene != .welcome
             taughtPop = true
             buzz = false
             popChoice = .off
@@ -164,11 +164,11 @@ final class AppModel {
             ballStyle = .bubble
             leadMinutes = 2
             cleared = []
-            calendars = ScreenshotMode.calendars
-            meetings = ScreenshotMode.meetings()
+            calendars = scene == .manycals ? ScreenshotMode.manyCalendars : ScreenshotMode.calendars
+            meetings = scene == .empty ? [] : ScreenshotMode.meetings()
             // The Pro sheet scene shows the App Store version of the sheet (price and buy button), for Apple's
             // in-app purchase review screenshot; every other scene shows Pro features unlocked.
-            if scene != .pro { store.forceBetaAccess() }
+            if scene != .pro && !ScreenshotMode.free { store.forceBetaAccess() }
             if scene == .now || scene == .late { arrived = meetings.first }
             if scene == .pro { showPro = true }
             return
@@ -209,11 +209,13 @@ final class AppModel {
     }
 
     func requestCalendarAccess() async {
+        if ScreenshotMode.isOn { calendarAuthorized = true; return }   // the audit walks first run without system prompts
         calendarAuthorized = await calendarService.requestAccess()
         await refresh()
     }
 
     func requestAlarmAccess() async {
+        if ScreenshotMode.isOn { alarmsAuthorized = true; return }
         alarmsAuthorized = await alarmService.requestAccess()
         await refresh()
     }

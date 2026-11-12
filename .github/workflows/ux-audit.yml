@@ -1,0 +1,113 @@
+name: ux-audit
+# The UX audit (docs/audit/ux-audit.md, adapted from Shoebox): the journeys walked through the real app in the
+# simulator under several conditions at once, then one report with every picture, check, timing and accessibility
+# issue, pushed to the ci-audit branch. Runs on a branch commit whose message contains [audit], or by hand.
+on:
+  push:
+    branches-ignore: [main, testflight, ci-audit]
+  workflow_dispatch:
+
+jobs:
+  walk:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[audit]')
+    runs-on: macos-26
+    timeout-minutes: 75
+    concurrency:
+      group: ux-audit-${{ github.ref }}-${{ matrix.config }}
+      cancel-in-progress: true
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - config: pro-light
+            pattern: "iPhone 17 Pro$|iPhone 17 Pro \\(|iPhone 16 Pro \\("
+            family: iPhone
+            text: ""
+          - config: big-text
+            pattern: "iPhone 17 Pro \\(|iPhone 16 Pro \\("
+            family: iPhone
+            text: UICTContentSizeCategoryAccessibilityXXXL
+          - config: small-phone
+            pattern: "iPhone SE|iPhone 16e|iPhone 17e"
+            family: iPhone
+            text: ""
+          - config: ipad
+            pattern: "iPad Pro 13|iPad Pro \\(12"
+            family: iPad
+            text: ""
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode 26
+        run: |
+          XC=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          sudo xcode-select -s "$XC"
+          xcodebuild -version
+
+      - name: Project and simulator
+        run: |
+          brew install xcodegen && xcodegen generate
+          LINE=$(xcrun simctl list devices available | grep -E "${{ matrix.pattern }}" | head -1)
+          [ -z "$LINE" ] && LINE=$(xcrun simctl list devices available | grep "${{ matrix.family }}" | head -1)
+          SIM=$(echo "$LINE" | grep -Eo '[0-9A-F]{8}-([0-9A-F]{4}-){3}[0-9A-F]{12}')
+          echo "Using: $LINE"
+          echo "SIM=$SIM" >> $GITHUB_ENV
+          xcrun simctl boot "$SIM" || true
+          xcrun simctl bootstatus "$SIM" -b
+          xcrun simctl ui "$SIM" appearance light
+          xcrun simctl status_bar "$SIM" override --time "9:41" --batteryState charged --batteryLevel 100 || true
+
+      - name: Walk the journeys
+        env:
+          TEST_RUNNER_AUDIT_OUT: ${{ github.workspace }}/audit-out
+          TEST_RUNNER_AUDIT_CONFIG: ${{ matrix.config }}
+          TEST_RUNNER_AUDIT_TEXT: ${{ matrix.text }}
+        run: |
+          mkdir -p audit-out
+          set -o pipefail
+          xcodebuild test -project Promptly.xcodeproj -scheme Screenshots -destination "id=$SIM" \
+            -only-testing:PromptlyUITests/Journeys \
+            -derivedDataPath build -resultBundlePath audit.xcresult CODE_SIGNING_ALLOWED=NO > test.log 2>&1 || {
+              grep -E "error:|Test Case .* failed|crash" test.log | sort -u | head -40 | while IFS= read -r l; do echo "::warning::$l"; done
+              grep -q "BUILD FAILED\|TEST BUILD FAILED\|swift:[0-9]*:[0-9]*: error:" test.log && { tail -60 test.log; exit 1; } || true
+            }
+          tail -20 test.log
+          test -n "$(find audit-out -name record.json)" || { echo "::error::No records were written"; tail -80 test.log; exit 1; }
+
+      - name: Keep the log
+        if: always()
+        run: |
+          mkdir -p audit-out/${{ matrix.config }}
+          cp test.log audit-out/${{ matrix.config }}/test.log 2>/dev/null || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: audit-${{ matrix.config }}
+          path: audit-out
+          retention-days: 14
+
+  report:
+    needs: walk
+    if: always() && (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[audit]'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Build the report
+        run: |
+          pip install --quiet pillow
+          mkdir -p report
+          for d in artifacts/audit-*; do cp -R "$d"/. report/ 2>/dev/null || true; done
+          python3 scripts/audit_report.py report "${GITHUB_SHA::7}" "" docs/audit-benchmarks.json
+      - name: Publish to the ci-audit branch
+        run: |
+          cd report
+          git init -q && git checkout -q -b ci-audit
+          git add . && git -c user.name=ci -c user.email=ci@example.com commit -qm "Audit for ${GITHUB_SHA::7}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" ci-audit
+          echo "::notice::Audit for ${GITHUB_SHA::7} on ci-audit"
