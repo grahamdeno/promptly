@@ -132,12 +132,21 @@ struct ThemeMarks: View {
                 // Pink glaze with sprinkles, and the hole.
                 ZStack {
                     Ellipse().fill(GumPalette.rgb(0xF48FB1)).frame(width: w * 0.86, height: h * 0.62).offset(y: -h * 0.12)
-                    ForEach(0..<18, id: \.self) { i in
-                        let a = Double(i) * 0.9
-                        Capsule().fill([GumPalette.rgb(0xFFFFFF), GumPalette.rgb(0x3DA5FF), GumPalette.rgb(0xFFD43B), GumPalette.rgb(0x3DDC97)][i % 4])
-                            .frame(width: max(4, w * 0.035), height: max(1.5, w * 0.012))
-                            .rotationEffect(.radians(a * 2))
-                            .offset(x: cos(a) * w * 0.3, y: sin(a) * h * 0.18 - h * 0.12)
+                    // Sprinkles that shimmer, each catching the light in turn.
+                    TimelineView(.animation(minimumInterval: 1.0 / 20, paused: reduceMotion)) { tl in
+                        let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
+                        ZStack {
+                            ForEach(0..<18, id: \.self) { i in
+                                let a = Double(i) * 0.9
+                                let glint = max(0, sin(t * 2.2 + Double(i) * 1.7))
+                                Capsule().fill([GumPalette.rgb(0xFFFFFF), GumPalette.rgb(0x3DA5FF), GumPalette.rgb(0xFFD43B), GumPalette.rgb(0x3DDC97)][i % 4])
+                                    .overlay(Capsule().fill(.white.opacity(glint * 0.8)))
+                                    .frame(width: max(4, w * 0.035), height: max(1.5, w * 0.012))
+                                    .scaleEffect(1 + 0.15 * glint)
+                                    .rotationEffect(.radians(a * 2))
+                                    .offset(x: cos(a) * w * 0.3, y: sin(a) * h * 0.18 - h * 0.12)
+                            }
+                        }
                     }
                     Ellipse().fill(palette.dark.opacity(0.85)).frame(width: w * 0.2, height: h * 0.12).offset(y: -h * 0.14)
                 }
@@ -565,6 +574,24 @@ struct ThemeTopper: View {
                                 .position(x: w * (0.25 + 0.5 * CGFloat((d * 0.37).truncatingRemainder(dividingBy: 1))) + w * 0.04 * CGFloat(sin(t * 2 + d)),
                                           y: w * 0.12 - w * 0.75 * CGFloat(phase))
                                 .opacity(reduceMotion ? 0 : (phase < 0.1 ? phase * 10 : 1 - phase))
+                        }
+                    }
+                }
+            case .donut:
+                // Sprinkles raining down onto the donut from above, tumbling as they fall.
+                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { tl in
+                    let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
+                    ZStack {
+                        ForEach(0..<12, id: \.self) { i in
+                            let d = Double(i)
+                            let period = 2.2 + (d * 0.37).truncatingRemainder(dividingBy: 1) * 1.2
+                            let phase = ((t + d * 0.41) / period).truncatingRemainder(dividingBy: 1)
+                            Capsule().fill([GumPalette.rgb(0xFFFFFF), GumPalette.rgb(0x3DA5FF), GumPalette.rgb(0xFFD43B), GumPalette.rgb(0x3DDC97), GumPalette.rgb(0xF48FB1)][i % 5])
+                                .frame(width: max(4, w * 0.035), height: max(1.5, w * 0.012))
+                                .rotationEffect(.degrees(phase * 540 + d * 40))
+                                .position(x: w * (0.22 + 0.56 * CGFloat((d * 0.61).truncatingRemainder(dividingBy: 1))),
+                                          y: -w * 0.55 + w * 0.7 * CGFloat(phase))
+                                .opacity(reduceMotion ? 0 : (phase > 0.85 ? (1 - phase) / 0.15 : 1))
                         }
                     }
                 }
