@@ -121,12 +121,16 @@ struct ThemeMarks: View {
                     .blur(radius: max(1, w * 0.008))
                 }
             case .basketball:
-                // Seams.
-                ZStack {
-                    Rectangle().fill(Color.black.opacity(0.75)).frame(width: max(2, w * 0.012), height: h)
-                    Rectangle().fill(Color.black.opacity(0.75)).frame(width: w, height: max(2, w * 0.012))
-                    Ellipse().stroke(Color.black.opacity(0.75), lineWidth: max(2, w * 0.012)).frame(width: w * 0.55, height: h * 1.1).offset(x: -w * 0.45)
-                    Ellipse().stroke(Color.black.opacity(0.75), lineWidth: max(2, w * 0.012)).frame(width: w * 0.55, height: h * 1.1).offset(x: w * 0.45)
+                // Seams, and the ball rolls to a new random angle now and then.
+                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { tl in
+                    ZStack {
+                        Rectangle().fill(Color.black.opacity(0.75)).frame(width: max(2, w * 0.012), height: h * 1.2)
+                        Rectangle().fill(Color.black.opacity(0.75)).frame(width: w * 1.2, height: max(2, w * 0.012))
+                        Ellipse().stroke(Color.black.opacity(0.75), lineWidth: max(2, w * 0.012)).frame(width: w * 0.55, height: h * 1.1).offset(x: -w * 0.45)
+                        Ellipse().stroke(Color.black.opacity(0.75), lineWidth: max(2, w * 0.012)).frame(width: w * 0.55, height: h * 1.1).offset(x: w * 0.45)
+                    }
+                    .frame(width: w, height: h)
+                    .rotationEffect(.degrees(Self.tumble(reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate, seed: 1)))
                 }
             case .donut:
                 // Pink glaze with sprinkles, and the hole.
@@ -197,13 +201,19 @@ struct ThemeMarks: View {
                 Ellipse().fill(c.opacity(0.75)).blendMode(.color)
                 Ellipse().fill(RadialGradient(colors: [.white.opacity(0.35), .clear], center: UnitPoint(x: 0.35, y: 0.3), startRadius: 0, endRadius: w * 0.5))
             case .soccer:
-                // Black pentagon patches, smaller toward the edge where the ball curves away.
-                ForEach(0..<Self.patches.count, id: \.self) { i in
-                    let p = Self.patches[i]
-                    Pentagon().fill(Color.black.opacity(0.85))
-                        .frame(width: w * p.2, height: w * p.2)
-                        .rotationEffect(.degrees(p.3))
-                        .position(x: w * p.0, y: h * p.1)
+                // Black pentagon patches, smaller toward the edge, and the ball rolls to a new random angle now and then.
+                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { tl in
+                    ZStack {
+                        ForEach(0..<Self.patches.count, id: \.self) { i in
+                            let p = Self.patches[i]
+                            Pentagon().fill(Color.black.opacity(0.85))
+                                .frame(width: w * p.2, height: w * p.2)
+                                .rotationEffect(.degrees(p.3))
+                                .position(x: w * p.0, y: h * p.1)
+                        }
+                    }
+                    .frame(width: w, height: h)
+                    .rotationEffect(.degrees(Self.tumble(reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate, seed: 2)))
                 }
             case .hockey:
                 // Grippy knurled edge and a faint ring.
@@ -527,6 +537,23 @@ struct ThemeMarks: View {
             }
         }
         .frame(width: w, height: h)
+    }
+
+    /// A resting ball nudged to a new random angle every 4 seconds, easing there over 1.4 seconds.
+    static func tumble(_ t: TimeInterval, seed: Int) -> Double {
+        func target(_ i: Int) -> Double {
+            var x = UInt64(bitPattern: Int64(i &* 2654435761 &+ seed &* 40503))
+            x ^= x >> 13; x = x &* 0x5bd1e995; x ^= x >> 15
+            return Double(x % 360) - 180
+        }
+        let seg = t / 4
+        let i = Int(seg.rounded(.down))
+        let k = min(1, (seg - Double(i)) * 4 / 1.4)
+        let e = (1 - cos(k * .pi)) / 2
+        let a = target(i - 1), b = target(i)
+        var d = (b - a).truncatingRemainder(dividingBy: 360)
+        if d > 180 { d -= 360 } else if d < -180 { d += 360 }
+        return a + d * e
     }
 
     static let patches: [(CGFloat, CGFloat, CGFloat, Double)] = [
