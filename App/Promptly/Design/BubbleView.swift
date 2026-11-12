@@ -282,12 +282,13 @@ struct BubbleView: View {
                     if GumPalette.current == .fortune {
                         // Fortune: puffs of violet mist and little star sparks.
                         if i % 3 == 0 {
-                            FourPointStar().fill(i % 2 == 0 ? Color.white : GumPalette.rgb(0xFFD66B))
-                                .frame(width: max(16, side * 0.35), height: max(16, side * 0.35))
+                            FourPointStar().fill(i % 2 == 0 ? GumPalette.violetDeep : GumPalette.rgb(0xF5B82E))
+                                .frame(width: max(26, side * 0.55), height: max(26, side * 0.55))
+                                .shadow(color: GumPalette.violet.opacity(0.6), radius: 6)
                         } else {
-                            Circle().fill(GumPalette.violet.opacity(0.45))
-                                .frame(width: side * 1.2, height: side * 1.2)
-                                .blur(radius: side * 0.3)
+                            Circle().fill(GumPalette.violet.opacity(0.65))
+                                .frame(width: side * 1.3, height: side * 1.3)
+                                .blur(radius: side * 0.22)
                         }
                     } else if GumPalette.current == .unicorn {
                         if Self.unicornSlots.contains(i) {

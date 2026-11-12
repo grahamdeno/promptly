@@ -230,6 +230,11 @@ struct HomeView: View {
                     .font(.subheadline.weight(.medium))
                     .foregroundStyle(Brand.ink.opacity(0.85))
                     .fixedSize(horizontal: false, vertical: true)
+                    // A glass pill, so the line reads over any bubble, including Fortune's black glass.
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 14)
+                    .glassEffect(.regular, in: .capsule)
+                    .padding(.horizontal, -14)
                     .padding(.horizontal, 20)
             }
         }
