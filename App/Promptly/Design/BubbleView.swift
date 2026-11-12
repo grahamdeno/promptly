@@ -43,7 +43,11 @@ struct BubbleView: View {
     }
 
     private var width: CGFloat {
-        style == .bubble ? minSize + CGFloat(puff) * (maxSize - minSize) : steadySize
+        style == .bubble ? minSize + CGFloat(puff) * (themeMax - minSize) : steadySize
+    }
+    /// Grenade stays smaller so its fuze, spoon and pin stay in view below the meeting card, even at full size.
+    private var themeMax: CGFloat {
+        GumPalette.current == .grenade ? max(minSize, maxSize * 0.55) : maxSize
     }
 
     private var height: CGFloat { width * (1 + 0.1 * CGFloat(puff)) }

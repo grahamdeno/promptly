@@ -189,6 +189,7 @@ struct ThemeTopper: View {
     let palette: GumPalette
     let w: CGFloat
     var h: CGFloat? = nil
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         ZStack {
@@ -204,10 +205,16 @@ struct ThemeTopper: View {
                         .frame(width: w * 0.27, height: w * 0.035)
                         .rotationEffect(.degrees(32))
                         .offset(x: w * 0.13, y: w * 0.06)
-                    Circle()
-                        .stroke(GumPalette.rgb(0xC9A33A), lineWidth: max(2, w * 0.014))
-                        .frame(width: w * 0.12, height: w * 0.12)
-                        .offset(x: -w * 0.15, y: -w * 0.03)
+                    // The pin's ring sways a little, inviting a pull.
+                    TimelineView(.animation(minimumInterval: 1.0 / 20, paused: reduceMotion)) { ctx in
+                        let t = reduceMotion ? 0 : ctx.date.timeIntervalSinceReferenceDate
+                        Circle()
+                            .stroke(GumPalette.rgb(0xC9A33A), lineWidth: max(2, w * 0.014))
+                            .frame(width: w * 0.12, height: w * 0.12)
+                            .rotationEffect(.degrees(sin(t * 1.6) * 10), anchor: .trailing)
+                    }
+                    .frame(width: w * 0.12, height: w * 0.12)
+                    .offset(x: -w * 0.15, y: -w * 0.03)
                     Capsule().fill(GumPalette.rgb(0xC9A33A))
                         .frame(width: w * 0.08, height: max(2, w * 0.012))
                         .offset(x: -w * 0.07, y: -w * 0.005)
