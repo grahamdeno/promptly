@@ -23,7 +23,7 @@ enum ScreenshotMode {
         let firstStart: Date
         switch scene {
         case .now: firstStart = now.addingTimeInterval(2 * 60)
-        case .late: firstStart = now.addingTimeInterval(-55)
+        case .late: firstStart = now.addingTimeInterval(120 - 50)   // 50 s after a 2-minute-early ring
         default: firstStart = now.addingTimeInterval(7 * 60 + 20)
         }
         func meeting(_ id: String, _ title: String, _ start: Date, minutes: Double, calendar: String, link: String?) -> Meeting {

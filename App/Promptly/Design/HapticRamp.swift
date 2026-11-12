@@ -52,7 +52,17 @@ enum PopHaptics {
 enum AlarmLoop {
     private static var player: AVAudioPlayer?
 
-    static func start() {
+    /// Volume while Pop In rings itself: quiet at first, rising over the last two minutes to full at the start time.
+    nonisolated static func volume(now: Date, start: Date) -> Float {
+        let remaining = start.timeIntervalSince(now)
+        if remaining <= 0 { return 1 }
+        if remaining >= 120 { return quiet }
+        return quiet + (1 - quiet) * Float(1 - remaining / 120)
+    }
+    nonisolated static let quiet: Float = 0.25
+    private static var ramp: Task<Void, Never>?
+
+    static func start(meetingStart: Date? = nil) {
         let file = Prefs().alarmSound.fileName
         guard player?.isPlaying != true,
               let url = Bundle.main.url(forResource: (file as NSString).deletingPathExtension, withExtension: "wav"),
@@ -60,9 +70,20 @@ enum AlarmLoop {
         try? AVAudioSession.sharedInstance().setCategory(.playback, options: [.duckOthers])
         try? AVAudioSession.sharedInstance().setActive(true)
         p.numberOfLoops = -1
-        p.volume = 1
+        p.volume = meetingStart.map { volume(now: .now, start: $0) } ?? 1
         p.play()
         player = p
+        ramp?.cancel()
+        if let meetingStart {
+            ramp = Task { @MainActor in
+                while !Task.isCancelled, player === p {
+                    try? await Task.sleep(for: .milliseconds(500))
+                    let v = volume(now: .now, start: meetingStart)
+                    p.setVolume(v, fadeDuration: 0.5)
+                    if v >= 1 { break }
+                }
+            }
+        }
     }
 
     /// A short sample when a sound is picked in settings, so each choice can be heard right away.
@@ -86,6 +107,8 @@ enum AlarmLoop {
     private static var previewEnd: Task<Void, Never>?
 
     static func stop() {
+        ramp?.cancel()
+        ramp = nil
         previewEnd?.cancel()
         previewEnd = nil
         player?.stop()
@@ -108,12 +131,13 @@ enum PopSound {
         return p
     }
 
-    /// The gum pop, or a sparkle chime when the alarm sound is Chimes. Follows the sound choice, not the color.
+    /// Pop or Sparkle, as chosen in settings (Unicorn mode defaults to Sparkle).
     static func play() {
-        guard Prefs().popSound else { return }
+        let choice = Prefs().popChoice
+        guard choice != .off else { return }
         try? AVAudioSession.sharedInstance().setCategory(.ambient, options: [.mixWithOthers])
         try? AVAudioSession.sharedInstance().setActive(true)
-        let player = Prefs().alarmSound == .chimes ? chime : gum
+        let player = choice == .sparkle ? chime : gum
         player?.currentTime = 0
         player?.play()
     }

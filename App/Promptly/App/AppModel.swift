@@ -62,13 +62,20 @@ final class AppModel {
     var buzz: Bool {
         didSet { prefs.buzz = buzz }
     }
-    var popSound: Bool {
-        didSet { prefs.popSound = popSound }
+    /// Pop, Sparkle or Off. Follows the bubble color (Sparkle for Unicorn) until the owner picks one.
+    var popChoice: PopChoice {
+        didSet { if !followingColor { prefs.popChoiceSaved = popChoice } }
     }
+    @ObservationIgnored private var followingColor = false
     /// Bubble color. Also tints the alarm's buttons, so a change reschedules the alarms; widgets redraw.
     var gumColor: GumPalette {
         didSet {
             prefs.gumColor = gumColor
+            if prefs.popChoiceSaved == nil {
+                followingColor = true
+                popChoice = prefs.popChoice
+                followingColor = false
+            }
             // The app icon follows the bubble color (iOS shows a one-line notice when it changes).
             let icon: String? = gumColor == .coral ? "AppIcon-Coral" : (gumColor == .unicorn ? "AppIcon-Unicorn" : nil)
             if UIApplication.shared.alternateIconName != icon {
@@ -123,7 +130,7 @@ final class AppModel {
         disabledCalendarIDs = prefs.disabledCalendarIDs
         countdownCard = prefs.countdownCard
         buzz = prefs.buzz
-        popSound = prefs.popSound
+        popChoice = prefs.popChoice
         alarmSound = prefs.alarmSound
         gumColor = prefs.gumColor
         gentleCalendarIDs = prefs.gentleCalendarIDs
@@ -151,7 +158,7 @@ final class AppModel {
             alarmsAuthorized = true
             taughtPop = true
             buzz = false
-            popSound = false
+            popChoice = .off
             keepAwake = false
             gumColor = scene == .unicorn ? .unicorn : .bubblegum
             ballStyle = .bubble
@@ -181,6 +188,13 @@ final class AppModel {
     }
 
     // MARK: Upcoming
+
+    /// Seconds since this meeting's alarm rang (0 before it). The extra bubbles bud off from here, so the first
+    /// appears about 15 seconds after the ring rather than after the start time.
+    func sinceRing(_ meeting: Meeting, now: Date) -> TimeInterval {
+        guard ringsFully(meeting) else { return max(0, now.timeIntervalSince(meeting.start)) }
+        return max(0, now.timeIntervalSince(meeting.start.addingTimeInterval(-TimeInterval(leadMinutes * 60))))
+    }
 
     /// Meetings not yet cleared that haven't ended.
     func upcoming(at now: Date) -> [Meeting] {
@@ -465,7 +479,7 @@ final class AppModel {
         guard !settingsOpen else { return }   // the watcher tries again once settings close
         shownNowFor.insert(meeting.id)
         arrived = meeting
-        if ring && isForeground { AlarmLoop.start() }
+        if ring && isForeground { AlarmLoop.start(meetingStart: meeting.start) }
         Task { await syncAlarms() }   // drops the backup alarm for this meeting
     }
 

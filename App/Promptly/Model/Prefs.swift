@@ -5,7 +5,8 @@ enum AlarmSoundChoice: String, CaseIterable, Sendable {
     case bubbleBlow
     /// Apple's standard alarm sound. AlarmKit can't pick a named system tone such as Mercury.
     case appleDefault
-    /// The owner's own recorded pops, cleaned up and made louder (Sounds/recorded_pops_alarm.wav). Pro.
+    /// "Popcorn": the owner's own recorded pops, cleaned up, evened out and made louder
+    /// (Sounds/recorded_pops_alarm.wav; the raw value and file name stay "recorded" so saved choices keep working). Pro.
     case recorded
     /// Bright rising chimes for Unicorn mode (Sounds/unicorn_chimes_alarm.wav). Pro.
     case chimes
@@ -15,7 +16,7 @@ enum AlarmSoundChoice: String, CaseIterable, Sendable {
     var label: String {
         switch self {
         case .bubbleBlow: "Gum pops"
-        case .recorded: "Recorded"
+        case .recorded: "Popcorn"
         case .chimes: "Chimes"
         case .appleDefault: "Apple"
         }
@@ -27,6 +28,23 @@ enum AlarmSoundChoice: String, CaseIterable, Sendable {
         case .recorded: "recorded_pops_alarm.wav"
         case .chimes: "unicorn_chimes_alarm.wav"
         default: "bubble_blow_alarm.wav"
+        }
+    }
+}
+
+/// The sound when a bubble pops. Unicorn mode defaults to Sparkle, other colors to Pop, until the owner picks one.
+enum PopChoice: String, CaseIterable, Sendable {
+    /// One real gum pop, taken from the owner's recording (Sounds/pop.wav).
+    case pop
+    /// A pop with a shower of tiny bells (Sounds/unicorn_pop.wav).
+    case sparkle
+    case off
+
+    var label: String {
+        switch self {
+        case .pop: "Pop"
+        case .sparkle: "Sparkle"
+        case .off: "Off"
         }
     }
 }
@@ -76,9 +94,23 @@ final class Prefs: @unchecked Sendable {
     }
 
     /// The gum pop sound when the bubble pops. Default on.
+    /// Older on/off switch for the pop sound; only read to work out the default below.
     var popSound: Bool {
         get { defaults.object(forKey: "popSound") as? Bool ?? true }
         set { defaults.set(newValue, forKey: "popSound") }
+    }
+
+    /// The pop sound the owner picked, or nil if they never picked one.
+    var popChoiceSaved: PopChoice? {
+        get { defaults.string(forKey: "popChoice").flatMap(PopChoice.init(rawValue:)) }
+        set { defaults.set(newValue?.rawValue, forKey: "popChoice") }
+    }
+
+    /// The pop sound in use: the owner's pick, else Sparkle in Unicorn mode and Pop otherwise.
+    var popChoice: PopChoice {
+        if let saved = popChoiceSaved { return saved }
+        if !popSound { return .off }
+        return gumColor == .unicorn ? .sparkle : .pop
     }
 
     /// One-buzz nudges at 5 and 2 minutes before. Default off.

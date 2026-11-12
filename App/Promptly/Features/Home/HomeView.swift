@@ -18,7 +18,7 @@ struct HomeView: View {
             let upcoming = model.upcoming(at: now)
             let next = model.calendarAuthorized && model.alarmsAuthorized ? upcoming.first : nil
             let progress = next.map { Countdown.progress(now: now, start: $0.start) } ?? 0
-            let overdue = next.map { max(0, now.timeIntervalSince($0.start)) } ?? 0
+            let overdue = next.map { model.sinceRing($0, now: now) } ?? 0
 
             if sizeClass == .regular {
                 // iPad: the meeting and the rest of today on the left, the bubble on the right.
@@ -57,7 +57,7 @@ struct HomeView: View {
         .hapticRamp(until: model.upcoming(at: .now).first?.start, enabled: model.buzz && model.arrived == nil)
         .overlay(alignment: .bottom) { undoToast }
         .sheet(isPresented: $showCalendars) {
-            CalendarsView(firstRun: false)
+            SettingsView()
                 .environment(model)
                 .onAppear { model.settingsOpen = true }
                 .onDisappear { model.settingsOpen = false }
@@ -121,12 +121,12 @@ struct HomeView: View {
             Wordmark()
             Spacer()
             Button { showCalendars = true } label: {
-                Image(systemName: "calendar")
+                Image(systemName: "gearshape")
                     .font(.system(size: 20, weight: .regular))
                     .foregroundStyle(Brand.ink)
                     .frame(width: 44, height: 44)
             }
-            .accessibilityLabel("Calendars and settings")
+            .accessibilityLabel("Settings")
         }
         .padding(.top, 8)
     }
@@ -136,12 +136,13 @@ struct HomeView: View {
         let parts = Countdown.parts(now: now, start: meeting.start)
         let started = meeting.start <= now
         let label = [started ? "Happening now" : "Next", meeting.service?.rawValue].compactMap { $0 }.joined(separator: " · ")
-        return VStack(alignment: .leading, spacing: 16) {
-            VStack(alignment: .leading, spacing: 10) {
-                VStack(alignment: .leading, spacing: 10) {
+        return VStack(alignment: .leading, spacing: 22) {
+            VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: 0) {
                     Text(label)
                         .font(.subheadline.weight(.medium))
                         .foregroundStyle(Brand.secondary)
+                        .padding(.bottom, 12)
                     Text(meeting.title)
                         .font(.system(size: titleSize, weight: .semibold))
                         .tracking(-0.8)
@@ -163,10 +164,11 @@ struct HomeView: View {
                         }
                     }
                     .foregroundStyle(Brand.ink)
-                    .padding(.top, 2)
+                    .padding(.top, 28)
                     Text(Countdown.span(meeting, now: now))
                         .font(.callout)
                         .foregroundStyle(Brand.secondary)
+                        .padding(.top, 6)
                 }
                 .accessibilityElement(children: .combine)
                 .accessibilityAction(named: meeting.joinURL == nil ? "Clear" : "Join") {
@@ -185,6 +187,7 @@ struct HomeView: View {
                     .underline()
                     .frame(minHeight: 44)
             }
+            .padding(.vertical, 8)
             .glassCard()
 
             if let then {

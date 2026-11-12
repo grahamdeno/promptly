@@ -14,7 +14,7 @@ struct WelcomeView: View {
     var body: some View {
         switch step {
         case .choose:
-            CalendarsView(firstRun: true, onDone: { step = .covered })
+            CalendarsView(onDone: { step = .covered })
         default:
             ZStack {
                 Color.white.ignoresSafeArea()
