@@ -460,6 +460,8 @@ struct ThemeMarks: View {
             }
         }
         .frame(width: w, height: h)
+        .modifier(RestSpin(on: [.tennis, .golf, .baseball, .bowling, .pixel].contains(palette), paused: reduceMotion,
+                           seed: Double(GumPalette.allCases.firstIndex(of: palette) ?? 0)))
         .clipShape(Ellipse())
         .allowsHitTesting(false)
     }
@@ -566,6 +568,24 @@ struct ThemeMarks: View {
 }
 
 /// Sparkly dots for glitter.
+/// A slow spin at rest that drifts one way, eases off and turns back the other way, never quite repeating.
+struct RestSpin: ViewModifier {
+    let on: Bool
+    let paused: Bool
+    let seed: Double
+
+    func body(content: Content) -> some View {
+        if on {
+            TimelineView(.animation(minimumInterval: 1.0 / 30, paused: paused)) { tl in
+                let t = paused ? 0 : tl.date.timeIntervalSinceReferenceDate
+                content.rotationEffect(.degrees(150 * sin(t / 11 + seed) + 90 * sin(t / 6.3 + seed * 2.1)))
+            }
+        } else {
+            content
+        }
+    }
+}
+
 struct GlitterDots: View {
     var body: some View {
         Canvas { ctx, size in
