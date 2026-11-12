@@ -279,12 +279,12 @@ final class FortuneTests: XCTestCase {
 
 final class ThemeTests: XCTestCase {
     func testSeasonalThemesHeldBack() {
-        XCTAssertFalse(GumPalette.seasonsReady)
+        XCTAssertFalse(GumPalette.seasonsInStore, "holiday themes stay out of the App Store until released")
         XCTAssertTrue(GumPalette.available.contains(.moon))
         XCTAssertTrue(GumPalette.available.contains(.grenade))
-        XCTAssertFalse(GumPalette.available.contains(.ornament))
-        XCTAssertFalse(PopChoice.available.contains(.glassTing))
-        XCTAssertFalse(AlarmSoundChoice.available.contains(.sleighBells))
+        XCTAssertEqual(GumPalette.available.contains(.ornament), GumPalette.seasonsReady)
+        XCTAssertEqual(PopChoice.available.contains(.glassTing), GumPalette.seasonsReady)
+        XCTAssertEqual(AlarmSoundChoice.available.contains(.sleighBells), GumPalette.seasonsReady)
         XCTAssertTrue(AlarmSoundChoice.available.contains(.sonar))
     }
 

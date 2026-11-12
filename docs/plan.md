@@ -246,5 +246,5 @@ Review: https://claude.ai/artifact/Xs4CqLSRPxh6u4VgfZJpko (App Store readiness r
   review risk; nothing in it is harmed or exploded, so the age rating answers stay None.
 - Seasons pack, built and held back (`GumPalette.seasonsReady = false`): Snowball (frost, snowflakes, Snow crunch),
   Ornament (red, gold glitter band and cap, Glass ting, Sleigh bells alarm), Pumpkin spice (ribs, stem, cinnamon,
-  Leaf thunk). Turn on by flipping seasonsReady (and add the "change with the seasons" switch if wanted).
+  Leaf thunk). Shown in TestFlight and Xcode builds only; set `GumPalette.seasonsInStore = true` to release them in the App Store. Owner will decide later how to restrict and release each theme.
 - All Pro. Every color has its own app icon (AppIcon-<Name>).

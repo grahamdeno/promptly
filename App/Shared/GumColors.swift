@@ -23,8 +23,17 @@ enum GumPalette: String, CaseIterable, Sendable {
 
     var isPro: Bool { !(self == .bubblegum || self == .coral) }
 
-    /// The holiday themes are built but held back until the owner turns them on for their season.
-    static let seasonsReady = false
+    /// The holiday themes are held back from the App Store until the owner decides how to release them. TestFlight
+    /// and Xcode builds show them so they can be tried. Set `seasonsInStore` to true to release them everywhere.
+    static let seasonsInStore = false
+    static var seasonsReady: Bool {
+        if seasonsInStore { return true }
+        #if DEBUG
+        return true
+        #else
+        return Bundle.main.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt"
+        #endif
+    }
     var isSeasonal: Bool { self == .snowball || self == .ornament || self == .pumpkin }
     /// The colors offered in Settings.
     static var available: [GumPalette] { allCases.filter { seasonsReady || !$0.isSeasonal } }
