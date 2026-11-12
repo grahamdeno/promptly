@@ -315,7 +315,8 @@ final class PackTests: XCTestCase {
         XCTAssertNil(ThemeGroup.classic.packID)
         XCTAssertNil(ThemeGroup.favorites.packID)
         XCTAssertEqual(Set(ThemeGroup.allCases.compactMap(\.packID)).count, 5)
-        for palette in GumPalette.allCases where palette.isHeld {
+        // Favorites are Pro only by design; every other held theme can be bought in a pack.
+        for palette in GumPalette.allCases where palette.isHeld && palette.group != .favorites {
             XCTAssertNotNil(palette.group.packID, "\(palette) should be in a pack")
         }
     }
