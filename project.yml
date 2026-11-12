@@ -67,7 +67,27 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.grahamdeno.promptly.tests
         GENERATE_INFOPLIST_FILE: YES
+  PromptlyUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - App/PromptlyUITests
+    dependencies:
+      - target: Promptly
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.grahamdeno.promptly.uitests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: Promptly
 schemes:
+  Screenshots:
+    build:
+      targets:
+        Promptly: all
+        PromptlyUITests: [test]
+    test:
+      targets:
+        - PromptlyUITests
   Promptly:
     build:
       targets:

@@ -47,7 +47,7 @@ struct RootView: View {
         }
         .onChange(of: model.linkToOpen) { _, url in
             guard let url else { return }
-            openURL(url)
+            if !ScreenshotMode.isOn { openURL(url) }
             model.linkToOpen = nil
         }
     }

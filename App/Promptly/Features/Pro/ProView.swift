@@ -35,8 +35,10 @@ struct ProView: View {
                         .font(.system(size: titleSize, weight: .semibold))
                         .tracking(-0.8)
                         .foregroundStyle(Brand.ink)
-                    Text(store.isPro ? "Thanks for supporting Pop In. Everything below is unlocked."
-                                     : "One purchase, yours for good. The free app keeps every alarm, the bubble and the widgets.")
+                    Text(store.betaAccess && !store.purchased
+                         ? "Unlocked for TestFlight testing. In the App Store version this is a one-time \(store.price) purchase."
+                         : store.isPro ? "Thanks for supporting Pop In. Everything below is unlocked."
+                                       : "One purchase, yours for good. The free app keeps every alarm, the bubble and the widgets.")
                         .font(.callout)
                         .foregroundStyle(Brand.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -53,8 +55,9 @@ struct ProView: View {
                     if let message = store.message {
                         Text(message).font(.subheadline).foregroundStyle(Brand.ink)
                     }
-                    if !store.isPro {
-                        Button(store.purchasing ? "One moment…" : "Unlock for \(store.price)") {
+                    if !store.purchased {
+                        Button(store.purchasing ? "One moment…"
+                               : store.betaAccess ? "Test the purchase (free in TestFlight)" : "Unlock for \(store.price)") {
                             Task { await store.buy() }
                         }
                         .buttonStyle(PrimaryButtonStyle(height: 56))

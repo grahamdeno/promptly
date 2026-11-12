@@ -5,7 +5,7 @@ import UIKit
 struct HomeView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.openURL) private var openURL
-    @State private var showCalendars = false
+    @State private var showCalendars = ScreenshotMode.scene == .settings || ScreenshotMode.scene == .pro
 
     @Environment(\.horizontalSizeClass) private var sizeClass
     @ScaledMetric(relativeTo: .largeTitle) private var titleSize: CGFloat = 32
@@ -73,7 +73,7 @@ struct HomeView: View {
             accessibilityTitle: next.map { ($0.joinURL == nil ? "Pop the bubble to clear " : "Pop the bubble to join ") + $0.title } ?? "",
             maxSize: maxSize,
             onPop: next.map { meeting -> () -> Void in
-                { if let url = model.join(meeting) { openURL(url) } }
+                { if let url = model.join(meeting), !ScreenshotMode.isOn { openURL(url) } }
             }
         )
     }

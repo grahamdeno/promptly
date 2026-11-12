@@ -143,6 +143,27 @@ final class AppModel {
             if self.leadMinutes > 5 { self.leadMinutes = 5 }
             if self.keepAwake { self.keepAwake = false }
         }
+        if let scene = ScreenshotMode.scene {
+            // App Store screenshots: demo meetings, no alarms, everything unlocked. didSet doesn't run in init,
+            // so none of this is saved or scheduled.
+            onboarded = true
+            calendarAuthorized = true
+            alarmsAuthorized = true
+            taughtPop = true
+            buzz = false
+            popSound = false
+            keepAwake = false
+            gumColor = scene == .unicorn ? .unicorn : .bubblegum
+            ballStyle = .bubble
+            leadMinutes = 2
+            cleared = []
+            calendars = ScreenshotMode.calendars
+            meetings = ScreenshotMode.meetings()
+            store.forceBetaAccess()
+            if scene == .now || scene == .late { arrived = meetings.first }
+            if scene == .pro { showPro = true }
+            return
+        }
         Task { await store.load() }
         storeObserver = NotificationCenter.default.addObserver(
             forName: .EKEventStoreChanged, object: calendarService.store, queue: .main
@@ -252,6 +273,7 @@ final class AppModel {
 
     func becameActive() async {
         isForeground = true
+        if ScreenshotMode.isOn { return }
         applyKeepAwake()
         calendarAuthorized = calendarService.isAuthorized
         alarmsAuthorized = alarmService.isAuthorized
@@ -270,6 +292,7 @@ final class AppModel {
     /// Pop In left the screen or the phone locked: put Apple's alarms back for everything, right away.
     func wentToBackground() async {
         isForeground = false
+        if ScreenshotMode.isOn { return }
         watcher?.cancel()
         AlarmLoop.stop()
         let task = UIApplication.shared.beginBackgroundTask(withName: "restore-alarms")
@@ -305,6 +328,7 @@ final class AppModel {
     }
 
     func refresh() async {
+        if ScreenshotMode.isOn { return }
         guard calendarAuthorized else { meetings = []; calendars = []; return }
         calendars = calendarService.calendars()
         meetings = calendarService.upcoming(disabled: disabledCalendarIDs)
@@ -317,6 +341,7 @@ final class AppModel {
     }
 
     func syncAlarms() async {
+        if ScreenshotMode.isOn { return }
         guard alarmsAuthorized else { return }
         let alarmMeetings = meetings.filter { ringsFully($0) }
         let gentleMeetings = meetings.filter { !ringsFully($0) }
@@ -458,7 +483,7 @@ final class AppModel {
         alarmService.stopAlerting()
         AlarmLoop.stop()
         cleared.insert(meeting.id)
-        prefs.clearedMeetingIDs = cleared
+        if !ScreenshotMode.isOn { prefs.clearedMeetingIDs = cleared }
         lastCleared = meeting
         popCount += 1
         if !taughtPop { taughtPop = true; prefs.taughtPop = true }
