@@ -9,7 +9,7 @@ struct WelcomeView: View {
     @ScaledMetric(relativeTo: .largeTitle) private var titleSize: CGFloat = 34
     @ScaledMetric(relativeTo: .body) private var bodySize: CGFloat = 16
 
-    enum Step { case hello, calendars, alarms, choose, covered }
+    enum Step { case hello, calendars, alarms, locked, choose, covered }
 
     var body: some View {
         switch step {
@@ -34,6 +34,7 @@ struct WelcomeView: View {
                                 .font(.system(size: bodySize))
                                 .foregroundStyle(Brand.secondary)
                                 .fixedSize(horizontal: false, vertical: true)
+                            if step == .locked { LockedAlarmPreview().padding(.top, 6) }
                         }
                         .glassCard()
                         Spacer(minLength: 24)
@@ -69,6 +70,7 @@ struct WelcomeView: View {
         case .hello: 0.2
         case .calendars: 0.4
         case .alarms: 0.6
+        case .locked: 0.7
         default: 0.8
         }
     }
@@ -78,6 +80,7 @@ struct WelcomeView: View {
         case .hello: "Never miss the start of a meeting."
         case .calendars: "First, your calendars"
         case .alarms: "Then, permission to ring"
+        case .locked: "When your phone is locked"
         default: model.upcoming(at: .now).first.map { _ in "You're covered" } ?? "You're all set"
         }
     }
@@ -88,6 +91,8 @@ struct WelcomeView: View {
             return "Pop In watches your calendar and rings before each meeting. Pop the bubble to join the call."
         case .calendars:
             return "Pop In reads the calendars on this device, including Google and Outlook accounts added in Settings. It never changes them, and nothing leaves this device."
+        case .locked:
+            return "iPhone shows its own alarm, like this. Tap Open to join the call. Open Pop In any time to see the bubble."
         case .alarms:
             return "For meetings with a video link, Pop In rings like an alarm, even in Silent and Focus, with Join on the alert. Other events get a quiet notification. You can change this per calendar."
         default:
@@ -103,6 +108,7 @@ struct WelcomeView: View {
         case .hello: "Get started"
         case .calendars: "Allow calendar access"
         case .alarms: "Allow alarms"
+        case .locked: "Got it"
         default: "Done"
         }
     }
@@ -123,12 +129,43 @@ struct WelcomeView: View {
             Task {
                 await model.requestAlarmAccess()
                 asking = false
-                step = .choose
+                step = .locked
             }
+        case .locked:
+            step = .choose
         case .choose:
             step = .covered
         case .covered:
             model.finishOnboarding()
         }
+    }
+}
+
+/// A sketch of Apple's alarm as it appears on the Lock Screen, so the first real one isn't a surprise.
+struct LockedAlarmPreview: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 10) {
+                GumBall().frame(width: 30, height: 30)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Design review · in 1 min").font(.subheadline.weight(.semibold)).foregroundStyle(.white)
+                    Text("Pop In").font(.caption).foregroundStyle(.white.opacity(0.7))
+                }
+            }
+            HStack(spacing: 10) {
+                Text("Open")
+                    .font(.subheadline.weight(.semibold)).foregroundStyle(.white)
+                    .frame(maxWidth: .infinity, minHeight: 40)
+                    .background(Capsule().fill(Brand.coralDark))
+                Text("Stop")
+                    .font(.subheadline.weight(.semibold)).foregroundStyle(.white)
+                    .frame(maxWidth: .infinity, minHeight: 40)
+                    .background(Capsule().fill(.white.opacity(0.2)))
+            }
+        }
+        .padding(16)
+        .background(RoundedRectangle(cornerRadius: 22).fill(Color(white: 0.12)))
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Example: the locked alarm shows the meeting, an Open button and a Stop button.")
     }
 }

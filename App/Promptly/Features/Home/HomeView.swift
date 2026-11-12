@@ -137,13 +137,22 @@ struct HomeView: View {
         let parts = Countdown.parts(now: now, start: meeting.start)
         let started = meeting.start <= now
         let label = isDemo(meeting) ? "Practice" : [started ? "Happening now" : "Next", meeting.service?.rawValue].compactMap { $0 }.joined(separator: " · ")
+        // How Pop In will alert, so a quiet one is never a surprise.
+        let rings = model.ringsFully(meeting)
+        let how = rings ? "Rings \(model.leadMinutes) min before" : "Quiet notification only"
         return VStack(alignment: .leading, spacing: 22) {
             VStack(alignment: .leading, spacing: 20) {
                 VStack(alignment: .leading, spacing: 0) {
                     Text(label)
                         .font(.subheadline.weight(.medium))
                         .foregroundStyle(Brand.secondary)
-                        .padding(.bottom, 12)
+                        .padding(.bottom, 4)
+                    if !isDemo(meeting) && !started {
+                        Label(how, systemImage: rings ? "bell.fill" : "bell.slash")
+                            .font(.footnote.weight(.medium))
+                            .foregroundStyle(rings ? Brand.accentText : Brand.secondary)
+                            .padding(.bottom, 10)
+                    }
                     Text(meeting.title)
                         .font(.system(size: titleSize, weight: .semibold))
                         .tracking(-0.8)

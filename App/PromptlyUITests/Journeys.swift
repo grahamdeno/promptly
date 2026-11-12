@@ -35,6 +35,11 @@ final class Journeys: XCTestCase {
         a.accessibility("alarms-why")
         a.tap("Allow alarms", a.button(startingWith: "Allow alarms"), severity: 4)
         a.pause(1.2)
+        a.shot("locked-alarm-preview")
+        a.accessibility("locked-alarm-preview")
+        a.check("shows what the locked alarm looks like", a.text(containing: "phone is locked").exists, severity: 3)
+        a.tap("Got it", a.app.buttons["Got it"], severity: 4)
+        a.pause(1.2)
         a.shot("which-calendars")
         a.accessibility("which-calendars")
         a.labels("which-calendars")
@@ -60,6 +65,7 @@ final class Journeys: XCTestCase {
         a.labels("home")
         a.expect("the card names the meeting", a.any(containing: "Design review"), severity: 4)
         a.expect("the card says how long", a.any(containing: "min"), severity: 3)
+        a.expect("the card says it will ring", a.any(containing: "Rings"), severity: 3)
         a.expect("Not going is visible", a.app.buttons["Not going"], severity: 4)
         a.expect("Settings is reachable", a.app.buttons["Settings"], severity: 3)
         a.begin("Join the next meeting")
@@ -134,6 +140,7 @@ final class Journeys: XCTestCase {
         a.shot("settings-top")
         a.accessibility("settings")
         a.labels("settings")
+        a.expect("Test the alarm is visible", a.any(containing: "Test the alarm"), severity: 3)
         for row in ["Calendars", "Ring before", "Sound"] {
             a.expect("row \(row) shows", a.any(containing: row), severity: 3)
         }
