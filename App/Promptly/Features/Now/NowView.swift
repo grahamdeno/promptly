@@ -30,7 +30,12 @@ struct NowView: View {
                         leave { if let url { openURL(url) } }
                     }
                 )
+                .environment(\.themeStill, PowerWatch.shared.strained)
+                .environment(\.fortuneText, model.gumColor == .fortune && model.fortunes ? Fortunes.fortune(for: meeting.id) : nil)
                 .ignoresSafeArea()
+
+                DiscoLights().ignoresSafeArea()
+                    .environment(\.themeStill, PowerWatch.shared.strained)
 
                 VStack(alignment: .leading, spacing: 14) {
                     Text(status(now))

@@ -36,6 +36,7 @@ struct BubbleView: View {
     /// Every few seconds a fingertip presses a small dent into the bubble, inviting a tap. No text on the gum.
     @State private var poked = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.themeStill) private var themeStill
 
     /// Inflates in breaths: 36 puffs from empty to full.
     private var puff: Double {
@@ -133,7 +134,7 @@ struct BubbleView: View {
                 .frame(width: width, height: height)
                 .overlay { if onPop != nil { pokeDimple } }
                 .scaleEffect(x: poked ? 1.008 : 1, y: poked ? 0.992 : 1, anchor: .bottom)
-                .modifier(ThemeIdle(palette: GumPalette.current, paused: reduceMotion || ScreenshotMode.isOn || popping))
+                .modifier(ThemeIdle(palette: GumPalette.current, paused: reduceMotion || themeStill || ScreenshotMode.isOn || popping))
                 .contentShape(Ellipse())
         }
         .buttonStyle(.plain)
@@ -453,7 +454,10 @@ struct GumBubbleShape: View {
     var thinness: Double
     /// Overrides the gum's main color.
     var tint: Color? = nil
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
+    @Environment(\.themeStill) private var themeStill
+    private var reduceMotion: Bool { systemReduceMotion || themeStill }
+    @Environment(\.fortuneText) private var fortuneText
 
     var body: some View {
         GeometryReader { geo in
@@ -461,6 +465,16 @@ struct GumBubbleShape: View {
             let h = geo.size.height
             let streak = min(26, max(5, w * 0.03))
             ZStack {
+            // The glow under the ball, on a plain shape so it isn't redrawn with every animation frame.
+            Group {
+                if GumPalette.current == .waterBalloon || GumPalette.current == .easterEgg {
+                    EggShape().fill(GumColors.dark)
+                } else {
+                    Ellipse().fill(GumColors.dark)
+                }
+            }
+            .shadow(color: GumColors.accent.opacity(GumPalette.current == .fortune ? 0.45 : 0.3),
+                    radius: GumPalette.current == .fortune ? 40 : 30, y: -12)
             ZStack {
                 // Solid, saturated gum with a soft lit side (Unicorn uses the same pink gum).
                 Ellipse()
@@ -476,16 +490,23 @@ struct GumBubbleShape: View {
                 }
                 ThemeMarks(palette: GumPalette.current, w: w, h: h, level: thinness)
                 if GumPalette.current == .fortune {
-                    // Fortune: a soft star of light drifts slowly inside the black glass.
-                    TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion || ScreenshotMode.isOn)) { ctx in
+                    // Fortune: a soft star of light drifts slowly inside the black glass. When there is a fortune,
+                    // the words surface out of the violet mist now and then, rest a while, and sink back.
+                    TimelineView(.animation(minimumInterval: 1.0 / 20, paused: reduceMotion || ScreenshotMode.isOn)) { ctx in
                         let t = reduceMotion || ScreenshotMode.isOn ? 0 : ctx.date.timeIntervalSinceReferenceDate
+                        let words = fortuneText.map { _ in FortuneSurface.amount(t, still: reduceMotion || ScreenshotMode.isOn) } ?? 0
                         let side = max(10, w * 0.07)
                         ZStack {
                             Circle().fill(GumPalette.violet.opacity(0.45)).frame(width: side * 2.6, height: side * 2.6).blur(radius: side * 0.7)
                             FourPointStar().fill(Color.white.opacity(0.92)).frame(width: side, height: side)
                                 .rotationEffect(.degrees(sin(t / 3) * 12))
                         }
+                        .opacity(1 - words)
                         .position(x: w * (0.5 + 0.16 * sin(t / 7)), y: h * (0.26 + 0.05 * sin(t / 5)))
+                        if let fortuneText {
+                            FortuneWords(text: fortuneText, w: w, amount: words)
+                                .position(x: w * 0.5, y: h * 0.3)
+                        }
                     }
                     .clipShape(Ellipse())
                 }
@@ -521,7 +542,7 @@ struct GumBubbleShape: View {
                     .padding(w * 0.012)
                 if GumPalette.current == .unicorn {
                     // The rainbow rim turns once every 6 seconds (still with Reduce Motion and in screenshots).
-                    TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion || ScreenshotMode.isOn)) { ctx in
+                    TimelineView(.animation(minimumInterval: 1.0 / 20, paused: reduceMotion || ScreenshotMode.isOn)) { ctx in
                         let spin = ctx.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 6) / 6 * 360
                         UnicornRim(lineWidth: max(2.5, w * 0.008),
                                    angle: reduceMotion || ScreenshotMode.isOn ? -60 : -60 + spin)
@@ -529,7 +550,7 @@ struct GumBubbleShape: View {
                 }
                 if GumPalette.current == .fortune {
                     // A violet glow at the edge that slowly circles the ball (once every 8 seconds).
-                    TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion || ScreenshotMode.isOn)) { ctx in
+                    TimelineView(.animation(minimumInterval: 1.0 / 20, paused: reduceMotion || ScreenshotMode.isOn)) { ctx in
                         let spin = reduceMotion || ScreenshotMode.isOn ? 0 : ctx.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 8) / 8 * 360
                         ZStack {
                             FortuneRim(lineWidth: max(10, w * 0.03), angle: spin).blur(radius: max(6, w * 0.02)).opacity(0.8)
@@ -542,8 +563,6 @@ struct GumBubbleShape: View {
             .modifier(EggMask(on: GumPalette.current == .waterBalloon || GumPalette.current == .easterEgg))
                 ThemeTopper(palette: GumPalette.current, w: w, h: h)
             }
-            .shadow(color: GumColors.accent.opacity(GumPalette.current == .fortune ? 0.45 : 0.3),
-                    radius: GumPalette.current == .fortune ? 40 : 30, y: -12)
         }
     }
 }
@@ -577,7 +596,7 @@ struct ThemeIdle: ViewModifier {
     func body(content: Content) -> some View {
         switch palette {
         case .waterBalloon, .moodRing, .easterEgg, .valentine:
-            TimelineView(.animation(minimumInterval: 1.0 / 30, paused: paused)) { ctx in
+            TimelineView(.animation(minimumInterval: 1.0 / 20, paused: paused)) { ctx in
                 let t = paused ? 0 : ctx.date.timeIntervalSinceReferenceDate
                 let s = Self.scale(palette, t: t)
                 content.scaleEffect(x: s.width, y: s.height, anchor: .bottom)
@@ -631,5 +650,53 @@ struct EggMask: ViewModifier {
         } else {
             content
         }
+    }
+}
+
+
+extension EnvironmentValues {
+    /// The fortune to show inside the Fortune ball, when there is one.
+    @Entry var fortuneText: String? = nil
+}
+
+/// When the fortune words show inside the ball: they surface over 1.5 seconds, stay 9 seconds, sink back over
+/// 1.5 seconds, and the star returns for 4 seconds before the next time. Held fully up with Reduce Motion.
+enum FortuneSurface {
+    static func amount(_ t: Double, still: Bool) -> Double {
+        if still { return 1 }
+        let k = t.truncatingRemainder(dividingBy: 16)
+        if k < 1.5 { return k / 1.5 }
+        if k < 10.5 { return 1 }
+        if k < 12 { return 1 - (k - 10.5) / 1.5 }
+        return 0
+    }
+}
+
+/// The fortune's words, soft violet-white, floating up out of the mist inside the black ball.
+struct FortuneWords: View {
+    let text: String
+    let w: CGFloat
+    let amount: Double
+
+    var body: some View {
+        let size: CGFloat = max(13, w * 0.05)
+        let blur: CGFloat = CGFloat(1 - amount) * size * 0.5
+        ZStack {
+            Circle().fill(GumPalette.violet.opacity(0.35 * amount))
+                .frame(width: w * 0.62, height: w * 0.62)
+                .blur(radius: w * 0.08)
+            Text(text)
+                .font(.system(size: size, weight: .semibold, design: .serif).italic())
+                .multilineTextAlignment(.center)
+                .foregroundStyle(Color.white.opacity(0.95))
+                .shadow(color: GumPalette.violet.opacity(0.9), radius: size * 0.4)
+                .lineLimit(4)
+                .minimumScaleFactor(0.6)
+                .frame(width: w * 0.46)
+                .blur(radius: blur)
+                .opacity(amount)
+                .offset(y: CGFloat(1 - amount) * size * 0.8)
+        }
+        .accessibilityHidden(true)
     }
 }

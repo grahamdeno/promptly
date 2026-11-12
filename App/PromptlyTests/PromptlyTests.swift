@@ -263,8 +263,8 @@ final class FortuneTests: XCTestCase {
 
     func testShowsOnlyInLastTenMinutes() {
         let start = Date(timeIntervalSince1970: 50_000)
-        XCTAssertFalse(Fortunes.shows(start: start, now: start.addingTimeInterval(-11 * 60)))
-        XCTAssertTrue(Fortunes.shows(start: start, now: start.addingTimeInterval(-9 * 60)))
+        XCTAssertFalse(Fortunes.shows(start: start, now: start.addingTimeInterval(-16 * 60)))
+        XCTAssertTrue(Fortunes.shows(start: start, now: start.addingTimeInterval(-14 * 60)))
         XCTAssertFalse(Fortunes.shows(start: start, now: start.addingTimeInterval(1)))
     }
 
@@ -319,5 +319,21 @@ final class PackTests: XCTestCase {
         for palette in GumPalette.allCases where palette.isHeld && palette.group != .favorites {
             XCTAssertNotNil(palette.group.packID, "\(palette) should be in a pack")
         }
+    }
+}
+
+
+final class QuietModeTests: XCTestCase {
+    func testQuietAfterTwoMinutesUntouchedWhenMeetingIsFar() {
+        let now = Date()
+        XCTAssertFalse(QuietMode.isQuiet(now: now, lastTouch: now.addingTimeInterval(-60), nextStart: nil))
+        XCTAssertTrue(QuietMode.isQuiet(now: now, lastTouch: now.addingTimeInterval(-121), nextStart: nil))
+        XCTAssertTrue(QuietMode.isQuiet(now: now, lastTouch: now.addingTimeInterval(-300), nextStart: now.addingTimeInterval(40 * 60)))
+    }
+
+    func testWakesWithinFifteenMinutesOfAMeeting() {
+        let now = Date()
+        XCTAssertFalse(QuietMode.isQuiet(now: now, lastTouch: now.addingTimeInterval(-600), nextStart: now.addingTimeInterval(14 * 60)))
+        XCTAssertFalse(QuietMode.isQuiet(now: now, lastTouch: now.addingTimeInterval(-600), nextStart: now.addingTimeInterval(-60)))
     }
 }

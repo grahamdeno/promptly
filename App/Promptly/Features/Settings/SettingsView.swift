@@ -70,7 +70,7 @@ struct SettingsView: View {
                         }
                     }
                     if model.gumColor == .fortune {
-                        SettingsToggle("Meeting fortunes", detail: "A light one-liner on the card in the last ten minutes",
+                        SettingsToggle("Meeting fortunes", detail: "A light one-liner inside the ball in the last fifteen minutes and when it rings",
                                        isOn: Binding(get: { model.fortunes }, set: { model.fortunes = $0 }))
                     }
                     SettingsToggle("Buzz as it gets close", detail: "Builds over the last ten minutes while Pop In is open",

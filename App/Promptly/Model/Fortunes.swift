@@ -1,6 +1,6 @@
 import Foundation
 
-/// Fortune theme: a light one-liner on the card before a meeting. Things everyone recognizes from meetings, said
+/// Fortune theme: a light one-liner that surfaces inside the ball before a meeting. Things everyone recognizes from meetings, said
 /// lightly; no coaching. Each meeting keeps the same one (picked from its id with a stable hash, since Swift's own
 /// hash changes every launch). Pure logic, unit tested.
 enum Fortunes {
@@ -54,9 +54,9 @@ enum Fortunes {
         return all[Int(h % UInt64(all.count))]
     }
 
-    /// Shown in the last ten minutes before the start.
+    /// Shown on the ball in the last fifteen minutes before the start (and on the alarm screen).
     static func shows(start: Date, now: Date) -> Bool {
         let left = start.timeIntervalSince(now)
-        return left > 0 && left <= 10 * 60
+        return left > 0 && left <= 15 * 60
     }
 }
