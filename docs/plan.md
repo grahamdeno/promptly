@@ -285,7 +285,7 @@ Review: https://claude.ai/artifact/Xs4CqLSRPxh6u4VgfZJpko (App Store readiness r
   falls back to Bubblegum if the current theme was in it.
 - Grok creates the five products; held themes (and so packs) stay hidden in the App Store until released.
 
-## Release calendar (proposed 2026-11-12, awaiting owner approval)
+## Release calendar (owner approved 2026-11-12; Grok acts on nothing until he has felt the themes)
 
 Audience: remote and hybrid workers, about 25 to 45, back-to-back video calls. Calm by default, a little personality.
 
