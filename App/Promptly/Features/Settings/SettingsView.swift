@@ -58,7 +58,9 @@ struct SettingsView: View {
                 }
 
                 SettingsGroup("Bubble") {
-                    colorRow
+                    SettingsLink("Theme", value: model.surprise ? "Surprise me" : model.gumColor.label) {
+                        ThemeGalleryPage()
+                    }
                     SettingsLink("Pop sound", value: model.popChoice.label) {
                         ChoicePage(title: "Pop sound", note: "What you hear when a bubble pops. Quiet when your phone is on silent.",
                                    options: PopChoice.available, selected: model.popChoice, label: \.label,
@@ -145,35 +147,6 @@ struct SettingsView: View {
             .background(RoundedRectangle(cornerRadius: 20).fill(.white))
         }
         .buttonStyle(.plain)
-    }
-
-    /// The three bubble colors as balls you tap.
-    private var colorRow: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Color").font(.body).foregroundStyle(Brand.ink)
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 4), spacing: 10) {
-                ForEach(GumPalette.available, id: \.self) { palette in
-                    let selected = model.gumColor == palette
-                    let locked = palette.isPro && !model.store.isPro
-                    Button {
-                        if locked { model.showPro = true } else { model.gumColor = palette }
-                    } label: {
-                        VStack(spacing: 8) {
-                            SwatchBall(palette: palette).frame(width: 44, height: 44)
-                            Text(locked ? "\(palette.label) ✦" : palette.label)
-                                .font(.footnote.weight(selected ? .semibold : .regular))
-                                .foregroundStyle(Brand.ink)
-                        }
-                        .frame(maxWidth: .infinity, minHeight: 84)
-                        .background(RoundedRectangle(cornerRadius: 14).stroke(selected ? Brand.ink : Brand.hairline, lineWidth: selected ? 2 : 1))
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(locked ? "\(palette.label), Pro" : palette.label)
-                    .accessibilityAddTraits(selected ? .isSelected : [])
-                }
-            }
-        }
-        .padding(.vertical, 14)
     }
 
     /// For the owner and for support: alarm count, test alarms, and the bubble rollback switch.

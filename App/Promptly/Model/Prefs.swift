@@ -163,6 +163,16 @@ final class Prefs: @unchecked Sendable {
         set { defaults.set(newValue, forKey: "popSound") }
     }
 
+    /// Surprise me: a different theme each day.
+    var surprise: Bool {
+        get { defaults.bool(forKey: "surprise") }
+        set { defaults.set(newValue, forKey: "surprise") }
+    }
+    var lastSurpriseDay: String {
+        get { defaults.string(forKey: "lastSurpriseDay") ?? "" }
+        set { defaults.set(newValue, forKey: "lastSurpriseDay") }
+    }
+
     /// Fortune theme: show a light meeting fortune on the card in the last ten minutes.
     var fortunes: Bool {
         get { defaults.object(forKey: "fortunes") as? Bool ?? true }

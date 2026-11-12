@@ -26,6 +26,8 @@ enum GumPalette: String, CaseIterable, Sendable {
     case soccer
     /// Sports and arcade set (held): hockey puck, tennis, golf, baseball, bowling, 8-bit.
     case hockey, tennis, golf, baseball, bowling, pixel
+    /// Food, nature, fun objects, more holidays and calm (held).
+    case gumball, cherry, orange, macaron, cakePop, earth, sun, dandelion, atom, geode, yarn, arcadeButton, clock, marble, duck, easterEgg, valentine, fireworks, beachBall, zen
 
     var isPro: Bool { !(self == .bubblegum || self == .coral) }
 
@@ -40,12 +42,25 @@ enum GumPalette: String, CaseIterable, Sendable {
         return Bundle.main.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt"
         #endif
     }
-    var isSeasonal: Bool { self == .snowball || self == .ornament || self == .pumpkin }
-    static let novelty: [GumPalette] = [.disco, .soap, .planet, .basketball, .donut, .waterBalloon, .eyeball, .fishbowl, .moodRing, .lavaLamp, .soccer, .hockey, .tennis, .golf, .baseball, .bowling, .pixel]
+    var isSeasonal: Bool { [.snowball, .ornament, .pumpkin, .easterEgg, .valentine, .fireworks, .beachBall].contains(self) }
+    static let novelty: [GumPalette] = [.disco, .soap, .planet, .basketball, .donut, .waterBalloon, .eyeball, .fishbowl, .moodRing, .lavaLamp, .soccer, .hockey, .tennis, .golf, .baseball, .bowling, .pixel, .gumball, .cherry, .orange, .macaron, .cakePop, .earth, .sun, .dandelion, .atom, .geode, .yarn, .arcadeButton, .clock, .marble, .duck, .zen]
     /// Held back from the App Store (shown in TestFlight) until the owner decides how to release it.
     var isHeld: Bool { isSeasonal || Self.novelty.contains(self) }
     /// The colors offered in Settings.
     static var available: [GumPalette] { allCases.filter { seasonsReady || !$0.isHeld } }
+    /// Groups for the theme gallery.
+    var group: ThemeGroup {
+        switch self {
+        case .bubblegum, .coral: .classic
+        case .unicorn, .fortune, .moon, .grenade, .disco, .soap, .lavaLamp, .moodRing, .eyeball, .fishbowl, .donut, .waterBalloon, .planet: .favorites
+        case .soccer, .hockey, .tennis, .golf, .baseball, .bowling, .basketball, .pixel: .sports
+        case .gumball, .cherry, .orange, .macaron, .cakePop: .food
+        case .earth, .sun, .dandelion, .atom, .geode: .nature
+        case .yarn, .arcadeButton, .clock, .marble, .duck, .zen: .objects
+        case .snowball, .ornament, .pumpkin, .easterEgg, .valentine, .fireworks, .beachBall: .seasons
+        }
+    }
+
     /// Themes with their own app icon (AppIcon-<Name>).
     var hasIcon: Bool { !(self == .bubblegum) && !Self.novelty.contains(self) }
     /// The theme's own pop sound (Sounds/<name>.wav), used by "Match the theme".
@@ -75,6 +90,26 @@ enum GumPalette: String, CaseIterable, Sendable {
         case .baseball: "baseball_pop"
         case .bowling: "bowling_pop"
         case .pixel: "pixel_pop"
+        case .gumball: "gumball_pop"
+        case .cherry: "juicy_pop"
+        case .orange: "juicy_pop"
+        case .macaron: "snow_pop"
+        case .cakePop: "donut_pop"
+        case .earth: "planet_pop"
+        case .sun: "fortune_pop"
+        case .dandelion: "puff_pop"
+        case .atom: "moon_pop"
+        case .geode: "crack_pop"
+        case .yarn: "donut_pop"
+        case .arcadeButton: "click_pop"
+        case .clock: "bell_pop"
+        case .marble: "ornament_pop"
+        case .duck: "squeak_pop"
+        case .easterEgg: "pop"
+        case .valentine: "unicorn_pop"
+        case .fireworks: "firework_pop"
+        case .beachBall: "donut_pop"
+        case .zen: "zen_pop"
         }
     }
 
@@ -114,6 +149,26 @@ enum GumPalette: String, CaseIterable, Sendable {
         case .baseball: "Baseball"
         case .bowling: "Bowling ball"
         case .pixel: "8-bit"
+        case .gumball: "Gumball machine"
+        case .cherry: "Cherry"
+        case .orange: "Orange"
+        case .macaron: "Macaron"
+        case .cakePop: "Cake pop"
+        case .earth: "Earth"
+        case .sun: "Sun"
+        case .dandelion: "Dandelion"
+        case .atom: "Atom"
+        case .geode: "Geode"
+        case .yarn: "Ball of yarn"
+        case .arcadeButton: "Big red button"
+        case .clock: "Clock"
+        case .marble: "Marble"
+        case .duck: "Rubber duck"
+        case .easterEgg: "Easter egg"
+        case .valentine: "Valentine"
+        case .fireworks: "Fireworks"
+        case .beachBall: "Beach ball"
+        case .zen: "Zen stone"
         }
     }
 
@@ -149,6 +204,26 @@ enum GumPalette: String, CaseIterable, Sendable {
         case .baseball: Self.rgb(0xF5F1E6)
         case .bowling: Self.rgb(0x3A1C71)
         case .pixel: Self.rgb(0xFF5A5A)
+        case .gumball: Self.rgb(0xCFE8F7)
+        case .cherry: Self.rgb(0xC8102E)
+        case .orange: Self.rgb(0xF28C1E)
+        case .macaron: Self.rgb(0xF7B7CF)
+        case .cakePop: Self.rgb(0xF48FB1)
+        case .earth: Self.rgb(0x2E7BD8)
+        case .sun: Self.rgb(0xFFB020)
+        case .dandelion: Self.rgb(0xF2F2EC)
+        case .atom: Self.rgb(0x1B2350)
+        case .geode: Self.rgb(0x8E8A84)
+        case .yarn: Self.rgb(0xD8456B)
+        case .arcadeButton: Self.rgb(0xE02020)
+        case .clock: Self.rgb(0xF7F5F0)
+        case .marble: Self.rgb(0xBFE0F5)
+        case .duck: Self.rgb(0xFFD43B)
+        case .easterEgg: Self.rgb(0xC9E7FF)
+        case .valentine: Self.rgb(0xE8336B)
+        case .fireworks: Self.rgb(0x141B3D)
+        case .beachBall: Self.rgb(0xF5F5F5)
+        case .zen: Self.rgb(0x9A9A94)
         }
     }
 
@@ -180,6 +255,26 @@ enum GumPalette: String, CaseIterable, Sendable {
         case .baseball: Self.rgb(0xFFFFFF)
         case .bowling: Self.rgb(0x7A4FC9)
         case .pixel: Self.rgb(0xFF9A9A)
+        case .gumball: Self.rgb(0xFFFFFF)
+        case .cherry: Self.rgb(0xFF7A8A)
+        case .orange: Self.rgb(0xFFC27A)
+        case .macaron: Self.rgb(0xFFE3EE)
+        case .cakePop: Self.rgb(0xFFD3E2)
+        case .earth: Self.rgb(0x8CC4FF)
+        case .sun: Self.rgb(0xFFF0A0)
+        case .dandelion: Self.rgb(0xFFFFFF)
+        case .atom: Self.rgb(0x3E4A9A)
+        case .geode: Self.rgb(0xC9C4BC)
+        case .yarn: Self.rgb(0xFF9AB4)
+        case .arcadeButton: Self.rgb(0xFF7A7A)
+        case .clock: Self.rgb(0xFFFFFF)
+        case .marble: Self.rgb(0xFFFFFF)
+        case .duck: Self.rgb(0xFFF3A8)
+        case .easterEgg: Self.rgb(0xF4FAFF)
+        case .valentine: Self.rgb(0xFF9AB8)
+        case .fireworks: Self.rgb(0x3A4580)
+        case .beachBall: Self.rgb(0xFFFFFF)
+        case .zen: Self.rgb(0xD0D0CA)
         }
     }
 
@@ -211,6 +306,26 @@ enum GumPalette: String, CaseIterable, Sendable {
         case .baseball: Self.rgb(0xA8A291)
         case .bowling: Self.rgb(0x140630)
         case .pixel: Self.rgb(0x8A1A1A)
+        case .gumball: Self.rgb(0x7FB0CF)
+        case .cherry: Self.rgb(0x5C0412)
+        case .orange: Self.rgb(0x8A4508)
+        case .macaron: Self.rgb(0xB86E8E)
+        case .cakePop: Self.rgb(0xA8476B)
+        case .earth: Self.rgb(0x0E3570)
+        case .sun: Self.rgb(0xD8540E)
+        case .dandelion: Self.rgb(0xA8AE9A)
+        case .atom: Self.rgb(0x070A1F)
+        case .geode: Self.rgb(0x3E3B37)
+        case .yarn: Self.rgb(0x7A1A35)
+        case .arcadeButton: Self.rgb(0x7A0A0A)
+        case .clock: Self.rgb(0xA8A49A)
+        case .marble: Self.rgb(0x5E9CC8)
+        case .duck: Self.rgb(0xC89A0A)
+        case .easterEgg: Self.rgb(0x7EAFD8)
+        case .valentine: Self.rgb(0x8A0E36)
+        case .fireworks: Self.rgb(0x05081A)
+        case .beachBall: Self.rgb(0xA0A0A0)
+        case .zen: Self.rgb(0x55554F)
         }
     }
 
@@ -279,6 +394,26 @@ enum GumPalette: String, CaseIterable, Sendable {
         case .baseball: Self.rgb(0xA11F1F)
         case .bowling: Self.rgb(0x5B33B0)
         case .pixel: Self.rgb(0xB02222)
+        case .gumball: Self.rgb(0x1F6E9C)
+        case .cherry: Self.rgb(0xA30D25)
+        case .orange: Self.rgb(0xA4500F)
+        case .macaron: Self.rgb(0xA8466F)
+        case .cakePop: Self.rgb(0xA8336A)
+        case .earth: Self.rgb(0x1E5FA8)
+        case .sun: Self.rgb(0xA85A0A)
+        case .dandelion: Self.rgb(0x5E7A3A)
+        case .atom: Self.rgb(0x3646B0)
+        case .geode: Self.rgb(0x6D3FB0)
+        case .yarn: Self.rgb(0xA82D50)
+        case .arcadeButton: Self.rgb(0xB01818)
+        case .clock: Self.rgb(0x5A564E)
+        case .marble: Self.rgb(0x1F6E9C)
+        case .duck: Self.rgb(0x9A7205)
+        case .easterEgg: Self.rgb(0x3E6FA8)
+        case .valentine: Self.rgb(0xB01E52)
+        case .fireworks: Self.rgb(0x3646B0)
+        case .beachBall: Self.rgb(0xC0392B)
+        case .zen: Self.rgb(0x55554F)
         default: Self.rgb(0xB02E68)
         }
     }
@@ -389,5 +524,21 @@ struct FourPointStar: Shape {
         p.addLine(to: CGPoint(x: c.x - w * k, y: c.y - h * k))
         p.closeSubpath()
         return p
+    }
+}
+
+/// The theme gallery's sections.
+enum ThemeGroup: String, CaseIterable, Sendable {
+    case classic, favorites, sports, food, nature, objects, seasons
+    var title: String {
+        switch self {
+        case .classic: "Classic"
+        case .favorites: "Pro favorites"
+        case .sports: "Sports and games"
+        case .food: "Treats"
+        case .nature: "Nature and space"
+        case .objects: "Fun objects"
+        case .seasons: "Seasons and holidays"
+        }
     }
 }

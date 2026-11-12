@@ -80,7 +80,8 @@ final class AppModel {
             }
             // The app icon follows the bubble color (iOS shows a one-line notice when it changes).
             // Each color has a matching app icon named after it (AppIcon-Coral, AppIcon-Moon…); Bubblegum is the main one.
-            let icon: String? = !gumColor.hasIcon ? nil : "AppIcon-" + gumColor.rawValue.prefix(1).uppercased() + String(gumColor.rawValue.dropFirst())
+            // Surprise me changes the theme daily; the icon stays put so iOS doesn't show its notice every morning.
+            let icon: String? = surprise ? UIApplication.shared.alternateIconName : !gumColor.hasIcon ? nil : "AppIcon-" + gumColor.rawValue.prefix(1).uppercased() + String(gumColor.rawValue.dropFirst())
             if UIApplication.shared.alternateIconName != icon {
                 UIApplication.shared.setAlternateIconName(icon) { _ in }
             }
@@ -105,6 +106,9 @@ final class AppModel {
                 await syncAlarms()
             }
         }
+    }
+    var surprise: Bool {
+        didSet { prefs.surprise = surprise }
     }
     var fortunes: Bool {
         didSet { prefs.fortunes = fortunes }
@@ -143,6 +147,7 @@ final class AppModel {
         alarmCalendarIDs = prefs.alarmCalendarIDs
         keepAwake = prefs.keepAwake
         fortunes = prefs.fortunes
+        surprise = prefs.surprise
         alarmService.sound = prefs.alarmSound
         nudges = prefs.nudges
         cleared = prefs.clearedMeetingIDs
@@ -155,6 +160,7 @@ final class AppModel {
             if self.gumColor.isPro { self.gumColor = .bubblegum }
             if self.alarmSound.isPro { self.alarmSound = .bubbleBlow }
             if self.popChoice.isPro { self.popChoice = .pop }
+            self.surprise = false
             if self.leadMinutes > 5 { self.leadMinutes = 5 }
             if self.keepAwake { self.keepAwake = false }
         }
@@ -203,6 +209,15 @@ final class AppModel {
     }
 
     // MARK: Upcoming
+
+    /// Surprise me: once a day, a different theme from the ones available (Pro only).
+    func surpriseIfNewDay(now: Date = .now) {
+        guard surprise, store.isPro else { return }
+        let day = Calendar.current.startOfDay(for: now).formatted(.iso8601.year().month().day())
+        guard prefs.lastSurpriseDay != day else { return }
+        prefs.lastSurpriseDay = day
+        if let next = GumPalette.available.filter({ $0 != gumColor }).randomElement() { gumColor = next }
+    }
 
     /// Seconds since this meeting's alarm rang (0 before it). The extra bubbles bud off from here, so the first
     /// appears about 15 seconds after the ring rather than after the start time.
@@ -307,6 +322,7 @@ final class AppModel {
     func becameActive() async {
         isForeground = true
         if ScreenshotMode.isOn { return }
+        surpriseIfNewDay()
         applyKeepAwake()
         calendarAuthorized = calendarService.isAuthorized
         alarmsAuthorized = alarmService.isAuthorized

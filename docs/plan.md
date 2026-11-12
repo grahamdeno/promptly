@@ -264,3 +264,14 @@ Review: https://claude.ai/artifact/Xs4CqLSRPxh6u4VgfZJpko (App Store readiness r
   thwock), Golf ball (dimples; drop into the cup), Baseball (red stitches; crack of the bat), Bowling ball (swirl
   and finger holes; strike), 8-bit (pixels; arcade coin). All held from the App Store (shown in TestFlight). No
   "World Cup" anywhere (FIFA's name); the soccer theme can be released around the tournament.
+
+## Sprint 22: twenty more themes, theme gallery, Surprise me (owner: "build and ship it", 2026-11-12)
+- Treats: Gumball machine, Cherry, Orange, Macaron, Cake pop. Nature and space: Earth (turning, clouds), Sun
+  (flickering), Dandelion (seeds), Atom (orbiting electrons), Geode (crystal crack). Fun objects: Ball of yarn, Big
+  red button, Clock (minute hand sweeps to twelve as the meeting nears; rings), Marble, Rubber duck (squeak), Zen
+  stone (soft chime). Seasons: Easter egg, Valentine, Fireworks, Beach ball. Nine new pop sounds.
+- Settings › Bubble › Theme opens a gallery grouped Classic, Pro favorites, Sports and games, Treats, Nature and
+  space, Fun objects, Seasons and holidays; tapping a tile picks it and plays its pop.
+- Surprise me (Pro): a different theme each day when Pop In opens; the app icon stays put.
+- Packs (selling bundles) are a later decision: the gallery groups are ready to become packs.
+- All new themes held from the App Store (shown in TestFlight).

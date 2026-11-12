@@ -209,6 +209,171 @@ struct ThemeMarks: View {
                         ctx.fill(Path(CGRect(x: CGFloat(col) * px, y: CGFloat(row) * px, width: px + 0.5, height: px + 0.5)), with: .color(shade))
                     } }
                 }
+            case .gumball:
+                // Little gumballs filling the glass.
+                Canvas { ctx, size in
+                    var rng = SeededRandom(seed: 3)
+                    let r = size.width * 0.05
+                    let colors: [Color] = [GumPalette.rgb(0xFF5A5A), GumPalette.rgb(0xFFD43B), GumPalette.rgb(0x3DA5FF), GumPalette.rgb(0x3DDC97), GumPalette.rgb(0xFF7FB0), .white]
+                    var y = size.height * 0.98
+                    while y > size.height * 0.32 {
+                        var x = rng.next() * r
+                        while x < size.width {
+                            ctx.fill(Path(ellipseIn: CGRect(x: x, y: y - r * 2, width: r * 2, height: r * 2)), with: .color(colors[Int(rng.next() * 6) % 6]))
+                            x += r * 2.05
+                        }
+                        y -= r * 1.8
+                    }
+                }
+            case .orange:
+                Canvas { ctx, size in
+                    var rng = SeededRandom(seed: 8)
+                    for _ in 0..<Int(size.width * size.height / 90) {
+                        ctx.fill(Path(ellipseIn: CGRect(x: rng.next() * size.width, y: rng.next() * size.height, width: 2, height: 2)), with: .color(.black.opacity(0.08)))
+                    }
+                }
+            case .macaron:
+                // The cream filling and the frilly foot.
+                Capsule().fill(GumPalette.rgb(0xFFF6E8)).frame(width: w * 1.05, height: h * 0.07).position(x: w / 2, y: h * 0.5)
+                HStack(spacing: 0) { ForEach(0..<24, id: \.self) { _ in Circle().fill(palette.dark.opacity(0.25)).frame(width: w / 24, height: w / 24) } }
+                    .frame(width: w).position(x: w / 2, y: h * 0.57)
+            case .cakePop:
+                Canvas { ctx, size in
+                    var rng = SeededRandom(seed: 12)
+                    let colors: [Color] = [.white, GumPalette.rgb(0x3DA5FF), GumPalette.rgb(0xFFD43B), GumPalette.rgb(0x3DDC97), GumPalette.rgb(0x9B5CFF)]
+                    for _ in 0..<60 {
+                        var p = Path(roundedRect: CGRect(x: 0, y: 0, width: size.width * 0.035, height: size.width * 0.012), cornerRadius: 2)
+                        p = p.applying(CGAffineTransform(rotationAngle: rng.next() * 3.14).concatenating(CGAffineTransform(translationX: rng.next() * size.width, y: rng.next() * size.height * 0.7)))
+                        ctx.fill(p, with: .color(colors[Int(rng.next() * 5) % 5]))
+                    }
+                }
+            case .earth:
+                // Continents drifting with the turn, and clouds.
+                TimelineView(.animation(minimumInterval: 1.0 / 15, paused: reduceMotion)) { ctx in
+                    let t = reduceMotion ? 0 : ctx.date.timeIntervalSinceReferenceDate
+                    let shift = CGFloat((t / 40).truncatingRemainder(dividingBy: 1))
+                    ZStack {
+                        ForEach(0..<6, id: \.self) { i in
+                            let x = (CGFloat(i) * 0.37 + shift).truncatingRemainder(dividingBy: 1.4) - 0.2
+                            Ellipse().fill(GumPalette.rgb(0x3DAA5C)).frame(width: w * 0.32, height: h * 0.2)
+                                .rotationEffect(.degrees(Double(i) * 33)).position(x: w * x, y: h * (0.25 + 0.12 * CGFloat(i % 4)))
+                        }
+                        ForEach(0..<4, id: \.self) { i in
+                            Capsule().fill(.white.opacity(0.7)).frame(width: w * 0.3, height: h * 0.04)
+                                .position(x: w * ((CGFloat(i) * 0.31 + shift * 1.6).truncatingRemainder(dividingBy: 1.3) - 0.15), y: h * (0.2 + 0.17 * CGFloat(i)))
+                        }
+                    }
+                    .blur(radius: max(1, w * 0.006))
+                }
+            case .sun:
+                TimelineView(.animation(minimumInterval: 1.0 / 15, paused: reduceMotion)) { ctx in
+                    let t = reduceMotion ? 0 : ctx.date.timeIntervalSinceReferenceDate
+                    ZStack {
+                        ForEach(0..<7, id: \.self) { i in
+                            let d = Double(i)
+                            Circle().fill(GumPalette.rgb(0xFF7A1A).opacity(0.35 + 0.15 * sin(t * 0.8 + d)))
+                                .frame(width: w * 0.22, height: w * 0.22)
+                                .position(x: w * (0.2 + 0.1 * d), y: h * (0.3 + 0.08 * CGFloat(i % 3) + 0.03 * sin(t / 2 + d)))
+                        }
+                    }
+                    .blur(radius: max(4, w * 0.04))
+                }
+            case .dandelion:
+                // Seeds radiating from the middle.
+                Canvas { ctx, size in
+                    let c = CGPoint(x: size.width / 2, y: size.height * 0.55)
+                    for k in 0..<72 {
+                        let a = Double(k) / 72 * 2 * .pi
+                        let end = CGPoint(x: c.x + cos(a) * size.width * 0.48, y: c.y + sin(a) * size.height * 0.48)
+                        var line = Path(); line.move(to: c); line.addLine(to: end)
+                        ctx.stroke(line, with: .color(GumPalette.rgb(0xB8BCA8).opacity(0.6)), lineWidth: 0.8)
+                        ctx.fill(Path(ellipseIn: CGRect(x: end.x - 3, y: end.y - 3, width: 6, height: 6)), with: .color(.white))
+                    }
+                }
+            case .atom:
+                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { ctx in
+                    let t = reduceMotion ? 0 : ctx.date.timeIntervalSinceReferenceDate
+                    ZStack {
+                        Circle().fill(GumPalette.rgb(0x8AB4FF)).frame(width: w * 0.12, height: w * 0.12).blur(radius: w * 0.02)
+                        ForEach(0..<3, id: \.self) { i in
+                            let rot = Double(i) * 60
+                            Ellipse().stroke(GumPalette.rgb(0x8AB4FF).opacity(0.6), lineWidth: max(1.5, w * 0.008))
+                                .frame(width: w * 0.8, height: h * 0.28).rotationEffect(.degrees(rot))
+                            let a = t * (1.2 + Double(i) * 0.3) + Double(i)
+                            Circle().fill(Color.white).frame(width: w * 0.035, height: w * 0.035)
+                                .offset(x: cos(a) * w * 0.4, y: sin(a) * h * 0.14).rotationEffect(.degrees(rot))
+                        }
+                    }
+                    .position(x: w / 2, y: h * 0.42)
+                }
+            case .geode:
+                // A crack showing crystal.
+                Ellipse().fill(AngularGradient(colors: [GumPalette.rgb(0x9B5CFF), GumPalette.rgb(0xD7B8FF), GumPalette.rgb(0x6D3FD6), GumPalette.rgb(0xE9D8FF), GumPalette.rgb(0x9B5CFF)], center: .center))
+                    .frame(width: w * 0.45, height: h * 0.3).position(x: w * 0.55, y: h * 0.35)
+                Ellipse().stroke(GumPalette.rgb(0x2E2B28), lineWidth: max(2, w * 0.012)).frame(width: w * 0.47, height: h * 0.32).position(x: w * 0.55, y: h * 0.35)
+            case .yarn:
+                ForEach(0..<7, id: \.self) { i in
+                    Ellipse().stroke(palette.dark.opacity(0.35), lineWidth: max(1.5, w * 0.012))
+                        .frame(width: w * 0.95, height: h * 0.35).rotationEffect(.degrees(Double(i) * 26))
+                }
+            case .arcadeButton:
+                Ellipse().stroke(palette.dark.opacity(0.6), lineWidth: max(4, w * 0.04)).padding(w * 0.05)
+            case .clock:
+                // Tick marks and hands; the minute hand sweeps toward twelve as the meeting nears.
+                ZStack {
+                    ForEach(0..<12, id: \.self) { i in
+                        Capsule().fill(Color.black.opacity(0.7)).frame(width: max(2, w * 0.01), height: w * 0.05)
+                            .offset(y: -h * 0.4).rotationEffect(.degrees(Double(i) * 30))
+                    }
+                    Capsule().fill(Color.black).frame(width: max(3, w * 0.018), height: h * 0.22).offset(y: -h * 0.11).rotationEffect(.degrees(300))
+                    Capsule().fill(GumPalette.rgb(0xC62828)).frame(width: max(2, w * 0.01), height: h * 0.34).offset(y: -h * 0.17).rotationEffect(.degrees(360 * (1 - level)))
+                    Circle().fill(Color.black).frame(width: w * 0.04, height: w * 0.04)
+                }
+                .position(x: w / 2, y: h / 2)
+            case .marble:
+                Ellipse().fill(AngularGradient(colors: [GumPalette.rgb(0xFF5A5A), .clear, GumPalette.rgb(0xFFD43B), .clear, GumPalette.rgb(0x3DA5FF), .clear], center: .center))
+                    .frame(width: w * 0.5, height: h * 0.5).rotationEffect(.degrees(25)).blur(radius: max(2, w * 0.015)).opacity(0.85)
+            case .duck:
+                Ellipse().fill(GumPalette.rgb(0xFF8A1E)).frame(width: w * 0.22, height: h * 0.1).position(x: w * 0.82, y: h * 0.42)
+                Circle().fill(Color.black).frame(width: w * 0.05, height: w * 0.05).position(x: w * 0.66, y: h * 0.3)
+                Ellipse().stroke(palette.dark.opacity(0.4), lineWidth: max(2, w * 0.012)).frame(width: w * 0.45, height: h * 0.3).position(x: w * 0.38, y: h * 0.62)
+            case .easterEgg:
+                VStack(spacing: h * 0.06) {
+                    ForEach(0..<5, id: \.self) { i in
+                        Capsule().fill([GumPalette.rgb(0xFFB3D9), GumPalette.rgb(0xFFF1A8), GumPalette.rgb(0xB5F2D6), GumPalette.rgb(0xD7B8FF), GumPalette.rgb(0xFFC9A8)][i])
+                            .frame(width: w * 1.1, height: h * 0.07)
+                    }
+                }
+            case .valentine:
+                Image(systemName: "heart.fill").font(.system(size: w * 0.3)).foregroundStyle(.white.opacity(0.35)).position(x: w * 0.5, y: h * 0.38)
+            case .fireworks:
+                TimelineView(.animation(minimumInterval: 1.0 / 10, paused: reduceMotion)) { ctx in
+                    let t = reduceMotion ? 0 : ctx.date.timeIntervalSinceReferenceDate
+                    Canvas { c, size in
+                        var rng = SeededRandom(seed: 4)
+                        for k in 0..<40 {
+                            let x = rng.next() * size.width, y = rng.next() * size.height
+                            let a = 0.4 + 0.6 * abs(sin(t * 2 + Double(k)))
+                            c.fill(Path(ellipseIn: CGRect(x: x, y: y, width: 3, height: 3)), with: .color([Color.yellow, .pink, .cyan, .white][k % 4].opacity(a)))
+                        }
+                    }
+                }
+            case .beachBall:
+                Ellipse().fill(AngularGradient(stops: [
+                    .init(color: GumPalette.rgb(0xE53935), location: 0), .init(color: GumPalette.rgb(0xE53935), location: 0.166),
+                    .init(color: .white, location: 0.167), .init(color: .white, location: 0.333),
+                    .init(color: GumPalette.rgb(0x1E88E5), location: 0.334), .init(color: GumPalette.rgb(0x1E88E5), location: 0.5),
+                    .init(color: .white, location: 0.501), .init(color: .white, location: 0.666),
+                    .init(color: GumPalette.rgb(0xFDD835), location: 0.667), .init(color: GumPalette.rgb(0xFDD835), location: 0.833),
+                    .init(color: .white, location: 0.834), .init(color: .white, location: 1)], center: UnitPoint(x: 0.5, y: 0.35)))
+                    .opacity(0.9)
+            case .zen:
+                Canvas { ctx, size in
+                    var rng = SeededRandom(seed: 9)
+                    for _ in 0..<Int(size.width * size.height / 120) {
+                        ctx.fill(Path(ellipseIn: CGRect(x: rng.next() * size.width, y: rng.next() * size.height, width: 1.5, height: 1.5)), with: .color(.white.opacity(0.25)))
+                    }
+                }
             case .lavaLamp:
                 // Warm blobs rising and sinking.
                 TimelineView(.animation(minimumInterval: 1.0 / 20, paused: reduceMotion)) { ctx in
@@ -325,6 +490,21 @@ struct ThemeTopper: View {
                         .offset(x: w * 0.07, y: -w * 0.05)
                 }
                 .position(x: w / 2, y: w * 0.01)
+            case .cherry, .orange:
+                ZStack {
+                    Capsule().fill(GumPalette.rgb(0x5A3A1E)).frame(width: max(2, w * 0.018), height: w * 0.14).rotationEffect(.degrees(15)).offset(y: -w * 0.05)
+                    Ellipse().fill(GumPalette.rgb(0x3DAA5C)).frame(width: w * 0.12, height: w * 0.05).rotationEffect(.degrees(-25)).offset(x: w * 0.06, y: -w * 0.08)
+                }
+                .position(x: w / 2, y: w * 0.01)
+            case .clock:
+                HStack(spacing: w * 0.25) {
+                    Circle().fill(GumPalette.rgb(0xB8B4AA)).frame(width: w * 0.13, height: w * 0.13)
+                    Circle().fill(GumPalette.rgb(0xB8B4AA)).frame(width: w * 0.13, height: w * 0.13)
+                }
+                .position(x: w / 2, y: w * 0.02)
+            case .yarn:
+                Circle().trim(from: 0.55, to: 0.95).stroke(palette.base, style: StrokeStyle(lineWidth: max(2, w * 0.012), lineCap: .round))
+                    .frame(width: w * 0.3, height: w * 0.3).position(x: w * 0.72, y: w * 0.0)
             case .planet:
                 // The ring, tilted across the ball.
                 Ellipse()
@@ -440,6 +620,12 @@ enum ThemeDebris {
         case .pixel:
             if i == 0 { Text("👾").font(.system(size: emoji)) }
             else { Rectangle().fill([GumPalette.rgb(0xFF5A5A), GumPalette.rgb(0xFFD43B), GumPalette.rgb(0x3DA5FF), GumPalette.rgb(0x3DDC97)][i % 4]).frame(width: small * 0.5, height: small * 0.5) }
+        case .gumball, .cherry, .orange, .macaron, .cakePop, .earth, .sun, .dandelion, .atom, .geode,
+             .yarn, .arcadeButton, .clock, .marble, .duck, .easterEgg, .valentine, .fireworks, .beachBall, .zen:
+            let look = simpleDebris(palette)
+            if i == 0, let e = look.emoji { Text(e).font(.system(size: emoji)) }
+            else if look.round { Circle().fill(look.colors[i % look.colors.count]).frame(width: small * 0.6, height: small * 0.6) }
+            else { FourPointStar().fill(look.colors[i % look.colors.count]).frame(width: small * 0.8, height: small * 0.8) }
         case .lavaLamp:
             Ellipse().fill(i % 2 == 0 ? GumPalette.rgb(0xFFC23A) : GumPalette.rgb(0xFF7A3D)).frame(width: side * 0.7, height: side * 0.8).blur(radius: 3)
         default:
@@ -447,8 +633,36 @@ enum ThemeDebris {
         }
     }
 
+    /// Emoji and piece colors for the simpler themes.
+    static func simpleDebris(_ p: GumPalette) -> (emoji: String?, colors: [Color], round: Bool) {
+        let c = GumPalette.rgb
+        switch p {
+        case .gumball: return ("🍬", [c(0xFF5A5A), c(0xFFD43B), c(0x3DA5FF), c(0x3DDC97), c(0xFF7FB0)], true)
+        case .cherry: return ("🍒", [c(0xC8102E), c(0x8A0A1E)], true)
+        case .orange: return ("🍊", [c(0xF28C1E), c(0xFFC27A)], true)
+        case .macaron: return (nil, [c(0xF7B7CF), c(0xFFF6E8), c(0xB5F2D6)], true)
+        case .cakePop: return ("🧁", [c(0xF48FB1), c(0x3DA5FF), c(0xFFD43B), .white], false)
+        case .earth: return ("🌍", [c(0xFFE08A), .white, c(0x8CC4FF)], false)
+        case .sun: return ("☀️", [c(0xFFB020), c(0xFFF0A0), c(0xFF7A1A)], false)
+        case .dandelion: return (nil, [.white, c(0xE8EADF)], true)
+        case .atom: return ("⚛️", [c(0x8AB4FF), .white], false)
+        case .geode: return ("💎", [c(0x9B5CFF), c(0xD7B8FF), c(0x8E8A84)], false)
+        case .yarn: return ("🧶", [c(0xD8456B), c(0xFF9AB4)], true)
+        case .arcadeButton: return ("🔴", [c(0xE02020), c(0xFFD43B)], false)
+        case .clock: return ("⏰", [c(0xC62828), .black], false)
+        case .marble: return (nil, [c(0xBFE0F5), c(0xFF5A5A), c(0xFFD43B), c(0x3DA5FF)], true)
+        case .duck: return ("🦆", [c(0x5BB5E0), .white], true)
+        case .easterEgg: return ("🐣", [c(0xFFB3D9), c(0xFFF1A8), c(0xB5F2D6), c(0xD7B8FF)], false)
+        case .valentine: return ("💕", [c(0xE8336B), c(0xFF9AB8), .white], false)
+        case .fireworks: return ("🎆", [c(0xFFD43B), c(0xFF5AA0), c(0x5AE0FF), .white], false)
+        case .beachBall: return ("🏖️", [c(0xE53935), c(0x1E88E5), c(0xFDD835), c(0xE8D4A8)], true)
+        case .zen: return (nil, [c(0xD0D0CA), c(0x9A9A94)], true)
+        default: return (nil, [.white], true)
+        }
+    }
+
     static func handles(_ palette: GumPalette) -> Bool {
-        [.moon, .grenade, .snowball, .ornament, .pumpkin].contains(palette) || GumPalette.novelty.contains(palette)
+        palette != .bubblegum && palette != .coral && palette != .unicorn && palette != .fortune
     }
 }
 
