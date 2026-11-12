@@ -56,7 +56,7 @@ struct PrimaryButtonStyle: ButtonStyle {
     var height: CGFloat = 50
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.system(size: 16, weight: .semibold))
+            .font(.callout.weight(.semibold))
             .foregroundStyle(.white)
             .padding(.horizontal, 22)
             .frame(height: height)
@@ -72,7 +72,7 @@ struct SecondaryButtonStyle: ButtonStyle {
     var fill = false
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.system(size: 16, weight: .medium))
+            .font(.callout.weight(.medium))
             .foregroundStyle(Brand.ink)
             .padding(.horizontal, 22)
             .frame(height: height)

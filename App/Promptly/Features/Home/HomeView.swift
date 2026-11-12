@@ -96,7 +96,7 @@ struct HomeView: View {
         VStack(alignment: .leading, spacing: 12) {
             if !items.isEmpty {
                 Text("Later")
-                    .font(.system(size: 14, weight: .medium))
+                    .font(.subheadline.weight(.medium))
                     .foregroundStyle(Brand.secondary)
                     .padding(.top, 40)
             }
@@ -104,11 +104,11 @@ struct HomeView: View {
                 HStack(alignment: .firstTextBaseline, spacing: 14) {
                     Text(Countdown.time(item.start))
                         .lineLimit(1)
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(.subheadline.weight(.semibold))
                         .foregroundStyle(Brand.coralDark)
                         .frame(width: 72, alignment: .leading)
                     Text(item.title)
-                        .font(.system(size: 17))
+                        .font(.body)
                         .foregroundStyle(Brand.ink)
                         .lineLimit(1)
                 }
@@ -122,7 +122,7 @@ struct HomeView: View {
             Spacer()
             Button { showCalendars = true } label: {
                 Image(systemName: "gearshape")
-                    .font(.system(size: 20, weight: .regular))
+                    .font(.title3)
                     .foregroundStyle(Brand.ink)
                     .frame(width: 44, height: 44)
             }
@@ -249,7 +249,7 @@ struct HomeView: View {
             Text(model.calendarAuthorized
                  ? "Turn on Alarms for Pop In in Settings so it can ring before your meetings."
                  : "Allow Full Access to Calendars for Pop In in Settings. It only reads, and nothing leaves this iPhone.")
-                .font(.system(size: 16))
+                .font(.callout)
                 .foregroundStyle(Brand.secondary)
             Button("Open Settings") {
                 if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
