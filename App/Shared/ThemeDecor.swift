@@ -17,17 +17,15 @@ struct ThemeMarks: View {
         ZStack {
             switch palette {
             case .moon:
-                // Soft craters, darker on their lower right, with a lit rim on the upper left.
-                ForEach(0..<Self.craters.count, id: \.self) { i in
-                    let c = Self.craters[i]
+                // Soft craters, darker on their lower right with a lit rim on the upper left, carried slowly round as
+                // the moon turns (once every 40 seconds), narrowing toward the edge.
+                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { tl in
+                    let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
                     ZStack {
-                        Ellipse().fill(palette.dark.opacity(0.22))
-                        Ellipse().stroke(Color.white.opacity(0.35), lineWidth: max(1, w * c.2 * 0.08))
-                            .offset(x: -w * c.2 * 0.06, y: -w * c.2 * 0.06)
+                        ForEach(0..<(Self.craters.count * 2), id: \.self) { i in
+                            ThemeMarks.crater(i, t: t, w: w, h: h, dark: palette.dark)
+                        }
                     }
-                    .frame(width: w * c.2, height: w * c.2 * 0.8)
-                    .blur(radius: max(1, w * 0.004))
-                    .position(x: w * c.0, y: h * c.1)
                 }
             case .snowball:
                 // Snow drifting down inside, swaying and turning as it falls.
@@ -731,6 +729,31 @@ struct ThemeMarks: View {
             .foregroundStyle(Color.white.opacity(0.9))
             .rotationEffect(.degrees(t * 30 + d * 40))
             .position(x: x, y: y)
+    }
+
+    /// One crater on the turning moon. The second half of the list is the far side (the same craters flipped).
+    static func crater(_ i: Int, t: Double, w: CGFloat, h: CGFloat, dark: Color) -> some View {
+        let n: Int = craters.count
+        let c = craters[i % n]
+        let back: Bool = i >= n
+        let lat: Double = Double(2 * (back ? 1 - c.1 : c.1) - 1)
+        let row: Double = max(0.05, (1 - lat * lat).squareRoot())
+        let lon0: Double = asin(min(1, max(-1, Double(2 * c.0 - 1) / row))) + (back ? .pi : 0)
+        let lon: Double = lon0 + t * 2 * .pi / 40
+        let facing: Double = cos(lon)
+        let x: CGFloat = w * CGFloat(0.5 + 0.5 * sin(lon) * row)
+        let y: CGFloat = h * CGFloat((lat + 1) / 2)
+        let size: CGFloat = w * c.2
+        let squash: CGFloat = CGFloat(max(0.05, facing))
+        return ZStack {
+            Ellipse().fill(dark.opacity(0.22))
+            Ellipse().stroke(Color.white.opacity(0.35), lineWidth: max(1, size * 0.08))
+                .offset(x: -size * 0.06, y: -size * 0.06)
+        }
+        .frame(width: size * squash, height: size * 0.8)
+        .blur(radius: max(1, w * 0.004))
+        .opacity(facing > 0 ? min(1, facing * 3) : 0)
+        .position(x: x, y: y)
     }
 
     static let patches: [(CGFloat, CGFloat, CGFloat, Double)] = [
