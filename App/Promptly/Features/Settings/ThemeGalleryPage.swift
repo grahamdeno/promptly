@@ -10,20 +10,32 @@ struct ThemeGalleryPage: View {
     var body: some View {
         SettingsPage {
             SettingsGroup(nil, note: "A different theme each day, picked from the ones you have.") {
-                SettingsToggle(model.store.isPro ? "Surprise me" : "Surprise me ✦", detail: "Changes once a day when you open Pop In",
+                SettingsToggle(model.store.isPro || !model.store.ownedPacks.isEmpty ? "Surprise me" : "Surprise me ✦", detail: "Changes once a day when you open Pop In",
                                isOn: Binding(get: { model.surprise }, set: { on in
-                                   if on && !model.store.isPro { model.showPro = true } else { model.surprise = on }
+                                   if on && !model.store.isPro && model.store.ownedPacks.isEmpty { model.showPro = true } else { model.surprise = on }
                                }))
             }
             ForEach(ThemeGroup.allCases, id: \.self) { group in
                 let themes = GumPalette.available.filter { $0.group == group }
                 if !themes.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text(group.title)
-                            .font(.footnote.weight(.semibold))
-                            .foregroundStyle(Brand.secondary)
-                            .padding(.leading, 18)
-                            .accessibilityAddTraits(.isHeader)
+                        HStack {
+                            Text(group.title)
+                                .font(.footnote.weight(.semibold))
+                                .foregroundStyle(Brand.secondary)
+                                .accessibilityAddTraits(.isHeader)
+                            Spacer()
+                            // Packs: buy one group without all of Pro.
+                            if group.packID != nil && !model.store.owns(group) {
+                                Button("Get the pack · \(model.store.packPrice(group))") {
+                                    Task { await model.store.buy(pack: group) }
+                                }
+                                .font(.footnote.weight(.semibold))
+                                .foregroundStyle(Brand.accentText)
+                                .frame(minHeight: 44)
+                            }
+                        }
+                        .padding(.horizontal, 18)
                         LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 3), spacing: 10) {
                             ForEach(themes, id: \.self) { tile($0) }
                         }
@@ -34,12 +46,18 @@ struct ThemeGalleryPage: View {
             }
         }
         .navigationTitle("Theme")
+        .safeAreaInset(edge: .bottom) {
+            if let message = model.store.message {
+                Text(message).font(.footnote).foregroundStyle(Brand.ink).padding(12)
+                    .glassEffect(.regular, in: .capsule).padding(.bottom, 8)
+            }
+        }
         .navigationBarTitleDisplayMode(.inline)
     }
 
     private func tile(_ palette: GumPalette) -> some View {
         let selected = model.gumColor == palette && !model.surprise
-        let locked = palette.isPro && !model.store.isPro
+        let locked = !model.store.unlocks(palette)
         return Button {
             if locked { model.showPro = true; return }
             model.surprise = false

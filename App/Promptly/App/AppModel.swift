@@ -157,10 +157,11 @@ final class AppModel {
         // If Pro goes away (refund), fall back to free choices.
         store.onLost = { [weak self] in
             guard let self else { return }
-            if self.gumColor.isPro { self.gumColor = .bubblegum }
+            if !self.store.unlocks(self.gumColor) { self.gumColor = .bubblegum }
+            guard !self.store.isPro else { return }
             if self.alarmSound.isPro { self.alarmSound = .bubbleBlow }
             if self.popChoice.isPro { self.popChoice = .pop }
-            self.surprise = false
+            if self.store.ownedPacks.isEmpty { self.surprise = false }
             if self.leadMinutes > 5 { self.leadMinutes = 5 }
             if self.keepAwake { self.keepAwake = false }
         }
@@ -212,11 +213,11 @@ final class AppModel {
 
     /// Surprise me: once a day, a different theme from the ones available (Pro only).
     func surpriseIfNewDay(now: Date = .now) {
-        guard surprise, store.isPro else { return }
+        guard surprise, store.isPro || !store.ownedPacks.isEmpty else { return }
         let day = Calendar.current.startOfDay(for: now).formatted(.iso8601.year().month().day())
         guard prefs.lastSurpriseDay != day else { return }
         prefs.lastSurpriseDay = day
-        if let next = GumPalette.available.filter({ $0 != gumColor }).randomElement() { gumColor = next }
+        if let next = GumPalette.available.filter({ $0 != gumColor && store.unlocks($0) }).randomElement() { gumColor = next }
     }
 
     /// Seconds since this meeting's alarm rang (0 before it). The extra bubbles bud off from here, so the first

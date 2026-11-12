@@ -530,6 +530,17 @@ struct FourPointStar: Shape {
 /// The theme gallery's sections.
 enum ThemeGroup: String, CaseIterable, Sendable {
     case classic, favorites, sports, food, nature, objects, seasons
+    /// The App Store product for this group's theme pack; nil for groups only Pro unlocks.
+    var packID: String? {
+        switch self {
+        case .classic, .favorites: nil
+        case .sports: "com.grahamdeno.promptly.pack.sports"
+        case .food: "com.grahamdeno.promptly.pack.treats"
+        case .nature: "com.grahamdeno.promptly.pack.space"
+        case .objects: "com.grahamdeno.promptly.pack.objects"
+        case .seasons: "com.grahamdeno.promptly.pack.seasons"
+        }
+    }
     var title: String {
         switch self {
         case .classic: "Classic"

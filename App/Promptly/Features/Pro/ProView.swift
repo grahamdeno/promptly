@@ -10,6 +10,7 @@ struct ProView: View {
         ("sparkles", "Unicorn mode: a rainbow bubble that bursts into confetti"),
         ("moon.stars", "Fortune: black glass, a violet glow and a meeting fortune"),
         ("moon.circle", "Moon and Grenade themes, each with its own pop"),
+        ("square.grid.3x3", "Every theme pack, now and later"),
         ("bell.and.waves.left.and.right", "More alarm sounds: Popcorn, Chimes, Oracle and Sonar"),
         ("calendar.badge.clock", "Per-calendar alerts: Alarm, Smart or Gentle"),
         ("clock", "Ring up to 10 minutes early"),

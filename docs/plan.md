@@ -275,3 +275,12 @@ Review: https://claude.ai/artifact/Xs4CqLSRPxh6u4VgfZJpko (App Store readiness r
 - Surprise me (Pro): a different theme each day when Pop In opens; the app icon stays put.
 - Packs (selling bundles) are a later decision: the gallery groups are ready to become packs.
 - All new themes held from the App Store (shown in TestFlight).
+
+## Sprint 23: theme packs (owner: "do it", 2026-11-12)
+- Five non-consumable packs, $1.99 each (price set in App Store Connect): Sports and games
+  (com.grahamdeno.promptly.pack.sports), Treats (.pack.treats), Nature and space (.pack.space), Fun objects
+  (.pack.objects), Seasons and holidays (.pack.seasons). Pop In Pro ($4.99) still unlocks everything, packs included.
+  Classic is free; Pro favorites (Unicorn, Fortune, Moon, Grenade and friends) come only with Pro.
+- The gallery shows "Get the pack · $1.99" on each group not owned. Restore covers packs. Losing a pack (refund)
+  falls back to Bubblegum if the current theme was in it.
+- Grok creates the five products; held themes (and so packs) stay hidden in the App Store until released.

@@ -309,3 +309,14 @@ final class ThemeTests: XCTestCase {
         XCTAssertFalse(GumPalette.moon.isHeld)
     }
 }
+
+final class PackTests: XCTestCase {
+    func testPacksCoverEveryHeldGroup() {
+        XCTAssertNil(ThemeGroup.classic.packID)
+        XCTAssertNil(ThemeGroup.favorites.packID)
+        XCTAssertEqual(Set(ThemeGroup.allCases.compactMap(\.packID)).count, 5)
+        for palette in GumPalette.allCases where palette.isHeld {
+            XCTAssertNotNil(palette.group.packID, "\(palette) should be in a pack")
+        }
+    }
+}
