@@ -461,6 +461,7 @@ struct GumBubbleShape: View {
             let h = geo.size.height
             let streak = min(26, max(5, w * 0.03))
             ZStack {
+            ZStack {
                 // Solid, saturated gum with a soft lit side (Unicorn uses the same pink gum).
                 Ellipse()
                     .fill(RadialGradient(colors: [GumColors.light, tint ?? GumColors.coral, GumColors.dark],
@@ -537,6 +538,8 @@ struct GumBubbleShape: View {
                         .mask(Ellipse())
                     }
                 }
+            }
+            .modifier(EggMask(on: GumPalette.current == .waterBalloon))
                 ThemeTopper(palette: GumPalette.current, w: w, h: h)
             }
             .shadow(color: GumColors.accent.opacity(GumPalette.current == .fortune ? 0.45 : 0.3),
@@ -588,9 +591,10 @@ struct ThemeIdle: ViewModifier {
         case .waterBalloon:
             // A poke every 7 seconds, then a damped wobble that settles in about 3 seconds.
             let k = t.truncatingRemainder(dividingBy: 7)
-            guard k < 3.2 else { return CGSize(width: 1, height: 1) }
+            // Hanging from its neck, the water pulls it slightly long.
+            guard k < 3.2 else { return CGSize(width: 0.9, height: 1.06) }
             let wob = exp(-k * 1.5) * sin(k * 2 * .pi * 2.2)
-            return CGSize(width: 1 + 0.06 * wob, height: 1 - 0.06 * wob)
+            return CGSize(width: 0.9 * (1 + 0.06 * wob), height: 1.06 * (1 - 0.06 * wob))
         case .moodRing:
             let k = t.truncatingRemainder(dividingBy: 16)
             let ease: (Double) -> Double = { x in (1 - cos(x * .pi)) / 2 }
@@ -599,6 +603,44 @@ struct ThemeIdle: ViewModifier {
             return CGSize(width: s, height: s)
         default:
             return CGSize(width: 1, height: 1)
+        }
+    }
+}
+
+
+/// A hanging water balloon's outline: narrow at the neck, full and heavy at the bottom.
+struct EggShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        var p = Path()
+        let cx = rect.midX, cy = rect.midY, rx = rect.width / 2, ry = rect.height / 2
+        let steps = 96
+        for n in 0...steps {
+            let t = Double(n) / Double(steps) * 2 * .pi
+            // sin(t) is -1 at the top and 1 at the bottom: pinch the top, fill out the bottom.
+            let m = (1 + 0.16 * sin(t)) / 1.06
+            let pt = CGPoint(x: cx + rx * CGFloat(cos(t) * m), y: cy + ry * CGFloat(sin(t)))
+            if n == 0 { p.move(to: pt) } else { p.addLine(to: pt) }
+        }
+        p.closeSubpath()
+        return p
+    }
+}
+
+/// Cuts the water balloon's gum to the egg outline and shades its edge.
+struct EggMask: ViewModifier {
+    let on: Bool
+
+    func body(content: Content) -> some View {
+        if on {
+            GeometryReader { geo in
+                let w = geo.size.width
+                content
+                    .overlay(EggShape().stroke(GumColors.dark.opacity(0.5), lineWidth: max(6, w * 0.05))
+                        .blur(radius: max(6, w * 0.03)))
+                    .mask(EggShape())
+            }
+        } else {
+            content
         }
     }
 }

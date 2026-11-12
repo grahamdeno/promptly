@@ -826,8 +826,21 @@ struct ThemeTopper: View {
                     .frame(width: w, height: hh)
                 }
             case .waterBalloon:
-                // The tied knot.
-                Ellipse().fill(palette.dark).frame(width: w * 0.06, height: w * 0.05).position(x: w / 2, y: -w * 0.005)
+                // The neck pinching up from the top, the tied knot, and the rolled lip poking out of it.
+                Path { p in
+                    p.move(to: CGPoint(x: w * 0.455, y: w * 0.012))
+                    p.addQuadCurve(to: CGPoint(x: w * 0.482, y: -w * 0.05), control: CGPoint(x: w * 0.478, y: -w * 0.012))
+                    p.addLine(to: CGPoint(x: w * 0.518, y: -w * 0.05))
+                    p.addQuadCurve(to: CGPoint(x: w * 0.545, y: w * 0.012), control: CGPoint(x: w * 0.522, y: -w * 0.012))
+                    p.closeSubpath()
+                }
+                .fill(LinearGradient(colors: [palette.light, palette.base, palette.dark], startPoint: .leading, endPoint: .trailing))
+                Ellipse().fill(RadialGradient(colors: [palette.light, palette.dark], center: UnitPoint(x: 0.35, y: 0.35), startRadius: 0, endRadius: w * 0.04))
+                    .frame(width: w * 0.07, height: w * 0.05).position(x: w / 2, y: -w * 0.062)
+                Capsule().fill(palette.base)
+                    .frame(width: w * 0.05, height: w * 0.022).rotationEffect(.degrees(-25)).position(x: w * 0.528, y: -w * 0.09)
+                Capsule().stroke(palette.dark.opacity(0.6), lineWidth: max(1, w * 0.004))
+                    .frame(width: w * 0.05, height: w * 0.022).rotationEffect(.degrees(-25)).position(x: w * 0.528, y: -w * 0.09)
             case .fishbowl:
                 // The bowl's lip.
                 Capsule().stroke(GumPalette.rgb(0x9FD3EE), lineWidth: max(2, w * 0.012))
