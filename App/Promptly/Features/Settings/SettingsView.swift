@@ -23,7 +23,25 @@ struct SettingsView: View {
                     }
                 }
 
-                SettingsGroup("Alarm") {
+                SettingsGroup("Alarm", note: model.testMessage) {
+                    Button {
+                        Task { await model.testAlarm(withCountdown: false) }
+                    } label: {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Test the alarm").font(.body).foregroundStyle(Brand.accentText)
+                                Text("Rings in 20 seconds, the same way a meeting would")
+                                    .font(.footnote).foregroundStyle(Brand.secondary)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                            Spacer()
+                            Image(systemName: "bell.badge").foregroundStyle(Brand.accentText)
+                        }
+                        .padding(.vertical, 10)
+                        .frame(minHeight: 52)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
                     SettingsLink("Sound", value: model.alarmSound.label) {
                         ChoicePage(title: "Alarm sound",
                                    note: "Tap one to hear it. It starts quietly and gets louder until the meeting starts. Apple's tone rings on the Lock Screen only; while Pop In is open you'll hear Gum pops instead.",

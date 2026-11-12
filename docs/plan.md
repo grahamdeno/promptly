@@ -194,3 +194,11 @@ Review: https://claude.ai/artifact/Xs4CqLSRPxh6u4VgfZJpko (App Store readiness r
   account, per-calendar Smart / Always rings / Quiet. Gear icon on Home instead of the calendar icon.
 - Next: the friction audit (model: Shoebox docs/audit/08-ux-audit.md). Grok's review notes say "calendar button";
   update to "settings button (gear)".
+
+## Sprint 17: clarity for a first-time user (owner said go, 2026-11-11)
+- First run adds "When your phone is locked" with a sketch of Apple's alarm (Open and Stop), so the first locked
+  alarm isn't a surprise.
+- Settings › Alarm starts with "Test the alarm" (rings in 20 s); no more five taps to find it.
+- The Home card says how each meeting will alert: "Rings N min before" (bell) or "Quiet notification only".
+- Next (from the assessment): "Pop to join" line in the last 10 minutes; a quieter animation for Not going.
+  Grok's review notes can now say Settings › Test the alarm instead of the five-tap Diagnostics.

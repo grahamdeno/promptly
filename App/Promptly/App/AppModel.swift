@@ -410,8 +410,8 @@ final class AppModel {
             testPlanned = [PlannedAlarm(id: UUID(), meeting: meeting, fireDate: fire, countdownSeconds: withCountdown ? 60 : nil)]
             await syncAlarms()
             testMessage = withCountdown
-                ? "Close this and either leave Pop In open (the bubble takes over in about 90 seconds) or lock your phone (Apple's card in about 30 seconds, then the alarm)."
-                : "Close this and either leave Pop In open (the bubble takes over in 20 seconds) or lock your phone (Apple's alarm in 20 seconds)." 
+                ? "Set. Close Settings to see the bubble take over in about 90 seconds, or lock your phone to see the locked alarm."
+                : "Set for 20 seconds from now. Close Settings to see the bubble take over, or lock your phone to see the locked alarm."
         } catch {
             testMessage = "Couldn't set the test alarm: \(error.localizedDescription)"
         }
