@@ -6,10 +6,16 @@ enum GumPalette: String, CaseIterable, Sendable {
     case bubblegum
     /// The original coral.
     case coral
-    /// Pro: a pastel rainbow bubble that bursts into confetti.
+    /// Pro: a pink bubble with a rainbow sheen that bursts into confetti.
     case unicorn
+    /// Pro: black glass with a violet glow; pops into mist and star sparks; shows a meeting fortune.
+    case fortune
 
-    var isPro: Bool { self == .unicorn }
+    var isPro: Bool { self == .unicorn || self == .fortune }
+
+    /// Fortune's violets.
+    static let violet = rgb(0x8B5CF6)
+    static let violetDeep = rgb(0x6D3FD6)
 
     /// Unicorn mode's rainbow, strong enough to read on white: tangerine, lemon, mint, sky, violet.
     /// Used for the sheen and rim on the pink bubble, and for the confetti.
@@ -20,6 +26,7 @@ enum GumPalette: String, CaseIterable, Sendable {
         case .bubblegum: "Bubblegum"
         case .coral: "Coral"
         case .unicorn: "Unicorn"
+        case .fortune: "Fortune"
         }
     }
 
@@ -32,6 +39,7 @@ enum GumPalette: String, CaseIterable, Sendable {
         case .bubblegum: Self.rgb(0xFF7FB0)
         case .coral: Self.rgb(0xE8553A)
         case .unicorn: Self.rgb(0xFF7FB0)
+        case .fortune: Self.rgb(0x16161C)
         }
     }
 
@@ -40,6 +48,7 @@ enum GumPalette: String, CaseIterable, Sendable {
         case .bubblegum: Self.rgb(0xFFD3E5)
         case .coral: Self.rgb(0xFFB8A0)
         case .unicorn: Self.rgb(0xFFD3E5)
+        case .fortune: Self.rgb(0x5A5866)
         }
     }
 
@@ -48,8 +57,15 @@ enum GumPalette: String, CaseIterable, Sendable {
         case .bubblegum: Self.rgb(0xE04F8C)
         case .coral: Self.rgb(0xC8361C)
         case .unicorn: Self.rgb(0xD0508A)
+        case .fortune: Self.rgb(0x030305)
         }
     }
+
+    /// The color for buttons, tints and small marks: the bubble's own color, or violet for Fortune (black is the
+    /// bubble, not an accent).
+    var accent: Color { self == .fortune ? Self.violet : base }
+    var accentDark: Color { self == .fortune ? Self.violetDeep : dark }
+    var accentLight: Color { self == .fortune ? Self.rgb(0xDDD0FB) : light }
 
     static let key = "gumColor"
 
@@ -64,6 +80,7 @@ enum GumColors {
     static var coral: Color { GumPalette.current.base }
     static var light: Color { GumPalette.current.light }
     static var dark: Color { GumPalette.current.dark }
+    static var accent: Color { GumPalette.current.accent }
 }
 
 /// A still gum ball with its gloss, for small places (Lock Screen card, Dynamic Island).
@@ -78,6 +95,9 @@ struct GumBall: View {
                 if GumPalette.current == .unicorn {
                     UnicornSheen(phase: 0.5).clipShape(Ellipse())
                     UnicornRim(lineWidth: max(1.5, s * 0.04))
+                }
+                if GumPalette.current == .fortune {
+                    FortuneRim(lineWidth: max(1.5, s * 0.05))
                 }
                 Ellipse()
                     .fill(.white.opacity(0.5))
@@ -120,5 +140,36 @@ struct UnicornRim: View {
             .strokeBorder(AngularGradient(colors: GumPalette.rainbow + [GumPalette.rainbow[0]], center: .center,
                                           angle: .degrees(angle)), lineWidth: lineWidth)
             .opacity(0.9)
+    }
+}
+
+/// Fortune's edge: a violet glow brightest on one side; `angle` turns it so the light circles the ball.
+struct FortuneRim: View {
+    var lineWidth: CGFloat
+    var angle: Double = 0
+
+    var body: some View {
+        Ellipse()
+            .strokeBorder(AngularGradient(colors: [GumPalette.violet, GumPalette.rgb(0xC4B5FD), GumPalette.violetDeep.opacity(0.4),
+                                                   GumPalette.violetDeep.opacity(0.15), GumPalette.violet],
+                                          center: .center, angle: .degrees(angle)), lineWidth: lineWidth)
+    }
+}
+
+/// A four-point star, for Fortune's drifting light and its sparks.
+struct FourPointStar: Shape {
+    func path(in r: CGRect) -> Path {
+        let c = CGPoint(x: r.midX, y: r.midY), w = r.width / 2, h = r.height / 2, k: CGFloat = 0.22
+        var p = Path()
+        p.move(to: CGPoint(x: c.x, y: c.y - h))
+        p.addLine(to: CGPoint(x: c.x + w * k, y: c.y - h * k))
+        p.addLine(to: CGPoint(x: c.x + w, y: c.y))
+        p.addLine(to: CGPoint(x: c.x + w * k, y: c.y + h * k))
+        p.addLine(to: CGPoint(x: c.x, y: c.y + h))
+        p.addLine(to: CGPoint(x: c.x - w * k, y: c.y + h * k))
+        p.addLine(to: CGPoint(x: c.x - w, y: c.y))
+        p.addLine(to: CGPoint(x: c.x - w * k, y: c.y - h * k))
+        p.closeSubpath()
+        return p
     }
 }

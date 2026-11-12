@@ -25,6 +25,7 @@ contact sheets) lands on the `ci-audit` branch as `SUMMARY.md` and `sheets/`.
 | J7 | Many calendars | 22 calendars in 5 accounts: fold, search "soccer", switch one off, turn a whole account off |
 | J8 | Nothing coming up | Empty Home, Try a pop |
 | J9 | Unicorn | Bubble, pop with confetti, sprinkles and unicorns |
+| J10 | Fortune | Black ball, the fortune on the card, the mist pop |
 
 Demo mode: `-screenshots -scene <name>` (`App/Promptly/App/ScreenshotMode.swift`), `-free` for the free version.
 No calendar, no alarms, no system prompts, nothing saved.

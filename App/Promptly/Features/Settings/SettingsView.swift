@@ -61,10 +61,15 @@ struct SettingsView: View {
                     colorRow
                     SettingsLink("Pop sound", value: model.popChoice.label) {
                         ChoicePage(title: "Pop sound", note: "What you hear when a bubble pops. Quiet when your phone is on silent.",
-                                   options: PopChoice.allCases, selected: model.popChoice, label: \.label) { choice in
+                                   options: PopChoice.allCases, selected: model.popChoice, label: \.label,
+                                   locked: { $0 == .star && !model.store.isPro }) { choice in
                             model.popChoice = choice
                             PopSound.play()
                         }
+                    }
+                    if model.gumColor == .fortune {
+                        SettingsToggle("Meeting fortunes", detail: "A light one-liner on the card in the last ten minutes",
+                                       isOn: Binding(get: { model.fortunes }, set: { model.fortunes = $0 }))
                     }
                     SettingsToggle("Buzz as it gets close", detail: "Builds over the last ten minutes while Pop In is open",
                                    isOn: Binding(get: { model.buzz }, set: { model.buzz = $0 }))
@@ -414,6 +419,10 @@ struct SwatchBall: View {
         ZStack {
             Circle().fill(RadialGradient(colors: [palette.light, palette.base, palette.dark],
                                          center: UnitPoint(x: 0.38, y: 0.26), startRadius: 0, endRadius: 30))
+            if palette == .fortune {
+                FortuneRim(lineWidth: 2.5)
+                FourPointStar().fill(.white.opacity(0.9)).frame(width: 10, height: 10).offset(x: 3, y: -6)
+            }
             if palette == .unicorn {
                 UnicornSheen(phase: 0.5).clipShape(Circle())
                 Circle().strokeBorder(AngularGradient(colors: GumPalette.rainbow + [GumPalette.rainbow[0]], center: .center),

@@ -279,7 +279,17 @@ struct BubbleView: View {
                 let side = width * scrap.size
                 let fallScale: CGFloat = 1.25
                 Group {
-                    if GumPalette.current == .unicorn {
+                    if GumPalette.current == .fortune {
+                        // Fortune: puffs of violet mist and little star sparks.
+                        if i % 3 == 0 {
+                            FourPointStar().fill(i % 2 == 0 ? Color.white : GumPalette.rgb(0xFFD66B))
+                                .frame(width: max(16, side * 0.35), height: max(16, side * 0.35))
+                        } else {
+                            Circle().fill(GumPalette.violet.opacity(0.45))
+                                .frame(width: side * 1.2, height: side * 1.2)
+                                .blur(radius: side * 0.3)
+                        }
+                    } else if GumPalette.current == .unicorn {
                         if Self.unicornSlots.contains(i) {
                             Text("🦄").font(.system(size: max(26, side * 0.5)))
                         } else {
@@ -455,6 +465,20 @@ struct GumBubbleShape: View {
                     }
                     .clipShape(Ellipse())
                 }
+                if GumPalette.current == .fortune {
+                    // Fortune: a soft star of light drifts slowly inside the black glass.
+                    TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion || ScreenshotMode.isOn)) { ctx in
+                        let t = reduceMotion || ScreenshotMode.isOn ? 0 : ctx.date.timeIntervalSinceReferenceDate
+                        let side = max(10, w * 0.07)
+                        ZStack {
+                            Circle().fill(GumPalette.violet.opacity(0.45)).frame(width: side * 2.6, height: side * 2.6).blur(radius: side * 0.7)
+                            FourPointStar().fill(Color.white.opacity(0.92)).frame(width: side, height: side)
+                                .rotationEffect(.degrees(sin(t / 3) * 12))
+                        }
+                        .position(x: w * (0.5 + 0.16 * sin(t / 7)), y: h * (0.26 + 0.05 * sin(t / 5)))
+                    }
+                    .clipShape(Ellipse())
+                }
                 // Depth: the edge falls into shadow, strongest at the lower right.
                 Ellipse()
                     .stroke(GumColors.dark.opacity(0.55), lineWidth: max(6, w * 0.05))
@@ -463,7 +487,7 @@ struct GumBubbleShape: View {
                 // Gloss: a crisp curved streak along the upper left, the way light wraps a stretched bubble.
                 Ellipse()
                     .trim(from: 0.56, to: 0.71)
-                    .stroke(.white.opacity(0.9), style: StrokeStyle(lineWidth: streak, lineCap: .round))
+                    .stroke(.white.opacity(GumPalette.current == .fortune ? 0.55 : 0.9), style: StrokeStyle(lineWidth: streak, lineCap: .round))
                     .padding(w * 0.075)
                     .blur(radius: 1.2)
                 // A small bright window reflection beside it.
@@ -493,8 +517,20 @@ struct GumBubbleShape: View {
                                    angle: reduceMotion || ScreenshotMode.isOn ? -60 : -60 + spin)
                     }
                 }
+                if GumPalette.current == .fortune {
+                    // A violet glow at the edge that slowly circles the ball (once every 8 seconds).
+                    TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion || ScreenshotMode.isOn)) { ctx in
+                        let spin = reduceMotion || ScreenshotMode.isOn ? 0 : ctx.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 8) / 8 * 360
+                        ZStack {
+                            FortuneRim(lineWidth: max(10, w * 0.03), angle: spin).blur(radius: max(6, w * 0.02)).opacity(0.8)
+                            FortuneRim(lineWidth: max(3, w * 0.009), angle: spin)
+                        }
+                        .mask(Ellipse())
+                    }
+                }
             }
-            .shadow(color: GumColors.coral.opacity(0.3), radius: 30, y: -12)
+            .shadow(color: GumColors.accent.opacity(GumPalette.current == .fortune ? 0.45 : 0.3),
+                    radius: GumPalette.current == .fortune ? 40 : 30, y: -12)
         }
     }
 }

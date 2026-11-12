@@ -10,14 +10,17 @@ enum AlarmSoundChoice: String, CaseIterable, Sendable {
     case recorded
     /// Bright rising chimes for Unicorn mode (Sounds/unicorn_chimes_alarm.wav). Pro.
     case chimes
+    /// "Oracle": a humming singing bowl, struck and swelling, made for Fortune (Sounds/oracle_alarm.wav). Pro.
+    case oracle
 
-    var isPro: Bool { self == .recorded || self == .chimes }
+    var isPro: Bool { self == .recorded || self == .chimes || self == .oracle }
 
     var label: String {
         switch self {
         case .bubbleBlow: "Gum pops"
         case .recorded: "Popcorn"
         case .chimes: "Chimes"
+        case .oracle: "Oracle"
         case .appleDefault: "Apple"
         }
     }
@@ -27,6 +30,7 @@ enum AlarmSoundChoice: String, CaseIterable, Sendable {
         switch self {
         case .recorded: "recorded_pops_alarm.wav"
         case .chimes: "unicorn_chimes_alarm.wav"
+        case .oracle: "oracle_alarm.wav"
         default: "bubble_blow_alarm.wav"
         }
     }
@@ -38,12 +42,15 @@ enum PopChoice: String, CaseIterable, Sendable {
     case pop
     /// A pop with a shower of tiny bells (Sounds/unicorn_pop.wav).
     case sparkle
+    /// A quick swell into a bright ting with a sparkly tail (Sounds/fortune_pop.wav). Fortune's default.
+    case star
     case off
 
     var label: String {
         switch self {
         case .pop: "Pop"
         case .sparkle: "Sparkle"
+        case .star: "Star"
         case .off: "Off"
         }
     }
@@ -100,6 +107,12 @@ final class Prefs: @unchecked Sendable {
         set { defaults.set(newValue, forKey: "popSound") }
     }
 
+    /// Fortune theme: show a light meeting fortune on the card in the last ten minutes.
+    var fortunes: Bool {
+        get { defaults.object(forKey: "fortunes") as? Bool ?? true }
+        set { defaults.set(newValue, forKey: "fortunes") }
+    }
+
     /// The pop sound the owner picked, or nil if they never picked one.
     var popChoiceSaved: PopChoice? {
         get { defaults.string(forKey: "popChoice").flatMap(PopChoice.init(rawValue:)) }
@@ -110,7 +123,11 @@ final class Prefs: @unchecked Sendable {
     var popChoice: PopChoice {
         if let saved = popChoiceSaved { return saved }
         if !popSound { return .off }
-        return gumColor == .unicorn ? .sparkle : .pop
+        switch gumColor {
+        case .unicorn: return .sparkle
+        case .fortune: return .star
+        default: return .pop
+        }
     }
 
     /// One-buzz nudges at 5 and 2 minutes before. Default off.

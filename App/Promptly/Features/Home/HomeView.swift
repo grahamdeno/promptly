@@ -190,6 +190,13 @@ struct HomeView: View {
                     if let url = model.join(meeting) { openURL(url) }
                 }
                 .accessibilityAction(named: "Not going") { model.clear(meeting) }
+                if model.gumColor == .fortune, model.fortunes, !isDemo(meeting), Fortunes.shows(start: meeting.start, now: now) {
+                    Text(Fortunes.fortune(for: meeting.id))
+                        .font(.callout.weight(.semibold).italic())
+                        .foregroundStyle(Brand.accentText)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityLabel("Fortune: \(Fortunes.fortune(for: meeting.id))")
+                }
                 if model.taughtPop, !isDemo(meeting), meeting.joinURL != nil,
                    meeting.start.timeIntervalSince(now) < 10 * 60 {
                     Label("Pop the bubble to join", systemImage: "hand.tap")
