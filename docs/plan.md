@@ -332,3 +332,11 @@ Code needed after approval (Sonnet): per-theme release dates replacing the singl
 - Disco light flecks across the screen; Moon turns; Fortune words surface inside the ball (15 min, alarm screen, Practice).
 - Cooler: quiet mode (2 min untouched and meeting over 15 min away: decoration still, screen dims to 60 percent; touch or the meeting nearing wakes it), resting animation at 15 fps (gumball shake 30), decoration still when the phone is warm or in Low Power Mode, the ball's glow drawn on a plain shape instead of every animated layer.
 - Not done (owner chose 1-4 only): keep screen on only within the hour or while charging.
+
+## Sprint 25: alarm fixes from phone use (owner, 2026-11-12)
+- One meeting in two calendars (invite plus forwarded copy) is merged: same start within a minute and the same link or tidied title. The copy whose calendar rings wins, then the one with a link.
+- Titles drop leading FW:, Fwd:, RE: tags.
+- Alarm sync cancels any Pop In alarm that isn't wanted (not only ones it remembers), except test alarms and one ringing now. Fixes stale Dynamic Island countdowns.
+- Opening Pop In while an alarm rings (tapping the banner) always shows the full alarm screen.
+- Video services: 8 to 30 recognized.
+- Known iOS limit: unlocked, AlarmKit shows a banner, not full screen. Full-screen takeover while unlocked would need a Mac app (later).

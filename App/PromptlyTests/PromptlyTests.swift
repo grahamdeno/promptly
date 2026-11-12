@@ -337,3 +337,51 @@ final class QuietModeTests: XCTestCase {
         XCTAssertFalse(QuietMode.isQuiet(now: now, lastTouch: now.addingTimeInterval(-600), nextStart: now.addingTimeInterval(-60)))
     }
 }
+
+
+final class MeetingMergeTests: XCTestCase {
+    private func m(_ id: String, _ title: String, _ start: Date, link: String? = nil, cal: String = "a") -> Meeting {
+        Meeting(id: id, eventID: id, title: title, start: start, end: start.addingTimeInterval(1800), calendarID: cal,
+                joinURL: link.flatMap(URL.init(string:)))
+    }
+
+    func testCleanTitleStripsForwardAndReplyTags() {
+        XCTAssertEqual(MeetingMerge.cleanTitle("FW: 1430: Scale and User Support WG"), "1430: Scale and User Support WG")
+        XCTAssertEqual(MeetingMerge.cleanTitle("RE: Fwd: fw:  Standup"), "Standup")
+        XCTAssertEqual(MeetingMerge.cleanTitle("Firmware review"), "Firmware review")
+        XCTAssertEqual(MeetingMerge.cleanTitle("FW:"), "FW:")
+    }
+
+    func testForwardedCopyMergesIntoOne() {
+        let t = Date(timeIntervalSince1970: 1_800_000_000)
+        let merged = MeetingMerge.merge([m("1", "1430: Scale WG", t), m("2", "FW: 1430: Scale WG", t)])
+        XCTAssertEqual(merged.count, 1)
+    }
+
+    func testSameLinkDifferentTitleMerges() {
+        let t = Date(timeIntervalSince1970: 1_800_000_000)
+        let merged = MeetingMerge.merge([m("1", "Sync", t, link: "https://zoom.us/j/123?pwd=a"),
+                                         m("2", "Weekly sync", t, link: "https://zoom.us/j/123?pwd=b")])
+        XCTAssertEqual(merged.count, 1)
+    }
+
+    func testDifferentTimesStaySeparate() {
+        let t = Date(timeIntervalSince1970: 1_800_000_000)
+        XCTAssertEqual(MeetingMerge.merge([m("1", "Standup", t), m("2", "Standup", t.addingTimeInterval(3600))]).count, 2)
+    }
+
+    func testKeepsTheCopyThatRingsThenTheOneWithALink() {
+        let t = Date(timeIntervalSince1970: 1_800_000_000)
+        let quiet = m("1", "Review", t, link: "https://zoom.us/j/9", cal: "quiet")
+        let loud = m("2", "FW: Review", t, cal: "loud")
+        XCTAssertEqual(MeetingMerge.merge([quiet, loud], preferred: { $0.calendarID == "loud" }).first?.id, "2")
+        XCTAssertEqual(MeetingMerge.merge([loud, quiet]).first?.id, "1")
+    }
+
+    func testMoreVideoServicesAreRecognized() {
+        for link in ["https://facetime.apple.com/join#v=1", "https://meet.jit.si/room", "https://acme.bluejeans.com/123",
+                     "https://v.ringcentral.com/join/1", "https://join.skype.com/abc", "https://8x8.vc/acme/room"] {
+            XCTAssertNotNil(MeetingLinkDetector.service(for: URL(string: link)!), link)
+        }
+    }
+}

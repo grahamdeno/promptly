@@ -35,7 +35,7 @@ final class CalendarService {
             }
             let link = MeetingLinkDetector.firstMeetingLink(in: [event.url?.absoluteString, event.location, event.notes])
             let eventID = event.eventIdentifier ?? event.calendarItemIdentifier
-            let title = (event.title ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+            let title = MeetingMerge.cleanTitle(event.title ?? "")
             return Meeting(id: Meeting.makeID(eventID: eventID, start: event.startDate),
                            eventID: eventID,
                            title: title.isEmpty ? "Untitled event" : title,

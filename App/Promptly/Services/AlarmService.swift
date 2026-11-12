@@ -34,13 +34,17 @@ final class AlarmService {
         ownedIDs = []
     }
 
-    func sync(_ planned: [PlannedAlarm]) async throws {
-        let existing = Set(((try? manager.alarms) ?? []).map(\.id))
+    /// `keep` protects test alarms. Any other alarm that isn't wanted is cancelled, even one this service has lost
+    /// track of (say across an update), so a stale countdown can never linger in the Dynamic Island. An alarm that
+    /// is ringing right now is left alone; stopAlerting handles those.
+    func sync(_ planned: [PlannedAlarm], keep: Set<UUID> = []) async throws {
+        let all = (try? manager.alarms) ?? []
+        let existing = Set(all.map(\.id))
         let wanted = Dictionary(planned.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
         var owned = ownedIDs
-        for id in existing where wanted[id] == nil && owned.contains(id) {
-            try? manager.cancel(id: id)
-            owned.remove(id)
+        for alarm in all where wanted[alarm.id] == nil && !keep.contains(alarm.id) && alarm.state != .alerting {
+            try? manager.cancel(id: alarm.id)
+            owned.remove(alarm.id)
         }
         for (id, alarm) in wanted where !existing.contains(id) {
             try await schedule(alarm)
@@ -50,6 +54,9 @@ final class AlarmService {
     }
 
 
+
+    /// True while one of Pop In's alarms is ringing.
+    var isAlerting: Bool { ((try? manager.alarms) ?? []).contains { $0.state == .alerting } }
 
     /// Silences any alarm that is ringing right now (the owner has opened Pop In or popped the bubble).
     func stopAlerting() {

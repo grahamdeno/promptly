@@ -9,6 +9,28 @@ enum MeetingService: String, Sendable {
     case chime = "Chime"
     case whereby = "Whereby"
     case slack = "Slack"
+    case faceTime = "FaceTime"
+    case blueJeans = "BlueJeans"
+    case ringCentral = "RingCentral"
+    case jitsi = "Jitsi"
+    case eightByEight = "8x8"
+    case skype = "Skype"
+    case discord = "Discord"
+    case dialpad = "Dialpad"
+    case zoho = "Zoho"
+    case lifesize = "Lifesize"
+    case vonage = "Vonage"
+    case gather = "Gather"
+    case around = "Around"
+    case tuple = "Tuple"
+    case pop = "Pop"
+    case livestorm = "Livestorm"
+    case streamYard = "StreamYard"
+    case riverside = "Riverside"
+    case butter = "Butter"
+    case teamViewer = "TeamViewer"
+    case adobeConnect = "Adobe Connect"
+    case bigBlueButton = "BigBlueButton"
 }
 
 /// Finds the video-call link in an event's URL, location or notes. Pure logic, unit tested.
@@ -29,6 +51,32 @@ enum MeetingLinkDetector {
         ("chime.aws", .chime),
         ("whereby.com", .whereby),
         ("app.slack.com", .slack),
+        ("facetime.apple.com", .faceTime),
+        ("bluejeans.com", .blueJeans),
+        ("ringcentral.com", .ringCentral),
+        ("meet.jit.si", .jitsi),
+        ("8x8.vc", .eightByEight),
+        ("join.skype.com", .skype),
+        ("meet.lync.com", .skype),
+        ("discord.gg", .discord),
+        ("discord.com", .discord),
+        ("meetings.dialpad.com", .dialpad),
+        ("meeting.zoho.com", .zoho),
+        ("meeting.zoho.eu", .zoho),
+        ("lifesizecloud.com", .lifesize),
+        ("lifesize.com", .lifesize),
+        ("meetings.vonage.com", .vonage),
+        ("app.gather.town", .gather),
+        ("around.co", .around),
+        ("tuple.app", .tuple),
+        ("pop.com", .pop),
+        ("app.livestorm.co", .livestorm),
+        ("streamyard.com", .streamYard),
+        ("riverside.fm", .riverside),
+        ("butter.us", .butter),
+        ("teamviewer.com", .teamViewer),
+        ("adobeconnect.com", .adobeConnect),
+        ("bigbluebutton.org", .bigBlueButton),
     ]
 
     static func service(for url: URL) -> MeetingService? {
