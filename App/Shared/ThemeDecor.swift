@@ -501,7 +501,7 @@ struct ThemeMarks: View {
             }
         }
         .frame(width: w, height: h)
-        .modifier(RestSpin(on: [.tennis, .golf, .baseball, .bowling, .pixel].contains(palette), paused: reduceMotion,
+        .modifier(RestSpin(on: [.tennis, .golf, .baseball, .bowling, .pixel, .beachBall].contains(palette), paused: reduceMotion,
                            seed: Double(GumPalette.allCases.firstIndex(of: palette) ?? 0)))
         .clipShape(Ellipse())
         .allowsHitTesting(false)
