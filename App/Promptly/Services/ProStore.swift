@@ -50,6 +50,7 @@ final class ProStore {
 
     /// Ask the App Store how this copy was installed. TestFlight reports the sandbox environment.
     func checkBetaAccess() async {
+        if let demoAccess { betaAccess = demoAccess; return }
         #if DEBUG
         betaAccess = true
         #else
@@ -60,7 +61,12 @@ final class ProStore {
     }
 
     /// Screenshot and audit mode only: show every Pro feature (true) or the App Store version (false), without StoreKit.
-    func setDemoAccess(_ on: Bool) { betaAccess = on }
+    func setDemoAccess(_ on: Bool) {
+        demoAccess = on
+        betaAccess = on
+    }
+    /// Set only in screenshot and audit mode; then nothing else changes beta access (the Pro sheet's own load included).
+    @ObservationIgnored private var demoAccess: Bool?
 
     func load() async {
         await checkBetaAccess()

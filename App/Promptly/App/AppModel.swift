@@ -169,7 +169,7 @@ final class AppModel {
             meetings = scene == .empty ? [] : ScreenshotMode.meetings()
             // The Pro sheet scene shows the App Store version of the sheet (price and buy button), for Apple's
             // in-app purchase review screenshot; every other scene shows Pro features unlocked.
-            store.setDemoAccess(scene != .pro && !ScreenshotMode.free)
+            store.setDemoAccess(![.pro, .settings].contains(scene) && !ScreenshotMode.free)   // App Store pictures of Settings and Pro show the price
             if scene == .now || scene == .late { arrived = meetings.first }
             if scene == .pro { showPro = true }
             return
