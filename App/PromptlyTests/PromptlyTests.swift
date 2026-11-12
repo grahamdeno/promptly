@@ -263,8 +263,8 @@ final class FortuneTests: XCTestCase {
 
     func testShowsOnlyInLastTenMinutes() {
         let start = Date(timeIntervalSince1970: 50_000)
-        XCTAssertFalse(Fortunes.shows(start: start, now: start.addingTimeInterval(-11 * 60)))
-        XCTAssertTrue(Fortunes.shows(start: start, now: start.addingTimeInterval(-9 * 60)))
+        XCTAssertFalse(Fortunes.shows(start: start, now: start.addingTimeInterval(-16 * 60)))
+        XCTAssertTrue(Fortunes.shows(start: start, now: start.addingTimeInterval(-14 * 60)))
         XCTAssertFalse(Fortunes.shows(start: start, now: start.addingTimeInterval(1)))
     }
 

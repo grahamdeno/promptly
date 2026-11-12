@@ -454,6 +454,7 @@ struct GumBubbleShape: View {
     /// Overrides the gum's main color.
     var tint: Color? = nil
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.fortuneText) private var fortuneText
 
     var body: some View {
         GeometryReader { geo in
@@ -476,16 +477,23 @@ struct GumBubbleShape: View {
                 }
                 ThemeMarks(palette: GumPalette.current, w: w, h: h, level: thinness)
                 if GumPalette.current == .fortune {
-                    // Fortune: a soft star of light drifts slowly inside the black glass.
+                    // Fortune: a soft star of light drifts slowly inside the black glass. When there is a fortune,
+                    // the words surface out of the violet mist now and then, rest a while, and sink back.
                     TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion || ScreenshotMode.isOn)) { ctx in
                         let t = reduceMotion || ScreenshotMode.isOn ? 0 : ctx.date.timeIntervalSinceReferenceDate
+                        let words = fortuneText.map { FortuneSurface.amount(t, still: reduceMotion || ScreenshotMode.isOn) } ?? 0
                         let side = max(10, w * 0.07)
                         ZStack {
                             Circle().fill(GumPalette.violet.opacity(0.45)).frame(width: side * 2.6, height: side * 2.6).blur(radius: side * 0.7)
                             FourPointStar().fill(Color.white.opacity(0.92)).frame(width: side, height: side)
                                 .rotationEffect(.degrees(sin(t / 3) * 12))
                         }
+                        .opacity(1 - words)
                         .position(x: w * (0.5 + 0.16 * sin(t / 7)), y: h * (0.26 + 0.05 * sin(t / 5)))
+                        if let fortuneText {
+                            FortuneWords(text: fortuneText, w: w, amount: words)
+                                .position(x: w * 0.5, y: h * 0.3)
+                        }
                     }
                     .clipShape(Ellipse())
                 }
@@ -631,5 +639,53 @@ struct EggMask: ViewModifier {
         } else {
             content
         }
+    }
+}
+
+
+extension EnvironmentValues {
+    /// The fortune to show inside the Fortune ball, when there is one.
+    @Entry var fortuneText: String? = nil
+}
+
+/// When the fortune words show inside the ball: they surface over 1.5 seconds, stay 9 seconds, sink back over
+/// 1.5 seconds, and the star returns for 4 seconds before the next time. Held fully up with Reduce Motion.
+enum FortuneSurface {
+    static func amount(_ t: Double, still: Bool) -> Double {
+        if still { return 1 }
+        let k = t.truncatingRemainder(dividingBy: 16)
+        if k < 1.5 { return k / 1.5 }
+        if k < 10.5 { return 1 }
+        if k < 12 { return 1 - (k - 10.5) / 1.5 }
+        return 0
+    }
+}
+
+/// The fortune's words, soft violet-white, floating up out of the mist inside the black ball.
+struct FortuneWords: View {
+    let text: String
+    let w: CGFloat
+    let amount: Double
+
+    var body: some View {
+        let size: CGFloat = max(13, w * 0.05)
+        let blur: CGFloat = CGFloat(1 - amount) * size * 0.5
+        ZStack {
+            Circle().fill(GumPalette.violet.opacity(0.35 * amount))
+                .frame(width: w * 0.62, height: w * 0.62)
+                .blur(radius: w * 0.08)
+            Text(text)
+                .font(.system(size: size, weight: .semibold, design: .serif).italic())
+                .multilineTextAlignment(.center)
+                .foregroundStyle(Color.white.opacity(0.95))
+                .shadow(color: GumPalette.violet.opacity(0.9), radius: size * 0.4)
+                .lineLimit(4)
+                .minimumScaleFactor(0.6)
+                .frame(width: w * 0.46)
+                .blur(radius: blur)
+                .opacity(amount)
+                .offset(y: CGFloat(1 - amount) * size * 0.8)
+        }
+        .accessibilityHidden(true)
     }
 }

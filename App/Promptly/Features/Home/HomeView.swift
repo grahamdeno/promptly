@@ -65,19 +65,29 @@ struct HomeView: View {
         }
     }
 
+    /// The Fortune ball's words: in the last fifteen minutes before a real meeting, and always on the Practice demo.
+    private func fortune(for next: Meeting?, now: Date) -> String? {
+        guard model.gumColor == .fortune, model.fortunes, let next else { return nil }
+        guard isDemo(next) || Fortunes.shows(start: next.start, now: now) else { return nil }
+        return Fortunes.fortune(for: next.id)
+    }
+
     private func bubble(next: Meeting?, progress: Double, overdue: TimeInterval, maxSize: CGFloat) -> some View {
-        BubbleView(
+        let words = fortune(for: next, now: .now)
+        return BubbleView(
             progress: progress,
             overdue: overdue,
             style: model.ballStyle,
             popCount: model.popCount,
             skipCount: model.skipCount,
-            accessibilityTitle: next.map { ($0.joinURL == nil ? "Pop the bubble to clear " : "Pop the bubble to join ") + $0.title } ?? "",
+            accessibilityTitle: next.map { ($0.joinURL == nil ? "Pop the bubble to clear " : "Pop the bubble to join ") + $0.title
+                + (words.map { ". Fortune: " + $0 } ?? "") } ?? "",
             maxSize: maxSize,
             onPop: next.map { meeting -> () -> Void in
                 { if let url = model.join(meeting), !ScreenshotMode.isOn { openURL(url) } }
             }
         )
+        .environment(\.fortuneText, words)
     }
 
     /// The text sits on a glass pane so it stays readable when the bubble rises behind it.
@@ -192,13 +202,6 @@ struct HomeView: View {
                     if let url = model.join(meeting) { openURL(url) }
                 }
                 .accessibilityAction(named: "Not going") { model.clear(meeting) }
-                if model.gumColor == .fortune, model.fortunes, !isDemo(meeting), Fortunes.shows(start: meeting.start, now: now) {
-                    Text(Fortunes.fortune(for: meeting.id))
-                        .font(.callout.weight(.semibold).italic())
-                        .foregroundStyle(Brand.accentText)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .accessibilityLabel("Fortune: \(Fortunes.fortune(for: meeting.id))")
-                }
                 if model.taughtPop, !isDemo(meeting), meeting.joinURL != nil,
                    meeting.start.timeIntervalSince(now) < 10 * 60 {
                     Label("Pop the bubble to join", systemImage: "hand.tap")

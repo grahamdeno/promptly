@@ -30,6 +30,7 @@ struct NowView: View {
                         leave { if let url { openURL(url) } }
                     }
                 )
+                .environment(\.fortuneText, model.gumColor == .fortune && model.fortunes ? Fortunes.fortune(for: meeting.id) : nil)
                 .ignoresSafeArea()
 
                 DiscoLights().ignoresSafeArea()
