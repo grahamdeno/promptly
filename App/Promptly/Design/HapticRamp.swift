@@ -65,7 +65,29 @@ enum AlarmLoop {
         player = p
     }
 
+    /// A short sample when a sound is picked in settings, so each choice can be heard right away.
+    /// Uses the playback category so it's audible with the silent switch on, like the alarm itself.
+    static func preview(_ choice: AlarmSoundChoice, seconds: Double = 4) {
+        stop()
+        guard let url = Bundle.main.url(forResource: (choice.fileName as NSString).deletingPathExtension, withExtension: "wav"),
+              let p = try? AVAudioPlayer(contentsOf: url) else { return }
+        try? AVAudioSession.sharedInstance().setCategory(.playback, options: [.duckOthers])
+        try? AVAudioSession.sharedInstance().setActive(true)
+        p.volume = 1
+        p.play()
+        player = p
+        previewEnd?.cancel()
+        previewEnd = Task { @MainActor in
+            try? await Task.sleep(for: .seconds(seconds))
+            if !Task.isCancelled, player === p { stop() }
+        }
+    }
+
+    private static var previewEnd: Task<Void, Never>?
+
     static func stop() {
+        previewEnd?.cancel()
+        previewEnd = nil
         player?.stop()
         player = nil
         try? AVAudioSession.sharedInstance().setActive(false, options: [.notifyOthersOnDeactivation])
@@ -86,12 +108,12 @@ enum PopSound {
         return p
     }
 
-    /// The gum pop, or a sparkle chime in Unicorn mode.
+    /// The gum pop, or a sparkle chime when the alarm sound is Chimes. Follows the sound choice, not the color.
     static func play() {
         guard Prefs().popSound else { return }
         try? AVAudioSession.sharedInstance().setCategory(.ambient, options: [.mixWithOthers])
         try? AVAudioSession.sharedInstance().setActive(true)
-        let player = GumPalette.current == .unicorn ? chime : gum
+        let player = Prefs().alarmSound == .chimes ? chime : gum
         player?.currentTime = 0
         player?.play()
     }

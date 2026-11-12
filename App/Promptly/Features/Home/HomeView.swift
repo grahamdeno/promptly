@@ -131,14 +131,15 @@ struct HomeView: View {
         .padding(.top, 8)
     }
 
-    /// Each kind of information gets its own card: the meeting, the countdown, and what's after it.
+    /// One card holds the meeting and its countdown; what comes after is a quiet line below it.
     private func meetingBlock(_ meeting: Meeting, now: Date, then: Meeting?) -> some View {
         let parts = Countdown.parts(now: now, start: meeting.start)
         let started = meeting.start <= now
-        return VStack(alignment: .leading, spacing: 18) {
-            VStack(alignment: .leading, spacing: 12) {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text(started ? "Happening now" : "Next")
+        let label = [started ? "Happening now" : "Next", meeting.service?.rawValue].compactMap { $0 }.joined(separator: " · ")
+        return VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: 10) {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text(label)
                         .font(.subheadline.weight(.medium))
                         .foregroundStyle(Brand.secondary)
                     Text(meeting.title)
@@ -147,7 +148,23 @@ struct HomeView: View {
                         .foregroundStyle(Brand.ink)
                         .lineLimit(4)
                         .fixedSize(horizontal: false, vertical: true)
-                    Text(subtitle(meeting, now: now))
+                    HStack(alignment: .lastTextBaseline, spacing: 8) {
+                        Text(parts.big)
+                            .font(.system(size: countSize, weight: .medium))
+                            .tracking(-2.5)
+                            .monospacedDigit()
+                            .contentTransition(.numericText())
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.5)
+                        if !parts.unit.isEmpty {
+                            Text(parts.unit)
+                                .font(.system(size: unitSize, weight: .medium))
+                                .foregroundStyle(Brand.secondary)
+                        }
+                    }
+                    .foregroundStyle(Brand.ink)
+                    .padding(.top, 2)
+                    Text(Countdown.span(meeting, now: now))
                         .font(.callout)
                         .foregroundStyle(Brand.secondary)
                 }
@@ -156,6 +173,12 @@ struct HomeView: View {
                     if let url = model.join(meeting) { openURL(url) }
                 }
                 .accessibilityAction(named: "Not going") { model.clear(meeting) }
+                if !model.taughtPop {
+                    Text("Tap the bubble to pop it and join.")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(Brand.ink)
+                        .transition(.opacity)
+                }
                 Button("Not going") { model.clear(meeting) }
                     .font(.subheadline.weight(.medium))
                     .foregroundStyle(Brand.secondary)
@@ -164,43 +187,12 @@ struct HomeView: View {
             }
             .glassCard()
 
-            VStack(alignment: .leading, spacing: 10) {
-                HStack(alignment: .lastTextBaseline, spacing: 8) {
-                    Text(parts.big)
-                        .font(.system(size: countSize, weight: .medium))
-                        .tracking(-2.5)
-                        .monospacedDigit()
-                        .contentTransition(.numericText())
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.5)
-                    if !parts.unit.isEmpty {
-                        Text(parts.unit)
-                            .font(.system(size: unitSize, weight: .medium))
-                            .foregroundStyle(Brand.secondary)
-                    }
-                }
-                .foregroundStyle(Brand.ink)
-                .accessibilityElement(children: .combine)
-                if !model.taughtPop {
-                    Text("Tap the bubble to pop it and join.")
-                        .font(.subheadline.weight(.medium))
-                        .foregroundStyle(Brand.ink)
-                        .transition(.opacity)
-                }
-            }
-            .glassCard()
-
             if let then {
-                HStack(spacing: 8) {
-                    Text("Then")
-                        .font(.subheadline.weight(.medium))
-                        .foregroundStyle(Brand.secondary)
-                    Text("\(Countdown.time(then.start, now: now))  \(then.title)")
-                        .font(.subheadline)
-                        .foregroundStyle(Brand.ink)
-                        .lineLimit(1)
-                }
-                .glassCard()
+                Text("Then \(Countdown.time(then.start, now: now)), \(then.title)")
+                    .font(.subheadline)
+                    .foregroundStyle(Brand.secondary)
+                    .lineLimit(2)
+                    .padding(.horizontal, 20)
             }
         }
     }
