@@ -280,9 +280,10 @@ struct ThemeMarks: View {
             case .gumball:
                 // Little gumballs filling the glass. From about ten minutes out they jostle silently,
                 // more and more as the meeting nears and on past the start.
-                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion || level < 0.7)) { tl in
-                    let t = reduceMotion || level < 0.7 ? 0 : tl.date.timeIntervalSinceReferenceDate
-                    let shake = level < 0.7 ? 0 : min(1, (level - 0.7) / 0.3)
+                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion || level < 0.83)) { tl in
+                    // level is the share of the last hour gone, so 0.83 is ten minutes out.
+                    let t = reduceMotion || level < 0.83 ? 0 : tl.date.timeIntervalSinceReferenceDate
+                    let shake = level < 0.83 ? 0 : 0.3 + 0.7 * min(1, (level - 0.83) / 0.17)
                     Canvas { ctx, size in
                         var rng = SeededRandom(seed: 3)
                         let r = size.width * 0.05
@@ -375,15 +376,27 @@ struct ThemeMarks: View {
                     .blur(radius: max(4, w * 0.04))
                 }
             case .dandelion:
-                // Seeds radiating from the middle.
-                Canvas { ctx, size in
-                    let c = CGPoint(x: size.width / 2, y: size.height * 0.55)
-                    for k in 0..<72 {
-                        let a = Double(k) / 72 * 2 * .pi
-                        let end = CGPoint(x: c.x + cos(a) * size.width * 0.48, y: c.y + sin(a) * size.height * 0.48)
-                        var line = Path(); line.move(to: c); line.addLine(to: end)
-                        ctx.stroke(line, with: .color(GumPalette.rgb(0xB8BCA8).opacity(0.6)), lineWidth: 0.8)
-                        ctx.fill(Path(ellipseIn: CGRect(x: end.x - 3, y: end.y - 3, width: 6, height: 6)), with: .color(.white))
+                // Seeds radiating from the middle, each swaying slowly on its stalk.
+                TimelineView(.animation(minimumInterval: 1.0 / 20, paused: reduceMotion)) { tl in
+                    let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
+                    Canvas { ctx, size in
+                        let c = CGPoint(x: size.width / 2, y: size.height * 0.55)
+                        for k in 0..<72 {
+                            let sway = 0.06 * sin(t * 0.9 + Double(k) * 0.45) + 0.03 * sin(t * 0.37 + Double(k))
+                            let a = Double(k) / 72 * 2 * .pi + sway
+                            let len = 0.44 + 0.04 * sin(Double(k) * 2.7)
+                            let end = CGPoint(x: c.x + cos(a) * size.width * len, y: c.y + sin(a) * size.height * len)
+                            var line = Path(); line.move(to: c); line.addLine(to: end)
+                            ctx.stroke(line, with: .color(GumPalette.rgb(0xB8BCA8).opacity(0.6)), lineWidth: 0.8)
+                            // A little fan of fluff at the tip.
+                            for f in -2...2 {
+                                let fa = a + Double(f) * 0.28
+                                var fluff = Path(); fluff.move(to: end)
+                                fluff.addLine(to: CGPoint(x: end.x + cos(fa) * size.width * 0.035, y: end.y + sin(fa) * size.width * 0.035))
+                                ctx.stroke(fluff, with: .color(.white.opacity(0.85)), lineWidth: 0.7)
+                            }
+                            ctx.fill(Path(ellipseIn: CGRect(x: end.x - 2, y: end.y - 2, width: 4, height: 4)), with: .color(.white))
+                        }
                     }
                 }
             case .atom:
@@ -757,6 +770,26 @@ struct ThemeTopper: View {
                                 .opacity(reduceMotion ? 0 : (phase > 0.85 ? (1 - phase) / 0.15 : 1))
                         }
                     }
+                }
+            case .dandelion:
+                // A ragged, fluffy rim: wisps poking out past the edge, swaying with the seeds.
+                TimelineView(.animation(minimumInterval: 1.0 / 20, paused: reduceMotion)) { tl in
+                    let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
+                    let hh = h ?? w
+                    Canvas { ctx, size in
+                        let c = CGPoint(x: size.width / 2, y: size.height / 2)
+                        for k in 0..<90 {
+                            let a = Double(k) / 90 * 2 * .pi + 0.05 * sin(t * 0.9 + Double(k) * 0.4)
+                            let rx = size.width / 2, ry = size.height / 2
+                            let inner = CGPoint(x: c.x + cos(a) * rx * 0.94, y: c.y + sin(a) * ry * 0.94)
+                            let out = 1.0 + 0.05 + 0.06 * abs(sin(Double(k) * 1.7))
+                            let tip = CGPoint(x: c.x + cos(a) * rx * out, y: c.y + sin(a) * ry * out)
+                            var p = Path(); p.move(to: inner); p.addLine(to: tip)
+                            ctx.stroke(p, with: .color(.white.opacity(0.75)), lineWidth: 0.8)
+                            ctx.fill(Path(ellipseIn: CGRect(x: tip.x - 1.5, y: tip.y - 1.5, width: 3, height: 3)), with: .color(.white.opacity(0.9)))
+                        }
+                    }
+                    .frame(width: w, height: hh)
                 }
             case .waterBalloon:
                 // The tied knot.
