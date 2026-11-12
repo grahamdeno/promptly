@@ -539,7 +539,7 @@ struct GumBubbleShape: View {
                     }
                 }
             }
-            .modifier(EggMask(on: GumPalette.current == .waterBalloon))
+            .modifier(EggMask(on: GumPalette.current == .waterBalloon || GumPalette.current == .easterEgg))
                 ThemeTopper(palette: GumPalette.current, w: w, h: h)
             }
             .shadow(color: GumColors.accent.opacity(GumPalette.current == .fortune ? 0.45 : 0.3),
@@ -576,10 +576,12 @@ struct ThemeIdle: ViewModifier {
 
     func body(content: Content) -> some View {
         switch palette {
-        case .waterBalloon, .moodRing:
+        case .waterBalloon, .moodRing, .easterEgg, .valentine:
             TimelineView(.animation(minimumInterval: 1.0 / 30, paused: paused)) { ctx in
-                let s = Self.scale(palette, t: paused ? 0 : ctx.date.timeIntervalSinceReferenceDate)
+                let t = paused ? 0 : ctx.date.timeIntervalSinceReferenceDate
+                let s = Self.scale(palette, t: t)
                 content.scaleEffect(x: s.width, y: s.height, anchor: .bottom)
+                    .rotationEffect(.degrees(palette == .easterEgg ? EggRock.angle(t) : 0), anchor: .bottom)
             }
         default:
             content
@@ -601,30 +603,17 @@ struct ThemeIdle: ViewModifier {
             let b: Double = k < 4 ? ease(k / 4) : (k < 8 ? 1 : (k < 12 ? 1 - ease((k - 8) / 4) : 0))
             let s = 1 + 0.04 * b
             return CGSize(width: s, height: s)
+        case .easterEgg:
+            return CGSize(width: 0.88, height: 1.08)
+        case .valentine:
+            let s = 1 + 0.025 * HeartBeat.beat(t)
+            return CGSize(width: s, height: s)
         default:
             return CGSize(width: 1, height: 1)
         }
     }
 }
 
-
-/// A hanging water balloon's outline: narrow at the neck, full and heavy at the bottom.
-struct EggShape: Shape {
-    func path(in rect: CGRect) -> Path {
-        var p = Path()
-        let cx = rect.midX, cy = rect.midY, rx = rect.width / 2, ry = rect.height / 2
-        let steps = 96
-        for n in 0...steps {
-            let t = Double(n) / Double(steps) * 2 * .pi
-            // sin(t) is -1 at the top and 1 at the bottom: pinch the top, fill out the bottom.
-            let m = (1 + 0.16 * sin(t)) / 1.06
-            let pt = CGPoint(x: cx + rx * CGFloat(cos(t) * m), y: cy + ry * CGFloat(sin(t)))
-            if n == 0 { p.move(to: pt) } else { p.addLine(to: pt) }
-        }
-        p.closeSubpath()
-        return p
-    }
-}
 
 /// Cuts the water balloon's gum to the egg outline and shades its edge.
 struct EggMask: ViewModifier {

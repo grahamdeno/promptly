@@ -30,13 +30,14 @@ struct ThemeMarks: View {
                     .position(x: w * c.0, y: h * c.1)
                 }
             case .snowball:
-                // A frosty sparkle of flakes on the surface.
-                ForEach(0..<Self.flakes.count, id: \.self) { i in
-                    let f = Self.flakes[i]
-                    Image(systemName: "snowflake")
-                        .font(.system(size: max(8, w * f.2)))
-                        .foregroundStyle(.white.opacity(0.9))
-                        .position(x: w * f.0, y: h * f.1)
+                // Snow drifting down inside, swaying and turning as it falls.
+                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { tl in
+                    let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
+                    ZStack {
+                        ForEach(0..<14, id: \.self) { i in
+                            ThemeMarks.snowflake(i, t: t, w: w, h: h)
+                        }
+                    }
                 }
             case .ornament:
                 // A band of gold glitter across the ball.
@@ -441,14 +442,53 @@ struct ThemeMarks: View {
                 Circle().fill(Color.black).frame(width: w * 0.05, height: w * 0.05).position(x: w * 0.66, y: h * 0.3)
                 Ellipse().stroke(palette.dark.opacity(0.4), lineWidth: max(2, w * 0.012)).frame(width: w * 0.45, height: h * 0.3).position(x: w * 0.38, y: h * 0.62)
             case .easterEgg:
-                VStack(spacing: h * 0.06) {
-                    ForEach(0..<5, id: \.self) { i in
-                        Capsule().fill([GumPalette.rgb(0xFFB3D9), GumPalette.rgb(0xFFF1A8), GumPalette.rgb(0xB5F2D6), GumPalette.rgb(0xD7B8FF), GumPalette.rgb(0xFFC9A8)][i])
-                            .frame(width: w * 1.1, height: h * 0.07)
+                // A dyed egg: a pastel zigzag band, polka dots and a wavy stripe, with a crack that shows when it rocks.
+                Canvas { ctx, size in
+                    let W = size.width, H = size.height
+                    // Wavy stripe near the top.
+                    var wave = Path()
+                    wave.move(to: CGPoint(x: 0, y: H * 0.27))
+                    for k in 0...24 {
+                        let x = W * CGFloat(k) / 24
+                        wave.addLine(to: CGPoint(x: x, y: H * 0.27 + H * 0.025 * CGFloat(sin(Double(k) * 1.2))))
+                    }
+                    ctx.stroke(wave, with: .color(GumPalette.rgb(0xD7B8FF)), lineWidth: H * 0.05)
+                    // Zigzag band across the middle.
+                    var zig = Path()
+                    zig.move(to: CGPoint(x: 0, y: H * 0.5))
+                    for k in 0...12 {
+                        zig.addLine(to: CGPoint(x: W * CGFloat(k) / 12, y: H * (k % 2 == 0 ? 0.46 : 0.56)))
+                    }
+                    ctx.stroke(zig, with: .color(GumPalette.rgb(0xFFB3D9)), style: StrokeStyle(lineWidth: H * 0.06, lineJoin: .round))
+                    // Polka dots below.
+                    for row in 0..<2 {
+                        for col in 0..<6 {
+                            let x = W * (0.12 + 0.16 * CGFloat(col) + (row == 1 ? 0.08 : 0))
+                            let y = H * (0.68 + 0.1 * CGFloat(row))
+                            ctx.fill(Path(ellipseIn: CGRect(x: x - W * 0.03, y: y - W * 0.03, width: W * 0.06, height: W * 0.06)),
+                                     with: .color([GumPalette.rgb(0xFFF1A8), GumPalette.rgb(0xB5F2D6)][(row + col) % 2]))
+                        }
                     }
                 }
+                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { tl in
+                    let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
+                    Path { p in
+                        p.move(to: CGPoint(x: w * 0.42, y: h * 0.16))
+                        p.addLine(to: CGPoint(x: w * 0.47, y: h * 0.21))
+                        p.addLine(to: CGPoint(x: w * 0.5, y: h * 0.15))
+                        p.addLine(to: CGPoint(x: w * 0.55, y: h * 0.22))
+                        p.addLine(to: CGPoint(x: w * 0.59, y: h * 0.17))
+                    }
+                    .stroke(Color.black.opacity(0.55 * EggRock.crack(t)), style: StrokeStyle(lineWidth: max(1.5, w * 0.006), lineJoin: .round))
+                }
             case .valentine:
-                Image(systemName: "heart.fill").font(.system(size: w * 0.3)).foregroundStyle(.white.opacity(0.35)).position(x: w * 0.5, y: h * 0.38)
+                // A heart that gives a double beat every few seconds.
+                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { tl in
+                    let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
+                    Image(systemName: "heart.fill").font(.system(size: w * 0.3)).foregroundStyle(.white.opacity(0.35 + 0.2 * HeartBeat.beat(t)))
+                        .scaleEffect(1 + 0.14 * HeartBeat.beat(t))
+                        .position(x: w * 0.5, y: h * 0.38)
+                }
             case .fireworks:
                 TimelineView(.animation(minimumInterval: 1.0 / 10, paused: reduceMotion)) { ctx in
                     let t = reduceMotion ? 0 : ctx.date.timeIntervalSinceReferenceDate
@@ -471,10 +511,33 @@ struct ThemeMarks: View {
                     .init(color: .white, location: 0.834), .init(color: .white, location: 1)], center: UnitPoint(x: 0.5, y: 0.35)))
                     .opacity(0.9)
             case .zen:
+                // Raked sand: rings around a small stone, and every so often a drop lands and a ripple spreads out.
                 Canvas { ctx, size in
                     var rng = SeededRandom(seed: 9)
-                    for _ in 0..<Int(size.width * size.height / 120) {
-                        ctx.fill(Path(ellipseIn: CGRect(x: rng.next() * size.width, y: rng.next() * size.height, width: 1.5, height: 1.5)), with: .color(.white.opacity(0.25)))
+                    for _ in 0..<Int(size.width * size.height / 140) {
+                        ctx.fill(Path(ellipseIn: CGRect(x: rng.next() * size.width, y: rng.next() * size.height, width: 1.5, height: 1.5)), with: .color(.white.opacity(0.22)))
+                    }
+                    let c = CGPoint(x: size.width * 0.6, y: size.height * 0.58)
+                    for k in 1...6 {
+                        let r = size.width * 0.07 * CGFloat(k)
+                        ctx.stroke(Path(ellipseIn: CGRect(x: c.x - r, y: c.y - r * 0.6, width: r * 2, height: r * 1.2)),
+                                   with: .color(.white.opacity(0.18)), lineWidth: max(1, size.width * 0.006))
+                    }
+                    ctx.fill(Path(ellipseIn: CGRect(x: c.x - size.width * 0.06, y: c.y - size.width * 0.04, width: size.width * 0.12, height: size.width * 0.08)),
+                             with: .color(palette.dark.opacity(0.8)))
+                }
+                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { tl in
+                    let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
+                    let k = t.truncatingRemainder(dividingBy: 9)
+                    ZStack {
+                        ForEach(0..<3, id: \.self) { i in
+                            let p = (k - Double(i) * 0.5) / 4
+                            if p > 0 && p < 1 {
+                                Ellipse().stroke(Color.white.opacity(0.5 * (1 - p)), lineWidth: max(1, w * 0.006))
+                                    .frame(width: w * 0.7 * CGFloat(p), height: w * 0.42 * CGFloat(p))
+                                    .position(x: w * 0.6, y: h * 0.58)
+                            }
+                        }
                     }
                 }
             case .lavaLamp:
@@ -653,6 +716,23 @@ struct ThemeMarks: View {
             .opacity(fade)
     }
 
+    /// One snowflake falling inside the snowball, swaying as it goes and starting again at the top.
+    static func snowflake(_ i: Int, t: Double, w: CGFloat, h: CGFloat) -> some View {
+        let d: Double = Double(i)
+        let period: Double = 7 + (d * 0.53).truncatingRemainder(dividingBy: 1) * 5
+        let phase: Double = ((t + d * 1.7) / period).truncatingRemainder(dividingBy: 1)
+        let lane: CGFloat = CGFloat((d * 0.618).truncatingRemainder(dividingBy: 1))
+        let sway: CGFloat = 0.04 * CGFloat(sin(t * 0.9 + d * 2))
+        let size: CGFloat = max(7, w * (0.03 + 0.02 * CGFloat(i % 3)))
+        let x: CGFloat = w * (0.12 + 0.76 * lane + sway)
+        let y: CGFloat = h * CGFloat(-0.05 + 1.1 * phase)
+        return Image(systemName: "snowflake")
+            .font(.system(size: size))
+            .foregroundStyle(Color.white.opacity(0.9))
+            .rotationEffect(.degrees(t * 30 + d * 40))
+            .position(x: x, y: y)
+    }
+
     static let patches: [(CGFloat, CGFloat, CGFloat, Double)] = [
         (0.5, 0.38, 0.2, 0), (0.22, 0.3, 0.13, 20), (0.78, 0.3, 0.13, -20), (0.3, 0.68, 0.14, 40),
         (0.7, 0.68, 0.14, -40), (0.5, 0.92, 0.1, 0), (0.08, 0.55, 0.08, 10), (0.92, 0.55, 0.08, -10),
@@ -678,6 +758,52 @@ struct RestSpin: ViewModifier {
         } else {
             content
         }
+    }
+}
+
+/// A double heartbeat (lub-dub) every 4.5 seconds; 0 at rest, up to 1 on the beat.
+enum HeartBeat {
+    static func beat(_ t: Double) -> Double {
+        let k = t.truncatingRemainder(dividingBy: 4.5)
+        func bump(_ at: Double, _ size: Double) -> Double {
+            let x = (k - at) / 0.18
+            return x > 0 && x < 1 ? size * sin(x * .pi) : 0
+        }
+        return bump(0, 1) + bump(0.28, 0.7)
+    }
+}
+
+/// The Easter egg rocks side to side every 8 seconds, as if something inside is about to hatch.
+enum EggRock {
+    /// Rotation in degrees.
+    static func angle(_ t: Double) -> Double {
+        let k = t.truncatingRemainder(dividingBy: 8)
+        guard k < 1.6 else { return 0 }
+        return 7 * exp(-k * 1.6) * sin(k * 2 * .pi * 2)
+    }
+
+    /// How visible the crack is: it shows as the egg rocks, then fades.
+    static func crack(_ t: Double) -> Double {
+        let k = t.truncatingRemainder(dividingBy: 8)
+        return k < 0.3 ? k / 0.3 : max(0, 1 - (k - 0.3) / 2.5)
+    }
+}
+
+/// An egg outline: narrow at the top, full and heavy at the bottom (the water balloon and the Easter egg).
+struct EggShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        var p = Path()
+        let cx = rect.midX, cy = rect.midY, rx = rect.width / 2, ry = rect.height / 2
+        let steps = 96
+        for n in 0...steps {
+            let t = Double(n) / Double(steps) * 2 * .pi
+            // sin(t) is -1 at the top and 1 at the bottom: pinch the top, fill out the bottom.
+            let m = (1 + 0.16 * sin(t)) / 1.06
+            let pt = CGPoint(x: cx + rx * CGFloat(cos(t) * m), y: cy + ry * CGFloat(sin(t)))
+            if n == 0 { p.move(to: pt) } else { p.addLine(to: pt) }
+        }
+        p.closeSubpath()
+        return p
     }
 }
 
@@ -824,6 +950,16 @@ struct ThemeTopper: View {
                         }
                     }
                     .frame(width: w, height: hh)
+                }
+            case .valentine:
+                // Little hearts slip out on each beat and float slowly up and away.
+                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { tl in
+                    let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
+                    ZStack {
+                        ForEach(0..<6, id: \.self) { i in
+                            ThemeTopper.floatingHeart(i, t: t, w: w, hidden: reduceMotion)
+                        }
+                    }
                 }
             case .waterBalloon:
                 // The neck pinching up from the top, the tied knot, and the rolled lip poking out of it.
@@ -1013,5 +1149,27 @@ struct Pentagon: Shape {
         }
         p.closeSubpath()
         return p
+    }
+}
+
+extension ThemeTopper {
+    /// One small heart leaving the Valentine ball and floating slowly up and away, fading as it goes.
+    static func floatingHeart(_ i: Int, t: Double, w: CGFloat, hidden: Bool) -> some View {
+        let d: Double = Double(i)
+        let period: Double = 9
+        // Each heart starts on a beat (beats are every 4.5 s), staggered across two cycles of three.
+        let phase: Double = ((t - d * 1.5) / period).truncatingRemainder(dividingBy: 1)
+        let p: Double = phase < 0 ? phase + 1 : phase
+        let lane: CGFloat = CGFloat((d * 0.37).truncatingRemainder(dividingBy: 1)) - 0.5
+        let x: CGFloat = w * (0.5 + 0.35 * lane) + w * 0.05 * CGFloat(sin(t * 0.8 + d))
+        let y: CGFloat = w * 0.2 - w * 1.6 * CGFloat(p)
+        let size: CGFloat = max(10, w * (0.05 + 0.015 * CGFloat(i % 3)))
+        let fade: Double = hidden ? 0 : (p < 0.08 ? p / 0.08 : (1 - p) * 0.9)
+        return Image(systemName: "heart.fill")
+            .font(.system(size: size))
+            .foregroundStyle(GumPalette.rgb(0xFF9AB8))
+            .rotationEffect(.degrees(12 * sin(t + d)))
+            .position(x: x, y: y)
+            .opacity(fade)
     }
 }
