@@ -494,7 +494,7 @@ struct GumBubbleShape: View {
                     // the words surface out of the violet mist now and then, rest a while, and sink back.
                     TimelineView(.animation(minimumInterval: 1.0 / 20, paused: reduceMotion || ScreenshotMode.isOn)) { ctx in
                         let t = reduceMotion || ScreenshotMode.isOn ? 0 : ctx.date.timeIntervalSinceReferenceDate
-                        let words = fortuneText.map { FortuneSurface.amount(t, still: reduceMotion || ScreenshotMode.isOn) } ?? 0
+                        let words = fortuneText.map { _ in FortuneSurface.amount(t, still: reduceMotion || ScreenshotMode.isOn) } ?? 0
                         let side = max(10, w * 0.07)
                         ZStack {
                             Circle().fill(GumPalette.violet.opacity(0.45)).frame(width: side * 2.6, height: side * 2.6).blur(radius: side * 0.7)
