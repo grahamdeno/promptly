@@ -225,4 +225,14 @@ Review: https://claude.ai/artifact/Xs4CqLSRPxh6u4VgfZJpko (App Store readiness r
   Unmute before you talk. / Take the good notes. / Someone will share the wrong screen. / Today's word: "alignment." /
   Stand up and stretch first. / Someone will say "can you see my screen?" / Listen twice, talk once. /
   Your Wi-Fi will hold. Probably. / Someone will say "you're on mute."
+  Added (owner liked all): Someone will join late and ask what they missed. / Two people will start talking at once. /
+  "Let's take this offline." / Someone's still eating lunch. / The first two minutes are about the weather. /
+  "Sorry, go ahead." "No, you go." / Someone will be frozen mid-sentence. / There will be an echo. Nobody knows whose. /
+  "I'll keep this short." It won't be. / Someone will forget to stop sharing. / A calendar invite for the follow-up is coming. /
+  Someone will say "great question." / "Can everyone hear me?" / You'll hear a keyboard. Loudly. /
+  Someone will be walking somewhere. / "I think you're frozen." / The agenda is a suggestion. /
+  "Let's give it two more minutes for people to join." / Someone will say "low-hanging fruit." /
+  A baby or a doorbell will make a guest appearance. / "Is this being recorded?" / Someone's camera is pointed at the ceiling. /
+  "We're at time, but quickly..." / Today's other word: "bandwidth."
+  Voice: things everyone recognizes from meetings, said lightly. No coaching, no advice.
 - Sound generator: docs/fortune/sound_samples.py.
