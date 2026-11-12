@@ -300,5 +300,24 @@ final class ThemeTests: XCTestCase {
         }
         XCTAssertFalse(GumPalette.coral.isPro)
         XCTAssertFalse(PopChoice.pop.isPro)
+        for palette in GumPalette.novelty {
+            prefs.gumColor = palette
+            XCTAssertEqual(prefs.popChoice, .themeSound)
+            XCTAssertTrue(palette.isHeld)
+            XCTAssertFalse(palette.popFile.isEmpty)
+        }
+        XCTAssertFalse(GumPalette.moon.isHeld)
+    }
+}
+
+final class PackTests: XCTestCase {
+    func testPacksCoverEveryHeldGroup() {
+        XCTAssertNil(ThemeGroup.classic.packID)
+        XCTAssertNil(ThemeGroup.favorites.packID)
+        XCTAssertEqual(Set(ThemeGroup.allCases.compactMap(\.packID)).count, 5)
+        // Favorites are Pro only by design; every other held theme can be bought in a pack.
+        for palette in GumPalette.allCases where palette.isHeld && palette.group != .favorites {
+            XCTAssertNotNil(palette.group.packID, "\(palette) should be in a pack")
+        }
     }
 }

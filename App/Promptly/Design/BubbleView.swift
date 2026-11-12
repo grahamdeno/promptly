@@ -43,7 +43,11 @@ struct BubbleView: View {
     }
 
     private var width: CGFloat {
-        style == .bubble ? minSize + CGFloat(puff) * (maxSize - minSize) : steadySize
+        style == .bubble ? minSize + CGFloat(puff) * (themeMax - minSize) : steadySize
+    }
+    /// Grenade stays smaller so its fuze, spoon and pin stay in view below the meeting card, even at full size.
+    private var themeMax: CGFloat {
+        GumPalette.current == .grenade ? max(minSize, maxSize * 0.55) : maxSize
     }
 
     private var height: CGFloat { width * (1 + 0.1 * CGFloat(puff)) }
@@ -129,6 +133,7 @@ struct BubbleView: View {
                 .frame(width: width, height: height)
                 .overlay { if onPop != nil { pokeDimple } }
                 .scaleEffect(x: poked ? 1.008 : 1, y: poked ? 0.992 : 1, anchor: .bottom)
+                .modifier(ThemeIdle(palette: GumPalette.current, paused: reduceMotion || ScreenshotMode.isOn || popping))
                 .contentShape(Ellipse())
         }
         .buttonStyle(.plain)
@@ -456,6 +461,7 @@ struct GumBubbleShape: View {
             let h = geo.size.height
             let streak = min(26, max(5, w * 0.03))
             ZStack {
+            ZStack {
                 // Solid, saturated gum with a soft lit side (Unicorn uses the same pink gum).
                 Ellipse()
                     .fill(RadialGradient(colors: [GumColors.light, tint ?? GumColors.coral, GumColors.dark],
@@ -468,7 +474,7 @@ struct GumBubbleShape: View {
                     }
                     .clipShape(Ellipse())
                 }
-                ThemeMarks(palette: GumPalette.current, w: w, h: h)
+                ThemeMarks(palette: GumPalette.current, w: w, h: h, level: thinness)
                 if GumPalette.current == .fortune {
                     // Fortune: a soft star of light drifts slowly inside the black glass.
                     TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion || ScreenshotMode.isOn)) { ctx in
@@ -532,6 +538,8 @@ struct GumBubbleShape: View {
                         .mask(Ellipse())
                     }
                 }
+            }
+            .modifier(EggMask(on: GumPalette.current == .waterBalloon || GumPalette.current == .easterEgg))
                 ThemeTopper(palette: GumPalette.current, w: w, h: h)
             }
             .shadow(color: GumColors.accent.opacity(GumPalette.current == .fortune ? 0.45 : 0.3),
@@ -557,4 +565,71 @@ struct ConfettiPiece: View {
 extension Array {
     /// Safe lookup: nil when out of range.
     func at(_ i: Int) -> Element? { indices.contains(i) ? self[i] : nil }
+}
+
+
+/// Resting motion for themes that move as a whole: the water balloon gets poked every so often and
+/// jiggles to a stop, and the mood ring breathes in a box pattern (in 4, hold 4, out 4, hold 4).
+struct ThemeIdle: ViewModifier {
+    let palette: GumPalette
+    let paused: Bool
+
+    func body(content: Content) -> some View {
+        switch palette {
+        case .waterBalloon, .moodRing, .easterEgg, .valentine:
+            TimelineView(.animation(minimumInterval: 1.0 / 30, paused: paused)) { ctx in
+                let t = paused ? 0 : ctx.date.timeIntervalSinceReferenceDate
+                let s = Self.scale(palette, t: t)
+                content.scaleEffect(x: s.width, y: s.height, anchor: .bottom)
+                    .rotationEffect(.degrees(palette == .easterEgg ? EggRock.angle(t) : 0), anchor: .bottom)
+            }
+        default:
+            content
+        }
+    }
+
+    static func scale(_ palette: GumPalette, t: TimeInterval) -> CGSize {
+        switch palette {
+        case .waterBalloon:
+            // A poke every 7 seconds, then a damped wobble that settles in about 3 seconds.
+            let k = t.truncatingRemainder(dividingBy: 7)
+            // Hanging from its neck, the water pulls it slightly long.
+            guard k < 3.2 else { return CGSize(width: 0.9, height: 1.06) }
+            let wob = exp(-k * 1.5) * sin(k * 2 * .pi * 2.2)
+            return CGSize(width: 0.9 * (1 + 0.06 * wob), height: 1.06 * (1 - 0.06 * wob))
+        case .moodRing:
+            let k = t.truncatingRemainder(dividingBy: 16)
+            let ease: (Double) -> Double = { x in (1 - cos(x * .pi)) / 2 }
+            let b: Double = k < 4 ? ease(k / 4) : (k < 8 ? 1 : (k < 12 ? 1 - ease((k - 8) / 4) : 0))
+            let s = 1 + 0.04 * b
+            return CGSize(width: s, height: s)
+        case .easterEgg:
+            return CGSize(width: 0.88, height: 1.08)
+        case .valentine:
+            let s = 1 + 0.025 * HeartBeat.beat(t)
+            return CGSize(width: s, height: s)
+        default:
+            return CGSize(width: 1, height: 1)
+        }
+    }
+}
+
+
+/// Cuts the water balloon's gum to the egg outline and shades its edge.
+struct EggMask: ViewModifier {
+    let on: Bool
+
+    func body(content: Content) -> some View {
+        if on {
+            GeometryReader { geo in
+                let w = geo.size.width
+                content
+                    .overlay(EggShape().stroke(GumColors.dark.opacity(0.5), lineWidth: max(6, w * 0.05))
+                        .blur(radius: max(6, w * 0.03)))
+                    .mask(EggShape())
+            }
+        } else {
+            content
+        }
+    }
 }

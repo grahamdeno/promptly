@@ -29,9 +29,10 @@ final class Audit {
 
     /// Starts Pop In in its demo mode on one scene (ScreenshotMode.swift): made-up meetings, no calendar, no alarms.
     /// `free` shows the free version with Pro choices locked. The run's text size is passed on.
-    func launch(_ scene: String, free: Bool = false, terminate: Bool = true, settle: Double = 2.5) {
+    func launch(_ scene: String, free: Bool = false, theme: String? = nil, terminate: Bool = true, settle: Double = 2.5) {
         if terminate { app.terminate() }
         var a = ["-screenshots", "-scene", scene]
+        if let theme { a += ["-theme", theme] }
         if free { a.append("-free") }
         if let t = Audit.env["AUDIT_TEXT"], !t.isEmpty { a += ["-UIPreferredContentSizeCategoryName", t] }
         app.launchArguments = a

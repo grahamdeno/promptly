@@ -170,6 +170,10 @@ final class Journeys: XCTestCase {
         a.shot("pop-sound")
         a.tap("Back", a.app.navigationBars.buttons.firstMatch)
         a.pause(0.6)
+        a.tap("Theme", a.any(containing: "Theme"))
+        a.pause(0.8)
+        a.shot("theme-gallery")
+        a.accessibility("theme-gallery")
         a.tap("Unicorn (locked)", a.app.buttons["Unicorn, Pro"])
         a.pause(1.2)
         a.shot("pro-sheet-from-locked")
@@ -268,5 +272,19 @@ final class Journeys: XCTestCase {
         }
         a.launch("moon")
         a.check("Moon says Next transmission", a.any(containing: "Next transmission").exists, severity: 2)
+    }
+
+    // J12. Every held theme (holiday and novelty): the ball and the pop, one picture each.
+    func test12_AllThemes() {
+        let a = Audit("J12-all-themes")
+        defer { a.finish() }
+        for theme in ["snowball", "ornament", "pumpkin", "disco", "soap", "planet", "basketball", "donut",
+                      "waterBalloon", "eyeball", "fishbowl", "moodRing", "lavaLamp", "soccer", "hockey", "tennis", "golf", "baseball", "bowling", "pixel", "gumball", "cherry", "orange", "macaron", "cakePop", "earth", "sun", "dandelion", "atom", "geode", "yarn", "arcadeButton", "clock", "marble", "duck", "easterEgg", "valentine", "fireworks", "beachBall", "zen"] {
+            a.launch("fortune", theme: theme, settle: 2)
+            a.shot("\(theme)")
+            _ = popBubble(a)
+            a.pause(0.3)
+            a.shot("\(theme)-pop")
+        }
     }
 }

@@ -16,10 +16,14 @@ enum AlarmSoundChoice: String, CaseIterable, Sendable {
     case sonar
     /// "Sleigh bells": jingles and a bell tune, for the holiday themes; held back with them (Sounds/sleigh_alarm.wav). Pro.
     case sleighBells
+    /// "Whistle": a referee's whistle, trilling faster; for Soccer and held with it (Sounds/whistle_alarm.wav). Pro.
+    case whistle
+    /// "Skates": blades carving the ice, faster, then a goal horn; for Hockey and held with it (Sounds/skates_alarm.wav). Pro.
+    case skates
 
     var isPro: Bool { !(self == .bubbleBlow || self == .appleDefault) }
     /// The sounds offered in Settings (seasonal ones wait for their themes).
-    static var available: [AlarmSoundChoice] { allCases.filter { GumPalette.seasonsReady || $0 != .sleighBells } }
+    static var available: [AlarmSoundChoice] { allCases.filter { GumPalette.seasonsReady || ![.sleighBells, .whistle, .skates].contains($0) } }
 
     var label: String {
         switch self {
@@ -29,6 +33,8 @@ enum AlarmSoundChoice: String, CaseIterable, Sendable {
         case .oracle: "Oracle"
         case .sonar: "Sonar"
         case .sleighBells: "Sleigh bells"
+        case .whistle: "Whistle"
+        case .skates: "Skates"
         case .appleDefault: "Apple"
         }
     }
@@ -41,6 +47,8 @@ enum AlarmSoundChoice: String, CaseIterable, Sendable {
         case .oracle: "oracle_alarm.wav"
         case .sonar: "sonar_alarm.wav"
         case .sleighBells: "sleigh_alarm.wav"
+        case .whistle: "whistle_alarm.wav"
+        case .skates: "skates_alarm.wav"
         default: "bubble_blow_alarm.wav"
         }
     }
@@ -64,10 +72,12 @@ enum PopChoice: String, CaseIterable, Sendable {
     case glassTing
     /// Pumpkin spice: a soft thunk and a leafy crunch.
     case leafThunk
+    /// Each theme's own sound (the default for the novelty themes).
+    case themeSound
     case off
 
     /// The Pro pop sounds belong to the Pro themes.
-    var isPro: Bool { !(self == .pop || self == .sparkle || self == .off) }
+    var isPro: Bool { !(self == .pop || self == .sparkle || self == .off || self == .themeSound) }
     var fileName: String? {
         switch self {
         case .pop: "pop"
@@ -78,6 +88,7 @@ enum PopChoice: String, CaseIterable, Sendable {
         case .crunch: "snow_pop"
         case .glassTing: "ornament_pop"
         case .leafThunk: "pumpkin_pop"
+        case .themeSound: GumPalette.current.popFile
         case .off: nil
         }
     }
@@ -95,6 +106,7 @@ enum PopChoice: String, CaseIterable, Sendable {
         case .crunch: "Snow crunch"
         case .glassTing: "Glass ting"
         case .leafThunk: "Leaf thunk"
+        case .themeSound: "Match the theme"
         case .off: "Off"
         }
     }
@@ -151,6 +163,16 @@ final class Prefs: @unchecked Sendable {
         set { defaults.set(newValue, forKey: "popSound") }
     }
 
+    /// Surprise me: a different theme each day.
+    var surprise: Bool {
+        get { defaults.bool(forKey: "surprise") }
+        set { defaults.set(newValue, forKey: "surprise") }
+    }
+    var lastSurpriseDay: String {
+        get { defaults.string(forKey: "lastSurpriseDay") ?? "" }
+        set { defaults.set(newValue, forKey: "lastSurpriseDay") }
+    }
+
     /// Fortune theme: show a light meeting fortune on the card in the last ten minutes.
     var fortunes: Bool {
         get { defaults.object(forKey: "fortunes") as? Bool ?? true }
@@ -175,7 +197,8 @@ final class Prefs: @unchecked Sendable {
         case .snowball: return .crunch
         case .ornament: return .glassTing
         case .pumpkin: return .leafThunk
-        default: return .pop
+        case .bubblegum, .coral: return .pop
+        default: return .themeSound
         }
     }
 

@@ -248,3 +248,82 @@ Review: https://claude.ai/artifact/Xs4CqLSRPxh6u4VgfZJpko (App Store readiness r
   Ornament (red, gold glitter band and cap, Glass ting, Sleigh bells alarm), Pumpkin spice (ribs, stem, cinnamon,
   Leaf thunk). Shown in TestFlight and Xcode builds only; set `GumPalette.seasonsInStore = true` to release them in the App Store. Owner will decide later how to restrict and release each theme.
 - All Pro. Every color has its own app icon (AppIcon-<Name>).
+
+## Sprint 20: ten novelty themes (owner: "build and ship them all", 2026-11-12)
+- Disco (mirror tiles, glitter, bass bwomp), Soap bubble (rainbow film, plip), Planet (bands and ring, whoosh),
+  Basketball (seams, swish), Donut (glaze, sprinkles, boing), Water balloon (knot, splash), Eyeball (iris,
+  squish), Fishbowl (water and a swimming goldfish, blub), Mood ring (blue to green to red as the meeting nears,
+  sparkle), Lava lamp (rising blobs, gloop). Each pops into its own pieces.
+- New "Match the theme" pop sound (default for these). All Pro.
+- Held from the App Store with the holiday themes (shown in TestFlight); owner decides later how to restrict and
+  release each. No app icons yet for these ten (they keep the Bubblegum icon).
+
+## Sprint 21: Soccer and the sports and arcade set (owner: "build them all", 2026-11-12)
+- Soccer (pentagon patches; kick and crowd pop; Whistle alarm), Hockey puck (knurled edge; bar down pop: crossbar
+  ping and a thud on the ice; Skates alarm: blades carving faster, with a goal horn), Tennis ball (fuzz and seams;
+  thwock), Golf ball (dimples; drop into the cup), Baseball (red stitches; crack of the bat), Bowling ball (swirl
+  and finger holes; strike), 8-bit (pixels; arcade coin). All held from the App Store (shown in TestFlight). No
+  "World Cup" anywhere (FIFA's name); the soccer theme can be released around the tournament.
+
+## Sprint 22: twenty more themes, theme gallery, Surprise me (owner: "build and ship it", 2026-11-12)
+- Treats: Gumball machine, Cherry, Orange, Macaron, Cake pop. Nature and space: Earth (turning, clouds), Sun
+  (flickering), Dandelion (seeds), Atom (orbiting electrons), Geode (crystal crack). Fun objects: Ball of yarn, Big
+  red button, Clock (minute hand sweeps to twelve as the meeting nears; rings), Marble, Rubber duck (squeak), Zen
+  stone (soft chime). Seasons: Easter egg, Valentine, Fireworks, Beach ball. Nine new pop sounds.
+- Settings › Bubble › Theme opens a gallery grouped Classic, Pro favorites, Sports and games, Treats, Nature and
+  space, Fun objects, Seasons and holidays; tapping a tile picks it and plays its pop.
+- Surprise me (Pro): a different theme each day when Pop In opens; the app icon stays put.
+- Packs (selling bundles) are a later decision: the gallery groups are ready to become packs.
+- All new themes held from the App Store (shown in TestFlight).
+
+## Sprint 23: theme packs (owner: "do it", 2026-11-12)
+- Five non-consumable packs, $1.99 each (price set in App Store Connect): Sports and games
+  (com.grahamdeno.promptly.pack.sports), Treats (.pack.treats), Nature and space (.pack.space), Fun objects
+  (.pack.objects), Seasons and holidays (.pack.seasons). Pop In Pro ($4.99) still unlocks everything, packs included.
+  Classic is free; Pro favorites (Unicorn, Fortune, Moon, Grenade and friends) come only with Pro.
+- The gallery shows "Get the pack · $1.99" on each group not owned. Restore covers packs. Losing a pack (refund)
+  falls back to Bubblegum if the current theme was in it.
+- Grok creates the five products; held themes (and so packs) stay hidden in the App Store until released.
+
+## Release calendar (owner approved 2026-11-12; Grok acts on nothing until he has felt the themes)
+
+Audience: remote and hybrid workers, about 25 to 45, back-to-back video calls. Calm by default, a little personality.
+
+Principles (owner agreed):
+- Launch small and curated; new themes through the year are the promotion.
+- Pro is everything, forever, including every future theme. Recommendation: Pro only, no packs (the five pack IDs were never created, so nothing is lost).
+- Each theme lands on a Monday ahead of its occasion: about two weeks ahead of days people take off, about ten days ahead of workday events, so users get a full work week with it.
+- At most one "What's new" card a month, covering that month's arrivals; stop cards for anyone who dismisses two in a row. Free users get a one-day Try it. No discounts, timers, pushes or badges.
+- Themes unlock on dates compiled into the app (no network), so drops need no update.
+
+1.0: Free Bubblegum, Coral. Pro Unicorn, Fortune, Gumball, Planet, Soap, Lava lamp, Mood ring, Zen, Fishbowl, Disco, Clock, Marble.
+
+| Release (Mon) | Theme | Occasion |
+|---|---|---|
+| 2026-11-30 | Snowball, Ornament | Christmas season |
+| 2026-12-14 | Fireworks | New Year's Eve |
+| 2027-01-04 | Duck | Rubber Ducky Day, Jan 13 |
+| 2027-02-01 | Valentine, Cake pop | Valentine's Day, Feb 14 |
+| 2027-02-08 | Cherry | Presidents' Day (cherry tree), Feb 15 |
+| 2027-03-01 | Basketball | March Madness (confirm Selection Sunday) |
+| 2027-03-08 | Atom | Pi Day, Mar 14 |
+| 2027-03-15 | Easter egg | Easter, Mar 28 |
+| 2027-03-22 | Baseball | MLB Opening Day (confirm) |
+| 2027-03-29 | Golf | The Masters, Apr 8 to 11 |
+| 2027-04-12 | Earth | Earth Day, Apr 22 |
+| 2027-04-19 | Hockey puck | Stanley Cup playoffs begin (confirm) |
+| 2027-04-26 | Macaron, Dandelion | May Day and Mother's Day, May 9 |
+| 2027-05-17 | Sun, Orange | Memorial Day weekend, May 31 |
+| 2027-05-24 | Donut | National Donut Day, Jun 4 |
+| 2027-06-07 | Beach ball | First day of summer, Jun 21 |
+| 2027-06-14 | Soccer | Women's World Cup opens Jun 24 |
+| 2027-06-21 | Tennis, Water balloon | Wimbledon (confirm); Fourth of July |
+| 2027-07-12 | Moon | Apollo 11 anniversary, Jul 20 |
+| 2027-08-02 | Bowling | National Bowling Day, Aug 14 |
+| 2027-08-23 | Pumpkin spice | Fall flavors, before Labor Day |
+| 2027-08-30 | 8-bit, Arcade button | Video Game Day, Sep 12 |
+| 2027-10-04 | Geode | Earth Science Week |
+| 2027-10-18 | Eyeball | Halloween |
+| 2027-11-01 | Grenade, Yarn | Veterans Day, Nov 11; first cold weeks |
+
+Code needed after approval (Sonnet): per-theme release dates replacing the single seasonsInStore switch; one-day Try it; monthly What's new card with the two-dismissal stop; hide pack UI if Pro only. Icons wait until the themes are refined (owner, 2026-11-12).
