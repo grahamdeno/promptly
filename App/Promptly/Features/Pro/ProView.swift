@@ -9,7 +9,8 @@ struct ProView: View {
     private let features: [(String, String)] = [
         ("sparkles", "Unicorn mode: a rainbow bubble that bursts into confetti"),
         ("moon.stars", "Fortune: black glass, a violet glow and a meeting fortune"),
-        ("bell.and.waves.left.and.right", "More alarm sounds: Popcorn, Chimes and Oracle"),
+        ("moon.circle", "Moon and Grenade themes, each with its own pop"),
+        ("bell.and.waves.left.and.right", "More alarm sounds: Popcorn, Chimes, Oracle and Sonar"),
         ("calendar.badge.clock", "Per-calendar alerts: Alarm, Smart or Gentle"),
         ("clock", "Ring up to 10 minutes early"),
         ("ipad.landscape", "Desk mode: keep the screen on while Pop In is open"),

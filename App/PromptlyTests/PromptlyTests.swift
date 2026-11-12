@@ -276,3 +276,29 @@ final class FortuneTests: XCTestCase {
         XCTAssertTrue(AlarmSoundChoice.oracle.isPro)
     }
 }
+
+final class ThemeTests: XCTestCase {
+    func testSeasonalThemesHeldBack() {
+        XCTAssertFalse(GumPalette.seasonsInStore, "holiday themes stay out of the App Store until released")
+        XCTAssertTrue(GumPalette.available.contains(.moon))
+        XCTAssertTrue(GumPalette.available.contains(.grenade))
+        XCTAssertEqual(GumPalette.available.contains(.ornament), GumPalette.seasonsReady)
+        XCTAssertEqual(PopChoice.available.contains(.glassTing), GumPalette.seasonsReady)
+        XCTAssertEqual(AlarmSoundChoice.available.contains(.sleighBells), GumPalette.seasonsReady)
+        XCTAssertTrue(AlarmSoundChoice.available.contains(.sonar))
+    }
+
+    func testEachThemeHasItsPopAndIsPro() {
+        let prefs = Prefs(defaults: UserDefaults(suiteName: "test-themes-\(UUID().uuidString)")!)
+        let expected: [GumPalette: PopChoice] = [.moon: .bloop, .grenade: .pinPull, .snowball: .crunch, .ornament: .glassTing, .pumpkin: .leafThunk]
+        for (palette, pop) in expected {
+            prefs.gumColor = palette
+            XCTAssertEqual(prefs.popChoice, pop)
+            XCTAssertTrue(palette.isPro)
+            XCTAssertTrue(pop.isPro)
+            XCTAssertNotNil(pop.fileName)
+        }
+        XCTAssertFalse(GumPalette.coral.isPro)
+        XCTAssertFalse(PopChoice.pop.isPro)
+    }
+}

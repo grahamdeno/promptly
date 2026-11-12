@@ -45,7 +45,7 @@ struct SettingsView: View {
                     SettingsLink("Sound", value: model.alarmSound.label) {
                         ChoicePage(title: "Alarm sound",
                                    note: "Tap one to hear it. It starts quietly and gets louder until the meeting starts. Apple's tone rings on the Lock Screen only; while Pop In is open you'll hear Gum pops instead.",
-                                   options: AlarmSoundChoice.allCases, selected: model.alarmSound, label: \.label,
+                                   options: AlarmSoundChoice.available, selected: model.alarmSound, label: \.label,
                                    locked: { $0.isPro && !model.store.isPro }) { choice in
                             model.alarmSound = choice
                             if choice != .appleDefault { AlarmLoop.preview(choice) }
@@ -61,8 +61,8 @@ struct SettingsView: View {
                     colorRow
                     SettingsLink("Pop sound", value: model.popChoice.label) {
                         ChoicePage(title: "Pop sound", note: "What you hear when a bubble pops. Quiet when your phone is on silent.",
-                                   options: PopChoice.allCases, selected: model.popChoice, label: \.label,
-                                   locked: { $0 == .star && !model.store.isPro }) { choice in
+                                   options: PopChoice.available, selected: model.popChoice, label: \.label,
+                                   locked: { $0.isPro && !model.store.isPro }) { choice in
                             model.popChoice = choice
                             PopSound.play()
                         }
@@ -89,7 +89,7 @@ struct SettingsView: View {
 
                 VStack(spacing: 6) {
                     Wordmark()
-                    Text("Reads your calendar. Never changes it. Nothing leaves your phone.")
+                    Text("Reads your calendar. Never changes it.\nNothing leaves your phone.")
                         .font(.footnote)
                         .foregroundStyle(Brand.secondary)
                         .multilineTextAlignment(.center)
@@ -151,8 +151,8 @@ struct SettingsView: View {
     private var colorRow: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Color").font(.body).foregroundStyle(Brand.ink)
-            HStack(spacing: 10) {
-                ForEach(GumPalette.allCases, id: \.self) { palette in
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 4), spacing: 10) {
+                ForEach(GumPalette.available, id: \.self) { palette in
                     let selected = model.gumColor == palette
                     let locked = palette.isPro && !model.store.isPro
                     Button {
@@ -419,6 +419,8 @@ struct SwatchBall: View {
         ZStack {
             Circle().fill(RadialGradient(colors: [palette.light, palette.base, palette.dark],
                                          center: UnitPoint(x: 0.38, y: 0.26), startRadius: 0, endRadius: 30))
+            ThemeMarks(palette: palette, w: 44, h: 44)
+            ThemeTopper(palette: palette, w: 44)
             if palette == .fortune {
                 FortuneRim(lineWidth: 2.5)
                 FourPointStar().fill(.white.opacity(0.9)).frame(width: 10, height: 10).offset(x: 3, y: -6)

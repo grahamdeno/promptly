@@ -279,15 +279,18 @@ struct BubbleView: View {
                 let side = width * scrap.size
                 let fallScale: CGFloat = 1.25
                 Group {
-                    if GumPalette.current == .fortune {
+                    if ThemeDebris.handles(GumPalette.current) {
+                        ThemeDebris.piece(GumPalette.current, index: i, side: side)
+                    } else if GumPalette.current == .fortune {
                         // Fortune: puffs of violet mist and little star sparks.
                         if i % 3 == 0 {
-                            FourPointStar().fill(i % 2 == 0 ? Color.white : GumPalette.rgb(0xFFD66B))
-                                .frame(width: max(16, side * 0.35), height: max(16, side * 0.35))
+                            FourPointStar().fill(i % 2 == 0 ? GumPalette.violetDeep : GumPalette.rgb(0xF5B82E))
+                                .frame(width: max(26, side * 0.55), height: max(26, side * 0.55))
+                                .shadow(color: GumPalette.violet.opacity(0.6), radius: 6)
                         } else {
-                            Circle().fill(GumPalette.violet.opacity(0.45))
-                                .frame(width: side * 1.2, height: side * 1.2)
-                                .blur(radius: side * 0.3)
+                            Circle().fill(GumPalette.violet.opacity(0.65))
+                                .frame(width: side * 1.3, height: side * 1.3)
+                                .blur(radius: side * 0.22)
                         }
                     } else if GumPalette.current == .unicorn {
                         if Self.unicornSlots.contains(i) {
@@ -465,6 +468,7 @@ struct GumBubbleShape: View {
                     }
                     .clipShape(Ellipse())
                 }
+                ThemeMarks(palette: GumPalette.current, w: w, h: h)
                 if GumPalette.current == .fortune {
                     // Fortune: a soft star of light drifts slowly inside the black glass.
                     TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion || ScreenshotMode.isOn)) { ctx in
@@ -528,6 +532,7 @@ struct GumBubbleShape: View {
                         .mask(Ellipse())
                     }
                 }
+                ThemeTopper(palette: GumPalette.current, w: w, h: h)
             }
             .shadow(color: GumColors.accent.opacity(GumPalette.current == .fortune ? 0.45 : 0.3),
                     radius: GumPalette.current == .fortune ? 40 : 30, y: -12)
@@ -552,15 +557,4 @@ struct ConfettiPiece: View {
 extension Array {
     /// Safe lookup: nil when out of range.
     func at(_ i: Int) -> Element? { indices.contains(i) ? self[i] : nil }
-}
-
-/// A tiny repeatable random source, so the sprinkles land the same way every pop.
-struct SeededRandom {
-    private var state: UInt64
-    init(seed: UInt64) { state = seed &* 0x9E3779B97F4A7C15 | 1 }
-    /// 0..<1
-    mutating func next() -> Double {
-        state ^= state << 13; state ^= state >> 7; state ^= state << 17
-        return Double(state % 1_000_000) / 1_000_000
-    }
 }
