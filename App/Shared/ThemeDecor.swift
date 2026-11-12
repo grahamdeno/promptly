@@ -278,19 +278,30 @@ struct ThemeMarks: View {
                     } }
                 }
             case .gumball:
-                // Little gumballs filling the glass.
-                Canvas { ctx, size in
-                    var rng = SeededRandom(seed: 3)
-                    let r = size.width * 0.05
-                    let colors: [Color] = [GumPalette.rgb(0xFF5A5A), GumPalette.rgb(0xFFD43B), GumPalette.rgb(0x3DA5FF), GumPalette.rgb(0x3DDC97), GumPalette.rgb(0xFF7FB0), .white]
-                    var y = size.height * 0.98
-                    while y > size.height * 0.32 {
-                        var x = rng.next() * r
-                        while x < size.width {
-                            ctx.fill(Path(ellipseIn: CGRect(x: x, y: y - r * 2, width: r * 2, height: r * 2)), with: .color(colors[Int(rng.next() * 6) % 6]))
-                            x += r * 2.05
+                // Little gumballs filling the glass. From about ten minutes out they jostle silently,
+                // more and more as the meeting nears and on past the start.
+                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion || level < 0.7)) { tl in
+                    let t = reduceMotion || level < 0.7 ? 0 : tl.date.timeIntervalSinceReferenceDate
+                    let shake = level < 0.7 ? 0 : min(1, (level - 0.7) / 0.3)
+                    Canvas { ctx, size in
+                        var rng = SeededRandom(seed: 3)
+                        let r = size.width * 0.05
+                        let colors: [Color] = [GumPalette.rgb(0xFF5A5A), GumPalette.rgb(0xFFD43B), GumPalette.rgb(0x3DA5FF), GumPalette.rgb(0x3DDC97), GumPalette.rgb(0xFF7FB0), .white]
+                        var y = size.height * 0.98
+                        var k = 0.0
+                        while y > size.height * 0.32 {
+                            var x = rng.next() * r
+                            while x < size.width {
+                                // Looser toward the top, where the balls have room to move.
+                                let free = 0.4 + 0.6 * (1 - y / size.height)
+                                let dx = r * 0.35 * shake * free * sin(t * (7 + k.truncatingRemainder(dividingBy: 5)) + k)
+                                let dy = r * 0.3 * shake * free * abs(sin(t * (5.5 + k.truncatingRemainder(dividingBy: 3)) + k * 1.7))
+                                ctx.fill(Path(ellipseIn: CGRect(x: x + dx, y: y - r * 2 - dy, width: r * 2, height: r * 2)), with: .color(colors[Int(rng.next() * 6) % 6]))
+                                x += r * 2.05
+                                k += 1
+                            }
+                            y -= r * 1.8
                         }
-                        y -= r * 1.8
                     }
                 }
             case .orange:
@@ -306,20 +317,31 @@ struct ThemeMarks: View {
                 HStack(spacing: 0) { ForEach(0..<24, id: \.self) { _ in Circle().fill(palette.dark.opacity(0.25)).frame(width: w / 24, height: w / 24) } }
                     .frame(width: w).position(x: w / 2, y: h * 0.57)
             case .cakePop:
-                Canvas { ctx, size in
-                    var rng = SeededRandom(seed: 12)
-                    let colors: [Color] = [.white, GumPalette.rgb(0x3DA5FF), GumPalette.rgb(0xFFD43B), GumPalette.rgb(0x3DDC97), GumPalette.rgb(0x9B5CFF)]
-                    for _ in 0..<60 {
-                        var p = Path(roundedRect: CGRect(x: 0, y: 0, width: size.width * 0.035, height: size.width * 0.012), cornerRadius: 2)
-                        p = p.applying(CGAffineTransform(rotationAngle: rng.next() * 3.14).concatenating(CGAffineTransform(translationX: rng.next() * size.width, y: rng.next() * size.height * 0.7)))
-                        ctx.fill(p, with: .color(colors[Int(rng.next() * 5) % 5]))
+                // Sprinkles that glisten, each catching the light in turn.
+                TimelineView(.animation(minimumInterval: 1.0 / 20, paused: reduceMotion)) { tl in
+                    let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
+                    Canvas { ctx, size in
+                        var rng = SeededRandom(seed: 12)
+                        let colors: [Color] = [.white, GumPalette.rgb(0x3DA5FF), GumPalette.rgb(0xFFD43B), GumPalette.rgb(0x3DDC97), GumPalette.rgb(0x9B5CFF)]
+                        for k in 0..<60 {
+                            let angle = rng.next() * 3.14, px = rng.next() * size.width, py = rng.next() * size.height * 0.7
+                            let move = CGAffineTransform(rotationAngle: angle).concatenating(CGAffineTransform(translationX: px, y: py))
+                            let p = Path(roundedRect: CGRect(x: 0, y: 0, width: size.width * 0.035, height: size.width * 0.012), cornerRadius: 2).applying(move)
+                            ctx.fill(p, with: .color(colors[Int(rng.next() * 5) % 5]))
+                            let glint = max(0, sin(t * 1.8 + Double(k) * 2.39))
+                            if glint > 0.75 {
+                                ctx.fill(p, with: .color(.white.opacity((glint - 0.75) * 3.2)))
+                                let g = size.width * 0.03 * (glint - 0.75) * 4
+                                ctx.fill(Path(ellipseIn: CGRect(x: px - g / 2, y: py - g / 2, width: g, height: g)), with: .color(.white.opacity(0.7 * (glint - 0.75) * 4)))
+                            }
+                        }
                     }
                 }
             case .earth:
                 // Continents drifting with the turn, and clouds.
                 TimelineView(.animation(minimumInterval: 1.0 / 15, paused: reduceMotion)) { ctx in
                     let t = reduceMotion ? 0 : ctx.date.timeIntervalSinceReferenceDate
-                    let shift = CGFloat((t / 40).truncatingRemainder(dividingBy: 1))
+                    let shift = CGFloat((t / 16).truncatingRemainder(dividingBy: 1))
                     ZStack {
                         ForEach(0..<6, id: \.self) { i in
                             let x = (CGFloat(i) * 0.37 + shift).truncatingRemainder(dividingBy: 1.4) - 0.2
@@ -334,14 +356,20 @@ struct ThemeMarks: View {
                     .blur(radius: max(1, w * 0.006))
                 }
             case .sun:
-                TimelineView(.animation(minimumInterval: 1.0 / 15, paused: reduceMotion)) { ctx in
+                // Hot spots carried round as the sun turns, flaring as they go.
+                TimelineView(.animation(minimumInterval: 1.0 / 20, paused: reduceMotion)) { ctx in
                     let t = reduceMotion ? 0 : ctx.date.timeIntervalSinceReferenceDate
+                    let turn = (t / 14).truncatingRemainder(dividingBy: 1)
                     ZStack {
-                        ForEach(0..<7, id: \.self) { i in
+                        ForEach(0..<8, id: \.self) { i in
                             let d = Double(i)
-                            Circle().fill(GumPalette.rgb(0xFF7A1A).opacity(0.35 + 0.15 * sin(t * 0.8 + d)))
-                                .frame(width: w * 0.22, height: w * 0.22)
-                                .position(x: w * (0.2 + 0.1 * d), y: h * (0.3 + 0.08 * CGFloat(i % 3) + 0.03 * sin(t / 2 + d)))
+                            // Each spot travels left to right across the face and wraps round the back.
+                            let u = (d / 8 + turn).truncatingRemainder(dividingBy: 1)
+                            let x = 0.5 - 0.5 * cos(u * 2 * .pi)
+                            let facing = sin(u * 2 * .pi)
+                            Circle().fill(GumPalette.rgb(0xFF7A1A).opacity(facing > 0 ? (0.3 + 0.2 * sin(t * 0.8 + d)) * facing : 0))
+                                .frame(width: w * 0.22 * CGFloat(0.5 + 0.5 * facing), height: w * 0.22)
+                                .position(x: w * CGFloat(x), y: h * (0.25 + 0.09 * CGFloat(i % 5)))
                         }
                     }
                     .blur(radius: max(4, w * 0.04))
@@ -533,7 +561,7 @@ struct ThemeMarks: View {
                     let x = size.width * CGFloat(0.26 + 0.12 * d + 0.04 * sin(t / 3 + d))
                     let y = size.height * CGFloat(0.88 - 0.68 * rise)
                     let stretch = CGFloat(1 + 0.45 * speed)
-                    l.fill(Path(ellipseIn: CGRect(x: x - r / stretch, y: y - r * stretch, width: 2 * r / stretch, height: 2 * r * stretch))),
+                    l.fill(Path(ellipseIn: CGRect(x: x - r / stretch, y: y - r * stretch, width: 2 * r / stretch, height: 2 * r * stretch)),
                            with: .color(.black))
                 }
             }
