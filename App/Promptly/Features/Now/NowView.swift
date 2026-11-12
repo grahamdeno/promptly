@@ -44,18 +44,23 @@ struct NowView: View {
                         .foregroundStyle(Brand.secondary)
                 }
                 .glassCard()
+                .frame(maxWidth: 680, alignment: .leading)
                 .overlay(alignment: .bottomLeading) {
-                    Button("Not going") {
+                    Button {
                         pops += 1
                         model.clear(meeting)
                         leave {}
+                    } label: {
+                        Text("Not going")
+                            .font(.subheadline.weight(.medium))
+                            .foregroundStyle(Brand.ink)
+                            .padding(.horizontal, 20)
+                            .frame(minHeight: 48)
+                            .contentShape(Capsule())
                     }
-                    .font(.subheadline.weight(.medium))
-                    .foregroundStyle(Brand.ink)
-                    .padding(.horizontal, 18)
-                    .frame(minHeight: 44)
+                    .buttonStyle(.plain)
                     .glassEffect(.regular, in: .capsule)
-                    .offset(y: 56)
+                    .offset(y: 60)
                 }
                 .padding(.horizontal, 12)
                 .padding(.top, 60)

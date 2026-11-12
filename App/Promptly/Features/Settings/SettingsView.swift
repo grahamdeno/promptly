@@ -100,7 +100,7 @@ struct SettingsView: View {
             HStack(spacing: 14) {
                 GumBall().frame(width: 36, height: 36)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Pop In Pro").font(.body.weight(.semibold)).foregroundStyle(Brand.ink)
+                    Text("Pop In Pro").font(.body.weight(.semibold)).foregroundStyle(Brand.ink).fixedSize(horizontal: false, vertical: true)
                     Text(model.store.isPro ? "Unlocked" : "Unicorn mode, more sounds, desk mode")
                         .font(.footnote).foregroundStyle(Brand.secondary)
                 }
@@ -248,14 +248,27 @@ struct SettingsLink<Destination: View>: View {
         self.destination = destination
     }
 
+    @Environment(\.dynamicTypeSize) private var typeSize
+
     var body: some View {
         NavigationLink(destination: destination) {
             HStack(spacing: 10) {
-                Text(title).font(.body).foregroundStyle(Brand.ink)
-                Spacer(minLength: 12)
-                Text(value).font(.body).foregroundStyle(Brand.secondary).lineLimit(1)
+                // Large text: the answer goes under the title, so neither breaks mid-word.
+                if typeSize.isAccessibilitySize {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(title).font(.body).foregroundStyle(Brand.ink)
+                        Text(value).font(.body).foregroundStyle(Brand.secondary)
+                    }
+                    .fixedSize(horizontal: false, vertical: true)
+                    Spacer(minLength: 8)
+                } else {
+                    Text(title).font(.body).foregroundStyle(Brand.ink).layoutPriority(1)
+                    Spacer(minLength: 12)
+                    Text(value).font(.body).foregroundStyle(Brand.secondary).lineLimit(1).fixedSize()
+                }
                 Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(Brand.secondary.opacity(0.6))
             }
+            .padding(.vertical, 8)
             .frame(minHeight: 52)
             .contentShape(Rectangle())
         }
@@ -345,7 +358,7 @@ struct ChoicePage<T: Hashable>: View {
                         HStack {
                             Text(label(option)).font(.body).foregroundStyle(Brand.ink)
                             if isLocked {
-                                Text("Pro").font(.caption.weight(.semibold)).foregroundStyle(Brand.coralDark)
+                                Text("Pro").font(.caption.weight(.semibold)).foregroundStyle(Brand.accentText)
                                     .padding(.horizontal, 8).padding(.vertical, 3)
                                     .background(Capsule().fill(Brand.coralLight.opacity(0.5)))
                             }

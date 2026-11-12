@@ -77,3 +77,4 @@ Pro choices marked and open the Pro sheet, never a dead end.
 
 | Date | Commit | Result |
 |---|---|---|
+| Nov 11 | 7421ca1 | First walk, 4 configs, 36 journeys. Found UX-1 to UX-11 (findings.md), led by first run blocked at large text. |

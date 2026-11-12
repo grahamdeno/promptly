@@ -7,6 +7,8 @@ enum Brand {
     static let ink = Color(red: 0x14 / 255, green: 0x14 / 255, blue: 0x14 / 255)
     /// 8:1 on white; stays readable on the glass pane over the bubble.
     static let secondary = Color(red: 0x4A / 255, green: 0x4A / 255, blue: 0x4A / 255)
+    /// Pink for small words on white (links, labels): the bubble pinks are too light to read at small sizes.
+    static let accentText = Color(red: 0xB0 / 255, green: 0x2E / 255, blue: 0x68 / 255)
     static let hairline = Color(red: 0xEF / 255, green: 0xEF / 255, blue: 0xEF / 255)
 
     static func display(_ size: CGFloat, _ weight: Font.Weight = .semibold) -> Font {
@@ -58,8 +60,10 @@ struct PrimaryButtonStyle: ButtonStyle {
         configuration.label
             .font(.callout.weight(.semibold))
             .foregroundStyle(.white)
+            .multilineTextAlignment(.center)
             .padding(.horizontal, 22)
-            .frame(height: height)
+            .padding(.vertical, 10)
+            .frame(minHeight: height)
             .frame(maxWidth: .infinity)
             .background(Capsule().fill(Brand.ink))
             .opacity(configuration.isPressed ? 0.8 : 1)
@@ -74,8 +78,10 @@ struct SecondaryButtonStyle: ButtonStyle {
         configuration.label
             .font(.callout.weight(.medium))
             .foregroundStyle(Brand.ink)
+            .multilineTextAlignment(.center)
             .padding(.horizontal, 22)
-            .frame(height: height)
+            .padding(.vertical, 8)
+            .frame(minHeight: height)
             .frame(maxWidth: fill ? .infinity : nil)
             .background(Capsule().fill(Brand.ink.opacity(0.07)))
             .opacity(configuration.isPressed ? 0.7 : 1)

@@ -105,8 +105,9 @@ struct HomeView: View {
                     Text(Countdown.time(item.start))
                         .lineLimit(1)
                         .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(Brand.coralDark)
-                        .frame(width: 72, alignment: .leading)
+                        .foregroundStyle(Brand.accentText)
+                        .fixedSize()
+                        .frame(minWidth: 72, alignment: .leading)
                     Text(item.title)
                         .font(.body)
                         .foregroundStyle(Brand.ink)
@@ -135,7 +136,7 @@ struct HomeView: View {
     private func meetingBlock(_ meeting: Meeting, now: Date, then: Meeting?) -> some View {
         let parts = Countdown.parts(now: now, start: meeting.start)
         let started = meeting.start <= now
-        let label = [started ? "Happening now" : "Next", meeting.service?.rawValue].compactMap { $0 }.joined(separator: " · ")
+        let label = isDemo(meeting) ? "Practice" : [started ? "Happening now" : "Next", meeting.service?.rawValue].compactMap { $0 }.joined(separator: " · ")
         return VStack(alignment: .leading, spacing: 22) {
             VStack(alignment: .leading, spacing: 20) {
                 VStack(alignment: .leading, spacing: 0) {
@@ -149,26 +150,29 @@ struct HomeView: View {
                         .foregroundStyle(Brand.ink)
                         .lineLimit(4)
                         .fixedSize(horizontal: false, vertical: true)
-                    HStack(alignment: .lastTextBaseline, spacing: 8) {
-                        Text(parts.big)
-                            .font(.system(size: countSize, weight: .medium))
-                            .tracking(-2.5)
-                            .monospacedDigit()
-                            .contentTransition(.numericText())
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.5)
-                        if !parts.unit.isEmpty {
-                            Text(parts.unit)
-                                .font(.system(size: unitSize, weight: .medium))
-                                .foregroundStyle(Brand.secondary)
+                    if !isDemo(meeting) {
+                        HStack(alignment: .lastTextBaseline, spacing: 8) {
+                            Text(parts.big)
+                                .font(.system(size: countSize, weight: .medium))
+                                .tracking(-2.5)
+                                .monospacedDigit()
+                                .contentTransition(.numericText())
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.5)
+                            if !parts.unit.isEmpty {
+                                Text(parts.unit)
+                                    .font(.system(size: unitSize, weight: .medium))
+                                    .foregroundStyle(Brand.secondary)
+                            }
                         }
+                        .foregroundStyle(Brand.ink)
+                        .padding(.top, 28)
                     }
-                    .foregroundStyle(Brand.ink)
-                    .padding(.top, 28)
-                    Text(Countdown.span(meeting, now: now))
+                    Text(isDemo(meeting) ? "Practice: pop the bubble below." : Countdown.span(meeting, now: now))
                         .font(.callout)
                         .foregroundStyle(Brand.secondary)
-                        .padding(.top, 6)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.top, isDemo(meeting) ? 20 : 6)
                 }
                 .accessibilityElement(children: .combine)
                 .accessibilityAction(named: meeting.joinURL == nil ? "Clear" : "Join") {
@@ -181,24 +185,33 @@ struct HomeView: View {
                         .foregroundStyle(Brand.ink)
                         .transition(.opacity)
                 }
-                Button("Not going") { model.clear(meeting) }
-                    .font(.subheadline.weight(.medium))
-                    .foregroundStyle(Brand.secondary)
-                    .underline()
-                    .frame(minHeight: 44)
+                Button { model.clear(meeting) } label: {
+                    Text(isDemo(meeting) ? "Skip" : "Not going")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(Brand.secondary)
+                        .underline()
+                        .padding(.vertical, 12)
+                        .padding(.trailing, 16)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .padding(.vertical, -8)
             }
             .padding(.vertical, 8)
             .glassCard()
 
             if let then {
                 Text("Then \(Countdown.time(then.start, now: now)), \(then.title)")
-                    .font(.subheadline)
-                    .foregroundStyle(Brand.secondary)
-                    .lineLimit(2)
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(Brand.ink.opacity(0.85))
+                    .fixedSize(horizontal: false, vertical: true)
                     .padding(.horizontal, 20)
             }
         }
     }
+
+    /// The "Try a pop" practice meeting: no countdown to wait for, just pop it.
+    private func isDemo(_ meeting: Meeting) -> Bool { meeting.eventID == "demo" }
 
     private var emptyBlock: some View {
         VStack(alignment: .leading, spacing: 12) {

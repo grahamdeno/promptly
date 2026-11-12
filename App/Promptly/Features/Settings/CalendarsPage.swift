@@ -86,16 +86,21 @@ struct CalendarsList: View {
                 .buttonStyle(.plain)
                 .accessibilityLabel("\(group.source), \(on) of \(group.calendars.count) calendars on")
                 .accessibilityHint(open ? "Folds the list" : "Shows the calendars")
-                Button(allOn ? "Turn all off" : "Turn all on") {
+                Button {
                     var disabled = model.disabledCalendarIDs
                     for cal in group.calendars {
                         if allOn { disabled.insert(cal.id) } else { disabled.remove(cal.id) }
                     }
                     model.disabledCalendarIDs = disabled
+                } label: {
+                    Text(allOn ? "Turn all off" : "Turn all on")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(Brand.accentText)
+                        .padding(.vertical, 12)
+                        .padding(.leading, 12)
+                        .contentShape(Rectangle())
                 }
-                .font(.subheadline.weight(.medium))
-                .foregroundStyle(Brand.coralDark)
-                .frame(minHeight: 44)
+                .buttonStyle(.plain)
             }
             if open {
                 ForEach(group.calendars) { cal in
@@ -119,7 +124,7 @@ struct CalendarsList: View {
         return HStack(alignment: .center, spacing: 12) {
             Circle().fill(Brand.color(hex: calendar.colorHex)).frame(width: 12, height: 12)
             VStack(alignment: .leading, spacing: 2) {
-                Text(calendar.title).font(.body).foregroundStyle(Brand.ink)
+                Text(calendar.title).font(.body).foregroundStyle(Brand.ink).fixedSize(horizontal: false, vertical: true)
                 if isOn.wrappedValue {
                     Menu {
                         Picker("Alerts", selection: Binding(get: { rule }, set: { new in
@@ -135,8 +140,10 @@ struct CalendarsList: View {
                             Image(systemName: "chevron.up.chevron.down").font(.caption2)
                         }
                         .font(.footnote.weight(.medium))
-                        .foregroundStyle(Brand.coralDark)
-                        .frame(minHeight: 28)
+                        .foregroundStyle(Brand.accentText)
+                        .frame(minHeight: 32)
+                        .padding(.trailing, 24)
+                        .contentShape(Rectangle())
                     }
                     .accessibilityLabel("\(calendar.title) alerts: \(ruleText(rule))")
                 } else {

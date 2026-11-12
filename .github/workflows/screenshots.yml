@@ -96,6 +96,13 @@ jobs:
                   shutil.copy(os.path.join(raw, a["exportedFileName"]), os.path.join(dest, out))
                   print("saved", out)
           EOF
+          # The simulator stores landscape iPad pictures sideways; turn them upright (2752 x 2064).
+          if [ "${{ matrix.family }}" = "iPad" ]; then
+            for f in shots/*.png; do
+              w=$(sips -g pixelWidth "$f" | awk '/pixelWidth/{print $2}'); h=$(sips -g pixelHeight "$f" | awk '/pixelHeight/{print $2}')
+              [ "$h" -gt "$w" ] && sips -r 270 "$f" >/dev/null
+            done
+          fi
           ls -la shots
 
       - name: Upload screenshots

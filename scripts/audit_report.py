@@ -31,6 +31,8 @@ def sheet(config, journey, folder, shots):
         if not os.path.exists(p):
             continue
         im = Image.open(p).convert("RGB")
+        if config == "ipad" and im.height > im.width:
+            im = im.rotate(90, expand=True)   # the simulator stores landscape iPad pictures sideways
         im = im.resize((w, int(im.height * w / im.width)))
         thumbs.append((s, im))
     if not thumbs:
