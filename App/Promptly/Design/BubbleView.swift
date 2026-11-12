@@ -170,7 +170,7 @@ struct BubbleView: View {
                 let grow = CGFloat(min(1, max(0, (overdueStep - bud.startsAt) / 30)))
                 let side = width * bud.size * max(0.001, grow) * (1 + mergeProgress * 0.8)
                 GumBubbleShape(thinness: 0.6 + 0.3 * Double(grow),
-                               tint: GumPalette.current == .unicorn ? GumPalette.rainbow.at(i + 1) : nil)
+                               tint: nil)
                     .frame(width: side, height: side * 1.05)
                     .position(x: width * bud.x, y: height * bud.y)
                     .opacity(grow > 0 ? Double(1 - mergeProgress) : 0)
@@ -371,7 +371,7 @@ struct ScrapShape: Shape {
 struct GumBubbleShape: View {
     /// 0 when small and thick, 1 when fully stretched.
     var thinness: Double
-    /// Unicorn buds each take one rainbow color.
+    /// Overrides the gum's main color.
     var tint: Color? = nil
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -381,25 +381,17 @@ struct GumBubbleShape: View {
             let h = geo.size.height
             let streak = min(26, max(5, w * 0.03))
             ZStack {
+                // Solid, saturated gum with a soft lit side (Unicorn uses the same pink gum).
+                Ellipse()
+                    .fill(RadialGradient(colors: [GumColors.light, tint ?? GumColors.coral, GumColors.dark],
+                                         center: UnitPoint(x: 0.36, y: 0.24), startRadius: 0, endRadius: max(w, h) * 0.78))
                 if GumPalette.current == .unicorn {
-                    // Unicorn: a pastel rainbow film whose sheen drifts slowly around the bubble.
-                    if let tint {
-                        Ellipse().fill(RadialGradient(colors: [.white, tint], center: UnitPoint(x: 0.36, y: 0.24),
-                                                      startRadius: 0, endRadius: max(w, h) * 0.8))
-                    } else {
-                        TimelineView(.animation(minimumInterval: 1.0 / 20, paused: reduceMotion)) { ctx in
-                            let angle = reduceMotion ? 0 : ctx.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 45) * 8
-                            Ellipse().fill(AngularGradient(colors: GumPalette.rainbow + [GumPalette.rainbow[0]], center: .center,
-                                                           angle: .degrees(angle)))
-                        }
-                        Ellipse().fill(RadialGradient(colors: [.white.opacity(0.75), .white.opacity(0)],
-                                                      center: UnitPoint(x: 0.36, y: 0.24), startRadius: 0, endRadius: max(w, h) * 0.55))
+                    // Unicorn: a holographic rainbow band slides slowly across the gum.
+                    TimelineView(.animation(minimumInterval: 1.0 / 20, paused: reduceMotion)) { ctx in
+                        let t = ctx.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 9) / 9
+                        UnicornSheen(phase: reduceMotion ? 0.5 : t)
                     }
-                } else {
-                    // Solid, saturated gum with a soft lit side.
-                    Ellipse()
-                        .fill(RadialGradient(colors: [GumColors.light, tint ?? GumColors.coral, GumColors.dark],
-                                             center: UnitPoint(x: 0.36, y: 0.24), startRadius: 0, endRadius: max(w, h) * 0.78))
+                    .clipShape(Ellipse())
                 }
                 // Depth: the edge falls into shadow, strongest at the lower right.
                 Ellipse()
@@ -431,13 +423,16 @@ struct GumBubbleShape: View {
                     .trim(from: 0.84, to: 0.97)
                     .stroke(.white.opacity(0.35 + thinness * 0.15), style: StrokeStyle(lineWidth: max(2, w * 0.006), lineCap: .round))
                     .padding(w * 0.012)
+                if GumPalette.current == .unicorn {
+                    UnicornRim(lineWidth: max(2.5, w * 0.008))
+                }
             }
             .shadow(color: GumColors.coral.opacity(0.3), radius: 30, y: -12)
         }
     }
 }
 
-/// Unicorn confetti: stars, hearts, sparkles and dots in the pastel rainbow.
+/// Unicorn confetti: stars, hearts, sparkles and dots in the rainbow.
 struct ConfettiPiece: View {
     var index: Int
     private static let symbols = ["star.fill", "heart.fill", "sparkle", "circle.fill"]

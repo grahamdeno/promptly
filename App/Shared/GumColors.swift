@@ -11,8 +11,9 @@ enum GumPalette: String, CaseIterable, Sendable {
 
     var isPro: Bool { self == .unicorn }
 
-    /// Unicorn mode's pastel rainbow: pink, lilac, sky, mint, lemon.
-    static let rainbow: [Color] = [rgb(0xFFB3D9), rgb(0xD7B8FF), rgb(0xAEDBFF), rgb(0xB5F2D6), rgb(0xFFF0A8)]
+    /// Unicorn mode's rainbow, strong enough to read on white: tangerine, lemon, mint, sky, violet.
+    /// Used for the sheen and rim on the pink bubble, and for the confetti.
+    static let rainbow: [Color] = [rgb(0xFF8A3D), rgb(0xFFD43B), rgb(0x3DDC97), rgb(0x3DA5FF), rgb(0x9B5CFF)]
 
     var label: String {
         switch self {
@@ -30,7 +31,7 @@ enum GumPalette: String, CaseIterable, Sendable {
         switch self {
         case .bubblegum: Self.rgb(0xFF7FB0)
         case .coral: Self.rgb(0xE8553A)
-        case .unicorn: Self.rgb(0xC9A7FF)
+        case .unicorn: Self.rgb(0xFF7FB0)
         }
     }
 
@@ -38,7 +39,7 @@ enum GumPalette: String, CaseIterable, Sendable {
         switch self {
         case .bubblegum: Self.rgb(0xFFD3E5)
         case .coral: Self.rgb(0xFFB8A0)
-        case .unicorn: Self.rgb(0xFFF4FB)
+        case .unicorn: Self.rgb(0xFFD3E5)
         }
     }
 
@@ -46,7 +47,7 @@ enum GumPalette: String, CaseIterable, Sendable {
         switch self {
         case .bubblegum: Self.rgb(0xE04F8C)
         case .coral: Self.rgb(0xC8361C)
-        case .unicorn: Self.rgb(0xE07AC0)
+        case .unicorn: Self.rgb(0xD0508A)
         }
     }
 
@@ -71,14 +72,12 @@ struct GumBall: View {
         GeometryReader { geo in
             let s = geo.size.width
             ZStack {
+                Ellipse()
+                    .fill(RadialGradient(colors: [GumColors.light, GumColors.coral, GumColors.dark],
+                                         center: UnitPoint(x: 0.38, y: 0.26), startRadius: 0, endRadius: s * 0.8))
                 if GumPalette.current == .unicorn {
-                    Ellipse().fill(AngularGradient(colors: GumPalette.rainbow + [GumPalette.rainbow[0]], center: .center))
-                    Ellipse().fill(RadialGradient(colors: [.white.opacity(0.7), .white.opacity(0)],
-                                                  center: UnitPoint(x: 0.38, y: 0.26), startRadius: 0, endRadius: s * 0.6))
-                } else {
-                    Ellipse()
-                        .fill(RadialGradient(colors: [GumColors.light, GumColors.coral, GumColors.dark],
-                                             center: UnitPoint(x: 0.38, y: 0.26), startRadius: 0, endRadius: s * 0.8))
+                    UnicornSheen(phase: 0.5).clipShape(Ellipse())
+                    UnicornRim(lineWidth: max(1.5, s * 0.04))
                 }
                 Ellipse()
                     .fill(.white.opacity(0.5))
@@ -89,5 +88,35 @@ struct GumBall: View {
         }
         .aspectRatio(1, contentMode: .fit)
         .accessibilityHidden(true)
+    }
+}
+
+/// Unicorn mode's holographic band: a soft diagonal rainbow that slides across the pink gum. `phase` 0...1 moves it
+/// from the upper left to the lower right.
+struct UnicornSheen: View {
+    var phase: Double
+
+    var body: some View {
+        let c = GumPalette.rainbow
+        let mid = -0.35 + phase * 1.7
+        func stop(_ color: Color, _ offset: Double, _ opacity: Double) -> Gradient.Stop {
+            .init(color: color.opacity(opacity), location: min(1, max(0, mid + offset)))
+        }
+        return LinearGradient(stops: [
+            stop(c[1], -0.24, 0), stop(c[0], -0.16, 0.42), stop(c[1], -0.08, 0.5), stop(c[2], 0, 0.46),
+            stop(c[3], 0.08, 0.5), stop(c[4], 0.16, 0.42), stop(c[4], 0.24, 0),
+        ], startPoint: UnitPoint(x: 0, y: 0.15), endPoint: UnitPoint(x: 1, y: 0.85))
+    }
+}
+
+/// A thin rainbow edge so the unicorn bubble keeps a crisp outline against white.
+struct UnicornRim: View {
+    var lineWidth: CGFloat
+
+    var body: some View {
+        Ellipse()
+            .strokeBorder(AngularGradient(colors: GumPalette.rainbow + [GumPalette.rainbow[0]], center: .center,
+                                          angle: .degrees(-60)), lineWidth: lineWidth)
+            .opacity(0.9)
     }
 }
