@@ -211,7 +211,7 @@ Review: https://claude.ai/artifact/Xs4CqLSRPxh6u4VgfZJpko (App Store readiness r
 - Owner: leave the EU out of availability for now (no DSA trader declaration). Not submitting yet; phone checks after
   this build. Still version 1.0 (not submitted), so the newer 1.0 build replaces 1024 on the version.
 
-## Next: Fortune theme (Pro), first update after 1.0 (owner chose 2026-11-12)
+## Fortune theme (Pro), built 2026-11-12 for the first update after 1.0 (PR: feature/fortune)
 - Look: mockup B ("Obsidian") without the round window (that's the Magic 8 Ball's mark; Mattel owns name and look).
   Black glass ball, violet edge glow that slowly circles, a soft star drifting inside. Buds: small black spheres
   with their own glow. Violet accent replaces pink; violet wordmark dot. Indigo app icon with the black ball.

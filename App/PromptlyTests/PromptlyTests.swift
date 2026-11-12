@@ -251,3 +251,28 @@ final class CalendarGroupsTests: XCTestCase {
         XCTAssertEqual(AlarmLoop.volume(now: start, start: start), 1)
     }
 }
+
+final class FortuneTests: XCTestCase {
+    func testFortyFortunesAndStablePick() {
+        XCTAssertEqual(Fortunes.all.count, 40)
+        XCTAssertEqual(Fortunes.fortune(for: "abc@123"), Fortunes.fortune(for: "abc@123"))
+        let picks = Set((0..<200).map { Fortunes.fortune(for: "meeting-\($0)") })
+        XCTAssertGreaterThan(picks.count, 20, "picks should spread across the list")
+        XCTAssertFalse(Fortunes.all.contains { $0.contains("\u{2014}") }, "no em-dashes")
+    }
+
+    func testShowsOnlyInLastTenMinutes() {
+        let start = Date(timeIntervalSince1970: 50_000)
+        XCTAssertFalse(Fortunes.shows(start: start, now: start.addingTimeInterval(-11 * 60)))
+        XCTAssertTrue(Fortunes.shows(start: start, now: start.addingTimeInterval(-9 * 60)))
+        XCTAssertFalse(Fortunes.shows(start: start, now: start.addingTimeInterval(1)))
+    }
+
+    func testFortuneDefaultsToStarPop() {
+        let prefs = Prefs(defaults: UserDefaults(suiteName: "test-fortune-\(UUID().uuidString)")!)
+        prefs.gumColor = .fortune
+        XCTAssertEqual(prefs.popChoice, .star)
+        XCTAssertTrue(GumPalette.fortune.isPro)
+        XCTAssertTrue(AlarmSoundChoice.oracle.isPro)
+    }
+}

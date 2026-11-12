@@ -19,7 +19,7 @@ struct MeetingCountdownActivity: Widget {
         ActivityConfiguration(for: AlarmAttributes<MeetingAlarmMetadata>.self) { context in
             LockScreenCard(state: context.state, meta: context.attributes.metadata)
                 .activityBackgroundTint(Color.white.opacity(0.92))
-                .activitySystemActionForegroundColor(GumColors.coral)
+                .activitySystemActionForegroundColor(GumColors.accent)
                 .widgetURL(context.attributes.metadata?.openURL)
         } dynamicIsland: { context in
             let meta = context.attributes.metadata
@@ -57,7 +57,7 @@ struct MeetingCountdownActivity: Widget {
                 GumBall().frame(width: 16, height: 16)
             }
             .widgetURL(meta?.openURL)
-            .keylineTint(GumColors.coral)
+            .keylineTint(GumColors.accent)
         }
     }
 }
@@ -110,7 +110,7 @@ private struct RingedBall: View {
                     EmptyView()
                 }
                 .progressViewStyle(.circular)
-                .tint(GumColors.coral)
+                .tint(GumColors.accent)
             }
             GumBall().padding(7)
         }

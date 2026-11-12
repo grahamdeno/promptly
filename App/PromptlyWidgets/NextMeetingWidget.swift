@@ -168,7 +168,7 @@ struct NextMeetingView: View {
         let size = base * (1 + 0.8 * CGFloat(progress))
         return GumBall()
             .frame(width: size, height: size * (1 + 0.08 * CGFloat(progress)))
-            .shadow(color: GumColors.coral.opacity(0.25), radius: 10, y: -4)
+            .shadow(color: GumColors.accent.opacity(0.25), radius: 10, y: -4)
             .animation(.easeOut(duration: 1.5), value: progress)
     }
 

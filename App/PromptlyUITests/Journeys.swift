@@ -239,4 +239,18 @@ final class Journeys: XCTestCase {
         a.pause(0.3)
         a.shot("unicorn-pop-late")
     }
+
+    // J10. Fortune: the black ball, the fortune on the card, the mist pop.
+    func test10_Fortune() {
+        let a = Audit("J10-fortune")
+        defer { a.finish() }
+        a.launch("fortune")
+        a.shot("fortune-home")
+        a.accessibility("fortune-home")
+        a.labels("fortune-home")
+        a.expect("the card shows a fortune", a.any(containing: "Fortune:"), severity: 3)
+        _ = popBubble(a)
+        a.pause(0.3)
+        a.shot("fortune-pop")
+    }
 }

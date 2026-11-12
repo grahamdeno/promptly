@@ -143,6 +143,7 @@ enum AlarmLoop {
 enum PopSound {
     private static var gum: AVAudioPlayer? = load("pop")
     private static var chime: AVAudioPlayer? = load("unicorn_pop")
+    private static var star: AVAudioPlayer? = load("fortune_pop")
 
     private static func load(_ name: String) -> AVAudioPlayer? {
         guard let url = Bundle.main.url(forResource: name, withExtension: "wav") else { return nil }
@@ -155,6 +156,7 @@ enum PopSound {
     static func prepare() {
         _ = gum
         _ = chime
+        _ = star
     }
 
     /// Pop or Sparkle, as chosen in settings (Unicorn mode defaults to Sparkle). Never activates the audio session
@@ -166,7 +168,7 @@ enum PopSound {
         if session.category != .ambient, !AlarmLoop.isPlaying {
             try? session.setCategory(.ambient, options: [.mixWithOthers])
         }
-        let player = choice == .sparkle ? chime : gum
+        let player = choice == .sparkle ? chime : (choice == .star ? star : gum)
         player?.currentTime = 0
         player?.play()
     }

@@ -79,7 +79,12 @@ final class AppModel {
                 followingColor = false
             }
             // The app icon follows the bubble color (iOS shows a one-line notice when it changes).
-            let icon: String? = gumColor == .coral ? "AppIcon-Coral" : (gumColor == .unicorn ? "AppIcon-Unicorn" : nil)
+            let icon: String? = switch gumColor {
+            case .coral: "AppIcon-Coral"
+            case .unicorn: "AppIcon-Unicorn"
+            case .fortune: "AppIcon-Fortune"
+            case .bubblegum: nil
+            }
             if UIApplication.shared.alternateIconName != icon {
                 UIApplication.shared.setAlternateIconName(icon) { _ in }
             }
@@ -104,6 +109,9 @@ final class AppModel {
                 await syncAlarms()
             }
         }
+    }
+    var fortunes: Bool {
+        didSet { prefs.fortunes = fortunes }
     }
     var keepAwake: Bool {
         didSet { prefs.keepAwake = keepAwake; applyKeepAwake() }
@@ -138,6 +146,7 @@ final class AppModel {
         gentleCalendarIDs = prefs.gentleCalendarIDs
         alarmCalendarIDs = prefs.alarmCalendarIDs
         keepAwake = prefs.keepAwake
+        fortunes = prefs.fortunes
         alarmService.sound = prefs.alarmSound
         nudges = prefs.nudges
         cleared = prefs.clearedMeetingIDs
@@ -149,6 +158,7 @@ final class AppModel {
             guard let self else { return }
             if self.gumColor.isPro { self.gumColor = .bubblegum }
             if self.alarmSound.isPro { self.alarmSound = .bubbleBlow }
+            if self.popChoice == .star { self.popChoice = .pop }
             if self.leadMinutes > 5 { self.leadMinutes = 5 }
             if self.keepAwake { self.keepAwake = false }
         }
@@ -163,7 +173,7 @@ final class AppModel {
             buzz = false
             popChoice = .off
             keepAwake = false
-            gumColor = scene == .unicorn ? .unicorn : .bubblegum
+            gumColor = scene == .unicorn ? .unicorn : (scene == .fortune ? .fortune : .bubblegum)
             ballStyle = .bubble
             leadMinutes = 2
             cleared = []
