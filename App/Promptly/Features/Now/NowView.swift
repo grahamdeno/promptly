@@ -7,6 +7,7 @@ struct NowView: View {
     @Environment(\.openURL) private var openURL
     @Environment(\.dismiss) private var dismiss
     @State private var pops = 0
+    @State private var skips = 0
     @ScaledMetric(relativeTo: .largeTitle) private var titleSize: CGFloat = 40
 
     var body: some View {
@@ -20,6 +21,7 @@ struct NowView: View {
                     overdue: model.sinceRing(meeting, now: now),
                     style: model.ballStyle,
                     popCount: pops,
+                    skipCount: skips,
                     hint: meeting.joinURL == nil ? "Pop when ready" : "Pop to join",
                     accessibilityTitle: (meeting.joinURL == nil ? "Pop the bubble to clear " : "Pop the bubble to join ") + meeting.title,
                     minSize: 920, maxSize: 920, steadySize: 560,
@@ -47,7 +49,7 @@ struct NowView: View {
                 .frame(maxWidth: 680, alignment: .leading)
                 .overlay(alignment: .bottomLeading) {
                     Button {
-                        pops += 1
+                        skips += 1
                         model.clear(meeting)
                         leave {}
                     } label: {

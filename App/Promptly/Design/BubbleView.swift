@@ -14,6 +14,8 @@ struct BubbleView: View {
     var overdue: TimeInterval = 0
     var style: BallStyle
     var popCount: Int
+    /// "Not going": the bubble shrinks away and a fresh one grows back, with no pop.
+    var skipCount: Int = 0
     /// Kept for callers; the bubble no longer shows text.
     var hint: String? = nil
     var accessibilityTitle: String = "Pop the bubble"
@@ -70,6 +72,18 @@ struct BubbleView: View {
         .animation(.timingCurve(0.2, 0.7, 0.3, 1, duration: 1.8), value: overdueStep)
         .onChange(of: popCount) { _, _ in
             if !popping { burst(then: nil) }
+        }
+        .onChange(of: skipCount) { _, _ in
+            guard !popping else { return }
+            popping = true
+            withAnimation(.easeIn(duration: 0.35)) { regrowScale = 0.05; opacity = reduceMotion ? 0 : 0.6 }
+            Task { @MainActor in
+                try? await Task.sleep(for: .milliseconds(380))
+                opacity = 1
+                withAnimation(.timingCurve(0.2, 0.7, 0.3, 1, duration: reduceMotion ? 0.3 : 1.0)) { regrowScale = 1 }
+                try? await Task.sleep(for: .milliseconds(600))
+                popping = false
+            }
         }
         .task(id: onPop != nil) { await pokeLoop() }
     }

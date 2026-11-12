@@ -43,6 +43,8 @@ final class AppModel {
     var linkToOpen: URL?
     /// Increments each time a meeting is joined or cleared; the bubble pops on change.
     var popCount = 0
+    /// Increments on "Not going"; the bubble deflates quietly instead of popping (popping means join).
+    var skipCount = 0
     var taughtPop: Bool
     var syncProblem: String?
     /// For the settings screen's alarm check.
@@ -432,7 +434,7 @@ final class AppModel {
         if let pending = PendingJoin.take(now: now) {
             let meeting = meetings.first { $0.id == pending.meetingID }
             if let url = URL(string: pending.joinURL), !pending.joinURL.isEmpty {
-                if let meeting { markCleared(meeting) }
+                if let meeting { markCleared(meeting, skipped: false) }
                 linkToOpen = url
             } else if let meeting {
                 show(meeting)
@@ -490,21 +492,22 @@ final class AppModel {
 
     /// Returns the link to open, if any, and clears the meeting so the bubble pops.
     func join(_ meeting: Meeting) -> URL? {
-        markCleared(meeting)
+        markCleared(meeting, skipped: false)
         return meeting.joinURL
     }
 
+    /// Not going: cleared with a quiet deflate, not a pop.
     func clear(_ meeting: Meeting) {
-        markCleared(meeting)
+        markCleared(meeting, skipped: true)
     }
 
-    private func markCleared(_ meeting: Meeting) {
+    private func markCleared(_ meeting: Meeting, skipped: Bool) {
         alarmService.stopAlerting()
         AlarmLoop.stop()
         cleared.insert(meeting.id)
         if !ScreenshotMode.isOn { prefs.clearedMeetingIDs = cleared }
         lastCleared = meeting
-        popCount += 1
+        if skipped { skipCount += 1 } else { popCount += 1 }
         if !taughtPop { taughtPop = true; prefs.taughtPop = true }
         writeWidgetSnapshot()
         Task { await syncAlarms() }

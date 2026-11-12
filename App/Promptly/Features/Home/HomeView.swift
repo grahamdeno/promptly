@@ -70,6 +70,7 @@ struct HomeView: View {
             overdue: overdue,
             style: model.ballStyle,
             popCount: model.popCount,
+            skipCount: model.skipCount,
             accessibilityTitle: next.map { ($0.joinURL == nil ? "Pop the bubble to clear " : "Pop the bubble to join ") + $0.title } ?? "",
             maxSize: maxSize,
             onPop: next.map { meeting -> () -> Void in
@@ -189,6 +190,13 @@ struct HomeView: View {
                     if let url = model.join(meeting) { openURL(url) }
                 }
                 .accessibilityAction(named: "Not going") { model.clear(meeting) }
+                if model.taughtPop, !isDemo(meeting), meeting.joinURL != nil,
+                   meeting.start.timeIntervalSince(now) < 10 * 60 {
+                    Label("Pop the bubble to join", systemImage: "hand.tap")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(Brand.accentText)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
                 if !model.taughtPop {
                     Text("Tap the bubble to pop it and join.")
                         .font(.subheadline.weight(.medium))

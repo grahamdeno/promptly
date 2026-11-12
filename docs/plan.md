@@ -202,3 +202,11 @@ Review: https://claude.ai/artifact/Xs4CqLSRPxh6u4VgfZJpko (App Store readiness r
 - The Home card says how each meeting will alert: "Rings N min before" (bell) or "Quiet notification only".
 - Next (from the assessment): "Pop to join" line in the last 10 minutes; a quieter animation for Not going.
   Grok's review notes can now say Settings › Test the alarm instead of the five-tap Diagnostics.
+
+## Sprint 18: polish before submitting (owner said go, 2026-11-11)
+- "Pop the bubble to join" line on the card in the last 10 minutes when the meeting has a link.
+- Not going: the bubble deflates and grows back (no pop; popping means join). Takeover too.
+- Large text: Pro row stacks; the Rings line wraps.
+- App Store header image in docs/app-store-header.png (5244 x 2950, no text).
+- Owner: leave the EU out of availability for now (no DSA trader declaration). Not submitting yet; phone checks after
+  this build. Still version 1.0 (not submitted), so the newer 1.0 build replaces 1024 on the version.
