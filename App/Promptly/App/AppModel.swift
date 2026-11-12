@@ -159,7 +159,9 @@ final class AppModel {
             cleared = []
             calendars = ScreenshotMode.calendars
             meetings = ScreenshotMode.meetings()
-            store.forceBetaAccess()
+            // The Pro sheet scene shows the App Store version of the sheet (price and buy button), for Apple's
+            // in-app purchase review screenshot; every other scene shows Pro features unlocked.
+            if scene != .pro { store.forceBetaAccess() }
             if scene == .now || scene == .late { arrived = meetings.first }
             if scene == .pro { showPro = true }
             return

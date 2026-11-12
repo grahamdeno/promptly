@@ -49,7 +49,15 @@ struct CalendarsView: View {
                     choiceRow(options: AlarmSoundChoice.allCases, selected: model.alarmSound, label: { $0.label },
                               locked: { $0.isPro && !model.store.isPro }) {
                         model.alarmSound = $0
+                        if $0 != .appleDefault { AlarmLoop.preview($0) }
                     }
+                    Text(model.alarmSound == .appleDefault
+                         ? "Apple's tone rings on the Lock Screen. While Pop In is open you'll hear Gum pops, because apps can't play Apple's alarm tones."
+                         : "Tap a sound to hear it. The pop when you clear a meeting matches: Chimes sparkle, the others pop.")
+                        .font(.footnote)
+                        .foregroundStyle(Brand.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.horizontal, 12)
 
                     sectionLabel("Bubble color")
                     choiceRow(options: GumPalette.allCases, selected: model.gumColor, label: { $0.label },
