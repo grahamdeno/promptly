@@ -39,10 +39,22 @@ extension View {
 }
 
 enum PopHaptics {
+    @MainActor private static let impact = UIImpactFeedbackGenerator(style: .rigid)
+    @MainActor private static let notice = UINotificationFeedbackGenerator()
+
+    /// Warms up the haptics and the sound so the first pop lands instantly.
+    @MainActor static func prepare() {
+        impact.prepare()
+        notice.prepare()
+        PopSound.prepare()
+    }
+
     @MainActor static func pop() {
-        UIImpactFeedbackGenerator(style: .rigid).impactOccurred(intensity: 1)
-        UINotificationFeedbackGenerator().notificationOccurred(.success)
         PopSound.play()
+        impact.impactOccurred(intensity: 1)
+        notice.notificationOccurred(.success)
+        impact.prepare()
+        notice.prepare()
     }
 }
 
@@ -106,14 +118,22 @@ enum AlarmLoop {
 
     private static var previewEnd: Task<Void, Never>?
 
+    static var isPlaying: Bool { player?.isPlaying == true }
+
     static func stop() {
         ramp?.cancel()
         ramp = nil
         previewEnd?.cancel()
         previewEnd = nil
+        let wasPlaying = player != nil
         player?.stop()
         player = nil
-        try? AVAudioSession.sharedInstance().setActive(false, options: [.notifyOthersOnDeactivation])
+        // Off the main thread: deactivating the session can take a moment, and this runs during the pop.
+        if wasPlaying {
+            DispatchQueue.global(qos: .userInitiated).async {
+                try? AVAudioSession.sharedInstance().setActive(false, options: [.notifyOthersOnDeactivation])
+            }
+        }
     }
 }
 
@@ -131,12 +151,21 @@ enum PopSound {
         return p
     }
 
-    /// Pop or Sparkle, as chosen in settings (Unicorn mode defaults to Sparkle).
+    /// Loads both sounds ahead of time (at launch), so a tap never waits on reading a file.
+    static func prepare() {
+        _ = gum
+        _ = chime
+    }
+
+    /// Pop or Sparkle, as chosen in settings (Unicorn mode defaults to Sparkle). Never activates the audio session
+    /// by hand: that call can stall the main thread for a moment, which showed as a hitch at the pop.
     static func play() {
         let choice = Prefs().popChoice
         guard choice != .off else { return }
-        try? AVAudioSession.sharedInstance().setCategory(.ambient, options: [.mixWithOthers])
-        try? AVAudioSession.sharedInstance().setActive(true)
+        let session = AVAudioSession.sharedInstance()
+        if session.category != .ambient, !AlarmLoop.isPlaying {
+            try? session.setCategory(.ambient, options: [.mixWithOthers])
+        }
         let player = choice == .sparkle ? chime : gum
         player?.currentTime = 0
         player?.play()

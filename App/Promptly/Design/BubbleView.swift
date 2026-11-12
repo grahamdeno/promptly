@@ -317,10 +317,8 @@ struct BubbleView: View {
             return
         }
         Task { @MainActor in
-            // A last stretch at the weak spot.
-            withAnimation(.easeOut(duration: 0.08)) { popScale = CGSize(width: 1.03, height: 1.045) }
-            try? await Task.sleep(for: .milliseconds(80))
-            // It tears: the bubble becomes scraps that fly up and out...
+            // It tears on the touch, in the same frame as the sound and the tap haptic (a stretch before it read as
+            // a hesitation): the bubble becomes scraps that fly up and out...
             piecesUp = false
             piecesDown = false
             showPieces = true
@@ -330,9 +328,10 @@ struct BubbleView: View {
             showLump = true
             lumpScale = 0.4
             withAnimation(.easeOut(duration: 0.25)) { lumpScale = 1 }
-            try? await Task.sleep(for: .milliseconds(300))
+            // The meeting clears while the pieces are still flying, so the card changes with the pop, not after it.
+            try? await Task.sleep(for: .milliseconds(60))
             action?()
-            try? await Task.sleep(for: .milliseconds(200))
+            try? await Task.sleep(for: .milliseconds(440))
             // ...then tumble down and fade, like gravity took over.
             withAnimation(.timingCurve(0.5, 0, 0.85, 0.6, duration: 0.65)) { piecesDown = true }
             try? await Task.sleep(for: .milliseconds(450))
@@ -438,7 +437,7 @@ struct GumBubbleShape: View {
                     // Unicorn: a holographic rainbow band slides slowly across the gum.
                     TimelineView(.animation(minimumInterval: 1.0 / 20, paused: reduceMotion)) { ctx in
                         let t = ctx.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 9) / 9
-                        UnicornSheen(phase: reduceMotion ? 0.5 : t)
+                        UnicornSheen(phase: reduceMotion || ScreenshotMode.isOn ? 0.5 : t)
                     }
                     .clipShape(Ellipse())
                 }

@@ -150,6 +150,7 @@ final class AppModel {
             if self.leadMinutes > 5 { self.leadMinutes = 5 }
             if self.keepAwake { self.keepAwake = false }
         }
+        PopHaptics.prepare()
         if let scene = ScreenshotMode.scene {
             // App Store screenshots: demo meetings, no alarms, everything unlocked. didSet doesn't run in init,
             // so none of this is saved or scheduled.
@@ -168,7 +169,7 @@ final class AppModel {
             meetings = scene == .empty ? [] : ScreenshotMode.meetings()
             // The Pro sheet scene shows the App Store version of the sheet (price and buy button), for Apple's
             // in-app purchase review screenshot; every other scene shows Pro features unlocked.
-            if scene != .pro && !ScreenshotMode.free { store.forceBetaAccess() }
+            store.setDemoAccess(scene != .pro && !ScreenshotMode.free)
             if scene == .now || scene == .late { arrived = meetings.first }
             if scene == .pro { showPro = true }
             return
