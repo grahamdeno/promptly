@@ -40,18 +40,39 @@ struct CalendarsView: View {
                     }
 
                     sectionLabel("Ring before")
-                    choiceRow(options: [1, 2, 5, 10], selected: model.leadMinutes, label: { "\($0) min" }) {
+                    choiceRow(options: [1, 2, 5, 10], selected: model.leadMinutes, label: { "\($0) min" },
+                              locked: { $0 > 5 && !model.store.isPro }) {
                         model.leadMinutes = $0
                     }
 
                     sectionLabel("Alarm sound")
-                    choiceRow(options: AlarmSoundChoice.allCases, selected: model.alarmSound, label: { $0.label }) {
+                    choiceRow(options: AlarmSoundChoice.allCases, selected: model.alarmSound, label: { $0.label },
+                              locked: { $0.isPro && !model.store.isPro }) {
                         model.alarmSound = $0
                     }
 
                     sectionLabel("Bubble color")
-                    choiceRow(options: GumPalette.allCases, selected: model.gumColor, label: { $0.label }) {
+                    choiceRow(options: GumPalette.allCases, selected: model.gumColor, label: { $0.label },
+                              locked: { $0.isPro && !model.store.isPro }) {
                         model.gumColor = $0
+                    }
+
+                    if !firstRun {
+                        Button { model.showPro = true } label: {
+                            HStack {
+                                Image(systemName: "sparkles").foregroundStyle(Brand.coralDark)
+                                Text(model.store.isPro ? "Pop In Pro: unlocked" : "Pop In Pro: Unicorn mode and more")
+                                    .font(.body.weight(.medium)).foregroundStyle(Brand.ink)
+                                Spacer()
+                                Image(systemName: "chevron.right").foregroundStyle(Brand.secondary)
+                            }
+                            .padding(.horizontal, 16)
+                            .frame(minHeight: 56)
+                            .background(RoundedRectangle(cornerRadius: 16).fill(Brand.ink.opacity(0.05)))
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.top, 24)
+                        .padding(.horizontal, 8)
                     }
 
                     if !firstRun {
@@ -79,8 +100,10 @@ struct CalendarsView: View {
                                           isOn: Binding(get: { model.buzz }, set: { model.buzz = $0 }))
                             settingToggle("Pop sound", detail: "A soft gum pop; quiet when the phone is on silent",
                                           isOn: Binding(get: { model.popSound }, set: { model.popSound = $0 }))
-                            settingToggle("Keep screen on", detail: "While Pop In is open, like a desk clock",
-                                          isOn: Binding(get: { model.keepAwake }, set: { model.keepAwake = $0 }))
+                            settingToggle("Keep screen on", detail: model.store.isPro ? "While Pop In is open, like a desk clock" : "Pro: desk mode while Pop In is open",
+                                          isOn: Binding(get: { model.keepAwake }, set: { on in
+                                              if on && !model.store.isPro { model.showPro = true } else { model.keepAwake = on }
+                                          }))
                             settingToggle("Nudges at 5 and 2 minutes", detail: "One buzz each, even when locked",
                                           isOn: Binding(get: { model.nudges }, set: { model.nudges = $0 }))
                         }
@@ -111,6 +134,9 @@ struct CalendarsView: View {
             .padding(.bottom, 24)
         }
         .task { await model.refresh() }
+        .sheet(isPresented: Binding(get: { model.showPro }, set: { model.showPro = $0 })) {
+            ProView().environment(model)
+        }
     }
 
     /// For the owner and for support: alarm count, test alarms, and the bubble rollback switch.
@@ -161,8 +187,12 @@ struct CalendarsView: View {
                 if isOn.wrappedValue {
                     Menu {
                         Button("Smart: alarm for video meetings") { model.setRule(.smart, forCalendar: calendar.id) }
-                        Button("Alarm: everything rings") { model.setRule(.alarm, forCalendar: calendar.id) }
-                        Button("Gentle: notifications only") { model.setRule(.gentle, forCalendar: calendar.id) }
+                        Button(model.store.isPro ? "Alarm: everything rings" : "Alarm: everything rings (Pro)") {
+                            if model.store.isPro { model.setRule(.alarm, forCalendar: calendar.id) } else { model.showPro = true }
+                        }
+                        Button(model.store.isPro ? "Gentle: notifications only" : "Gentle: notifications only (Pro)") {
+                            if model.store.isPro { model.setRule(.gentle, forCalendar: calendar.id) } else { model.showPro = true }
+                        }
                     } label: {
                         Text(ruleLabel)
                             .font(.subheadline.weight(.medium))
@@ -215,12 +245,14 @@ struct CalendarsView: View {
     }
 
     private func choiceRow<T: Hashable>(options: [T], selected: T, label: @escaping (T) -> String,
+                                        locked: @escaping (T) -> Bool = { _ in false },
                                         pick: @escaping (T) -> Void) -> some View {
         HStack(spacing: 8) {
             ForEach(options, id: \.self) { option in
                 let isSelected = option == selected
-                Button { pick(option) } label: {
-                    Text(label(option))
+                let isLocked = locked(option)
+                Button { if isLocked { model.showPro = true } else { pick(option) } } label: {
+                    Text(isLocked ? "\(label(option)) ✦" : label(option))
                         .font(.callout.weight(.medium))
                         .lineLimit(1)
                         .minimumScaleFactor(0.7)
@@ -231,6 +263,7 @@ struct CalendarsView: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityAddTraits(isSelected ? .isSelected : [])
+                .accessibilityLabel(isLocked ? "\(label(option)), Pro" : label(option))
             }
         }
         .padding(.horizontal, 8)

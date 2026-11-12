@@ -13,6 +13,10 @@ final class AppModel {
     @ObservationIgnored let calendarService = CalendarService()
     @ObservationIgnored let alarmService = AlarmService()
     @ObservationIgnored let nudgeService = NudgeService()
+    /// Pop In Pro (observable, so views update when it unlocks).
+    let store = ProStore()
+    /// Shows the Pro sheet from anywhere a locked choice is tapped.
+    var showPro = false
     @ObservationIgnored let prefs: Prefs
     @ObservationIgnored private var storeObserver: NSObjectProtocol?
 
@@ -66,7 +70,7 @@ final class AppModel {
         didSet {
             prefs.gumColor = gumColor
             // The app icon follows the bubble color (iOS shows a one-line notice when it changes).
-            let icon: String? = gumColor == .coral ? "AppIcon-Coral" : nil
+            let icon: String? = gumColor == .coral ? "AppIcon-Coral" : (gumColor == .unicorn ? "AppIcon-Unicorn" : nil)
             if UIApplication.shared.alternateIconName != icon {
                 UIApplication.shared.setAlternateIconName(icon) { _ in }
             }
@@ -131,6 +135,15 @@ final class AppModel {
         taughtPop = prefs.taughtPop
         calendarAuthorized = calendarService.isAuthorized
         alarmsAuthorized = alarmService.isAuthorized
+        // If Pro goes away (refund), fall back to free choices.
+        store.onLost = { [weak self] in
+            guard let self else { return }
+            if self.gumColor.isPro { self.gumColor = .bubblegum }
+            if self.alarmSound.isPro { self.alarmSound = .bubbleBlow }
+            if self.leadMinutes > 5 { self.leadMinutes = 5 }
+            if self.keepAwake { self.keepAwake = false }
+        }
+        Task { await store.load() }
         storeObserver = NotificationCenter.default.addObserver(
             forName: .EKEventStoreChanged, object: calendarService.store, queue: .main
         ) { [weak self] _ in

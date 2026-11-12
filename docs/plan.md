@@ -148,6 +148,16 @@ Review: https://claude.ai/artifact/Xs4CqLSRPxh6u4VgfZJpko (App Store readiness r
 - [x] site/: home, privacy and support pages for popin.tangomike.app, deployed by GitHub Pages (needs Pages enabled
       and a DNS CNAME, via Grok).
 
+## Sprint 14: Pro and Unicorn mode (owner said do it, 2026-11-11)
+- [x] Pop In Pro, one-time non-consumable `com.grahamdeno.promptly.pro` ($4.99), StoreKit 2 (`ProStore`): buy,
+      restore, Transaction.updates, refund fallback to free choices. Pro sheet from Settings.
+- [x] Pro unlocks: Unicorn mode, Recorded and Chimes alarm sounds, per-calendar Alarm/Gentle overrides, 10-min lead,
+      Keep screen on. Free: Smart alerts, bubble, widgets, Gum pops and Apple sounds, Bubblegum and Coral.
+- [x] Unicorn mode: pastel rainbow bubble with a slowly drifting sheen (still with Reduce Motion), rainbow buds when
+      late, confetti pop (stars, hearts, sparkles, dots), sparkle chime pop sound, "Chimes" alarm, Unicorn icon.
+- [ ] App Store Connect: create the in-app purchase and confirm the Paid Apps agreement (Grok).
+- [ ] Next: listing and screenshots (UI-test screenshot run on iPhone and iPad simulators with demo data).
+
 ## Later
 - iPad screenshots in App Store Connect before public release (Grok).
 - Smart filters: travel-time buffer, a second alert for chosen meetings, quiet hours.

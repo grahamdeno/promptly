@@ -5,13 +5,18 @@ enum AlarmSoundChoice: String, CaseIterable, Sendable {
     case bubbleBlow
     /// Apple's standard alarm sound. AlarmKit can't pick a named system tone such as Mercury.
     case appleDefault
-    /// The owner's own recorded pops, cleaned up and made louder (Sounds/recorded_pops_alarm.wav).
+    /// The owner's own recorded pops, cleaned up and made louder (Sounds/recorded_pops_alarm.wav). Pro.
     case recorded
+    /// Bright rising chimes for Unicorn mode (Sounds/unicorn_chimes_alarm.wav). Pro.
+    case chimes
+
+    var isPro: Bool { self == .recorded || self == .chimes }
 
     var label: String {
         switch self {
         case .bubbleBlow: "Gum pops"
         case .recorded: "Recorded"
+        case .chimes: "Chimes"
         case .appleDefault: "Apple"
         }
     }
@@ -20,6 +25,7 @@ enum AlarmSoundChoice: String, CaseIterable, Sendable {
     var fileName: String {
         switch self {
         case .recorded: "recorded_pops_alarm.wav"
+        case .chimes: "unicorn_chimes_alarm.wav"
         default: "bubble_blow_alarm.wav"
         }
     }
