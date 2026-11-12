@@ -153,23 +153,43 @@ struct ThemeMarks: View {
             case .waterBalloon:
                 Ellipse().fill(.white.opacity(0.25)).frame(width: w * 0.5, height: h * 0.7).offset(x: -w * 0.15, y: -h * 0.05).blur(radius: w * 0.05)
             case .eyeball:
-                // The iris looks up and to the side.
-                ZStack {
-                    Ellipse().stroke(GumPalette.rgb(0xE57373).opacity(0.35), lineWidth: max(1, w * 0.004)).frame(width: w * 0.9, height: h * 0.9)
-                    Circle().fill(RadialGradient(colors: [GumPalette.rgb(0x6EC6FF), GumPalette.rgb(0x1F5FA8)], center: .center, startRadius: 0, endRadius: w * 0.14))
-                        .frame(width: w * 0.28, height: w * 0.28)
-                    Circle().fill(Color.black).frame(width: w * 0.12, height: w * 0.12)
-                    Circle().fill(.white.opacity(0.9)).frame(width: w * 0.04, height: w * 0.04).offset(x: -w * 0.04, y: -w * 0.04)
-                }
-                .position(x: w * 0.55, y: h * 0.3)
-            case .fishbowl:
-                // Water, and a goldfish swimming slowly back and forth.
-                Rectangle().fill(GumPalette.rgb(0x7CC4E8).opacity(0.45)).frame(width: w, height: h * 0.72).position(x: w / 2, y: h * 0.64)
-                TimelineView(.animation(minimumInterval: 1.0 / 20, paused: reduceMotion)) { ctx in
+                // The eye looks around slowly: it glances to a new spot, holds, then glances again.
+                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { ctx in
                     let t = reduceMotion ? 0 : ctx.date.timeIntervalSinceReferenceDate
-                    Text("🐠").font(.system(size: max(14, w * 0.14)))
-                        .scaleEffect(x: cos(t / 3) >= 0 ? -1 : 1, y: 1)
-                        .position(x: w * (0.5 + 0.22 * sin(t / 3)), y: h * (0.42 + 0.03 * sin(t)))
+                    let gaze = Self.gaze(t)
+                    ZStack {
+                        Ellipse().stroke(GumPalette.rgb(0xE57373).opacity(0.35), lineWidth: max(1, w * 0.004)).frame(width: w * 0.9, height: h * 0.9)
+                            .position(x: w / 2, y: h / 2)
+                        ZStack {
+                            Circle().fill(RadialGradient(colors: [GumPalette.rgb(0x6EC6FF), GumPalette.rgb(0x1F5FA8)], center: .center, startRadius: 0, endRadius: w * 0.14))
+                                .frame(width: w * 0.28, height: w * 0.28)
+                            Circle().fill(Color.black).frame(width: w * 0.12, height: w * 0.12)
+                            Circle().fill(.white.opacity(0.9)).frame(width: w * 0.04, height: w * 0.04).offset(x: -w * 0.04, y: -w * 0.04)
+                        }
+                        .position(x: w * gaze.x, y: h * gaze.y)
+                    }
+                }
+            case .fishbowl:
+                // Water. Food sprinkles in on one side, the fish swims over and gobbles it, then the other side.
+                Rectangle().fill(GumPalette.rgb(0x7CC4E8).opacity(0.45)).frame(width: w, height: h * 0.72).position(x: w / 2, y: h * 0.64)
+                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { ctx in
+                    let t = reduceMotion ? 0 : ctx.date.timeIntervalSinceReferenceDate
+                    let f = Self.fish(t)
+                    ZStack {
+                        ForEach(0..<6, id: \.self) { i in
+                            let flake = Self.flake(i, t: t)
+                            if flake.visible {
+                                RoundedRectangle(cornerRadius: 1).fill([GumPalette.rgb(0xE0802E), GumPalette.rgb(0xC9572A), GumPalette.rgb(0xE8B04A)][i % 3])
+                                    .frame(width: max(3, w * 0.022), height: max(2, w * 0.014))
+                                    .rotationEffect(.degrees(flake.spin))
+                                    .position(x: w * flake.x, y: h * flake.y)
+                            }
+                        }
+                        Text("🐠").font(.system(size: max(14, w * 0.14)))
+                            .scaleEffect(x: f.facingRight ? -1 : 1, y: 1)
+                            .scaleEffect(f.gulp)
+                            .position(x: w * f.x, y: h * f.y)
+                    }
                 }
             case .moodRing:
                 // Blue when it's far off, green as it nears, red when it's time.
@@ -413,18 +433,17 @@ struct ThemeMarks: View {
                     }
                 }
             case .lavaLamp:
-                // Warm blobs rising and sinking.
-                TimelineView(.animation(minimumInterval: 1.0 / 20, paused: reduceMotion)) { ctx in
+                // Gooey wax: blobs that stretch as they rise, merge and split, over a warm glow from the base
+                // and a pool of wax sitting at the bottom.
+                Ellipse().fill(RadialGradient(colors: [GumPalette.rgb(0xFFB347).opacity(0.55), .clear],
+                                              center: UnitPoint(x: 0.5, y: 1.0), startRadius: 0, endRadius: h * 0.75))
+                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { ctx in
                     let t = reduceMotion ? 0 : ctx.date.timeIntervalSinceReferenceDate
                     ZStack {
-                        ForEach(0..<4, id: \.self) { i in
-                            let d = Double(i)
-                            Ellipse().fill(GumPalette.rgb(0xFFC23A))
-                                .frame(width: w * (0.18 + 0.06 * d), height: w * (0.22 + 0.05 * d))
-                                .position(x: w * (0.3 + 0.14 * d), y: h * (0.55 + 0.3 * sin(t / (6 + d) + d)))
-                        }
+                        Self.lava(t: t, w: w, h: h, color: GumPalette.rgb(0xFF9F1C), grow: 1)
+                        Self.lava(t: t, w: w, h: h, color: GumPalette.rgb(0xFFD166), grow: 0.55)
+                            .offset(x: -w * 0.012, y: -h * 0.012)
                     }
-                    .blur(radius: max(3, w * 0.02))
                 }
             default:
                 EmptyView()
@@ -441,6 +460,75 @@ struct ThemeMarks: View {
         (0.22, 0.58, 0.07), (0.55, 0.70, 0.11), (0.80, 0.68, 0.06), (0.35, 0.80, 0.08), (0.50, 0.36, 0.05),
     ]
     /// (x, y, size, angle) for the soccer ball's patches.
+    /// Where the eye is looking (share of the ball): a new spot every 3.2 seconds, eased over 0.7 seconds.
+    static func gaze(_ t: TimeInterval) -> CGPoint {
+        let spots: [CGPoint] = [CGPoint(x: 0.55, y: 0.3), CGPoint(x: 0.38, y: 0.36), CGPoint(x: 0.62, y: 0.42),
+                                CGPoint(x: 0.5, y: 0.5), CGPoint(x: 0.4, y: 0.28), CGPoint(x: 0.66, y: 0.32), CGPoint(x: 0.47, y: 0.44)]
+        let seg = t / 3.2
+        let i = Int(seg.rounded(.down))
+        let k = min(1, (seg - Double(i)) * 3.2 / 0.7)
+        let e = CGFloat((1 - cos(k * .pi)) / 2)
+        let a = spots[((i - 1) % spots.count + spots.count) % spots.count], b = spots[(i % spots.count + spots.count) % spots.count]
+        return CGPoint(x: a.x + (b.x - a.x) * e, y: a.y + (b.y - a.y) * e)
+    }
+
+    /// Feeding runs in 7-second turns, alternating left and right.
+    private static func feedSide(_ turn: Int) -> CGFloat { turn % 2 == 0 ? 0.3 : 0.7 }
+
+    /// The fish swims to the side being fed (about 2 seconds), then nibbles in place.
+    static func fish(_ t: TimeInterval) -> (x: CGFloat, y: CGFloat, facingRight: Bool, gulp: CGFloat) {
+        let turn = Int((t / 7).rounded(.down)), k = t - Double(turn) * 7
+        let from = feedSide(turn - 1), to = feedSide(turn)
+        let m = min(1, k / 2.2)
+        let e = CGFloat((1 - cos(m * .pi)) / 2)
+        let x = from + (to - from) * e + (m >= 1 ? 0.03 * CGFloat(sin(k * 2.4)) : 0)
+        let facingRight = m < 1 ? to > from : cos(k * 2.4) > 0
+        // A little gulp each time a flake reaches the fish.
+        let gulpPhase = k > 2.2 ? (k - 2.2).truncatingRemainder(dividingBy: 0.75) : 1
+        let gulp: CGFloat = gulpPhase < 0.15 ? 1.12 : 1
+        return (x, 0.5 + 0.025 * CGFloat(sin(t * 1.3)), facingRight, gulp)
+    }
+
+    /// Flakes drift down from the surface on the fed side; each is eaten when it reaches the fish.
+    static func flake(_ i: Int, t: TimeInterval) -> (visible: Bool, x: CGFloat, y: CGFloat, spin: Double) {
+        let turn = Int((t / 7).rounded(.down)), k = t - Double(turn) * 7
+        let start = 0.2 + Double(i) * 0.35, eatenAt = 2.4 + Double(i) * 0.75
+        guard k >= start, k < eatenAt else { return (false, 0, 0, 0) }
+        let p = CGFloat((k - start) / (eatenAt - start))
+        let side = feedSide(turn)
+        let spread = CGFloat((Double(i) * 0.37).truncatingRemainder(dividingBy: 1) - 0.5) * 0.14
+        return (true, side + spread * (1 - p * 0.7) + 0.015 * CGFloat(sin(k * 3 + Double(i))), 0.3 + 0.2 * p, k * 90 + Double(i) * 50)
+    }
+
+    /// One layer of lava: blurred blobs cut at half opacity so neighbours fuse like wax.
+    static func lava(t: TimeInterval, w: CGFloat, h: CGFloat, color: Color, grow: CGFloat) -> some View {
+        Canvas { c, size in
+            c.addFilter(.alphaThreshold(min: 0.5, color: color))
+            c.addFilter(.blur(radius: max(4, size.width * 0.045)))
+            c.drawLayer { l in
+                // The pool at the bottom, gently heaving.
+                let pool = CGRect(x: -size.width * 0.1, y: size.height * (0.8 - 0.02 * sin(t * 0.7)),
+                                  width: size.width * 1.2, height: size.height * 0.4)
+                l.fill(Path(ellipseIn: pool.insetBy(dx: size.width * 0.1 * (1 - grow), dy: size.height * 0.08 * (1 - grow))), with: .color(.black))
+                for i in 0..<5 {
+                    let d = Double(i)
+                    let period = 9 + d * 2.3
+                    let phase = (t / period + d * 0.27).truncatingRemainder(dividingBy: 1)
+                    // Rise slowly from the pool, linger near the top, sink back.
+                    let rise = (1 - cos(phase * 2 * .pi)) / 2
+                    let speed = abs(sin(phase * 2 * .pi))
+                    let r = size.width * CGFloat(0.09 + 0.025 * Double(i % 3)) * grow
+                    let x = size.width * CGFloat(0.26 + 0.12 * d + 0.04 * sin(t / 3 + d))
+                    let y = size.height * CGFloat(0.88 - 0.68 * rise)
+                    let stretch = CGFloat(1 + 0.45 * speed)
+                    l.fill(Path(ellipseIn: CGRect(x: x - r / stretch, y: y - r * stretch, width: 2 * r / stretch, height: 2 * r * stretch))),
+                           with: .color(.black))
+                }
+            }
+        }
+        .frame(width: w, height: h)
+    }
+
     static let patches: [(CGFloat, CGFloat, CGFloat, Double)] = [
         (0.5, 0.38, 0.2, 0), (0.22, 0.3, 0.13, 20), (0.78, 0.3, 0.13, -20), (0.3, 0.68, 0.14, 40),
         (0.7, 0.68, 0.14, -40), (0.5, 0.92, 0.1, 0), (0.08, 0.55, 0.08, 10), (0.92, 0.55, 0.08, -10),

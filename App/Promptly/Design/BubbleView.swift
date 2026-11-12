@@ -133,6 +133,7 @@ struct BubbleView: View {
                 .frame(width: width, height: height)
                 .overlay { if onPop != nil { pokeDimple } }
                 .scaleEffect(x: poked ? 1.008 : 1, y: poked ? 0.992 : 1, anchor: .bottom)
+                .modifier(ThemeIdle(palette: GumPalette.current, paused: reduceMotion || ScreenshotMode.isOn || popping))
                 .contentShape(Ellipse())
         }
         .buttonStyle(.plain)
@@ -561,4 +562,43 @@ struct ConfettiPiece: View {
 extension Array {
     /// Safe lookup: nil when out of range.
     func at(_ i: Int) -> Element? { indices.contains(i) ? self[i] : nil }
+}
+
+
+/// Resting motion for themes that move as a whole: the water balloon gets poked every so often and
+/// jiggles to a stop, and the mood ring breathes in a box pattern (in 4, hold 4, out 4, hold 4).
+struct ThemeIdle: ViewModifier {
+    let palette: GumPalette
+    let paused: Bool
+
+    func body(content: Content) -> some View {
+        switch palette {
+        case .waterBalloon, .moodRing:
+            TimelineView(.animation(minimumInterval: 1.0 / 30, paused: paused)) { ctx in
+                let s = Self.scale(palette, t: paused ? 0 : ctx.date.timeIntervalSinceReferenceDate)
+                content.scaleEffect(x: s.width, y: s.height, anchor: .bottom)
+            }
+        default:
+            content
+        }
+    }
+
+    static func scale(_ palette: GumPalette, t: TimeInterval) -> CGSize {
+        switch palette {
+        case .waterBalloon:
+            // A poke every 7 seconds, then a damped wobble that settles in about 3 seconds.
+            let k = t.truncatingRemainder(dividingBy: 7)
+            guard k < 3.2 else { return CGSize(width: 1, height: 1) }
+            let wob = exp(-k * 1.5) * sin(k * 2 * .pi * 2.2)
+            return CGSize(width: 1 + 0.06 * wob, height: 1 - 0.06 * wob)
+        case .moodRing:
+            let k = t.truncatingRemainder(dividingBy: 16)
+            let ease: (Double) -> Double = { x in (1 - cos(x * .pi)) / 2 }
+            let b: Double = k < 4 ? ease(k / 4) : (k < 8 ? 1 : (k < 12 ? 1 - ease((k - 8) / 4) : 0))
+            let s = 1 + 0.04 * b
+            return CGSize(width: s, height: s)
+        default:
+            return CGSize(width: 1, height: 1)
+        }
+    }
 }
