@@ -141,14 +141,7 @@ struct ThemeMarks: View {
                         let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
                         ZStack {
                             ForEach(0..<18, id: \.self) { i in
-                                let a = Double(i) * 0.9
-                                let glint = max(0, sin(t * 2.2 + Double(i) * 1.7))
-                                Capsule().fill([GumPalette.rgb(0xFFFFFF), GumPalette.rgb(0x3DA5FF), GumPalette.rgb(0xFFD43B), GumPalette.rgb(0x3DDC97)][i % 4])
-                                    .overlay(Capsule().fill(.white.opacity(glint * 0.8)))
-                                    .frame(width: max(4, w * 0.035), height: max(1.5, w * 0.012))
-                                    .scaleEffect(1 + 0.15 * glint)
-                                    .rotationEffect(.radians(a * 2))
-                                    .offset(x: cos(a) * w * 0.3, y: sin(a) * h * 0.18 - h * 0.12)
+                                Self.glazeSprinkle(i, t: t, w: w, h: h)
                             }
                         }
                     }
@@ -367,8 +360,9 @@ struct ThemeMarks: View {
                             // Each spot travels left to right across the face and wraps round the back.
                             let u = (d / 8 + turn).truncatingRemainder(dividingBy: 1)
                             let x = 0.5 - 0.5 * cos(u * 2 * .pi)
-                            let facing = sin(u * 2 * .pi)
-                            Circle().fill(GumPalette.rgb(0xFF7A1A).opacity(facing > 0 ? (0.3 + 0.2 * sin(t * 0.8 + d)) * facing : 0))
+                            let facing: Double = sin(u * 2 * .pi)
+                            let glow: Double = facing > 0 ? (0.3 + 0.2 * sin(t * 0.8 + d)) * facing : 0
+                            Circle().fill(GumPalette.rgb(0xFF7A1A).opacity(glow))
                                 .frame(width: w * 0.22 * CGFloat(0.5 + 0.5 * facing), height: w * 0.22)
                                 .position(x: w * CGFloat(x), y: h * (0.25 + 0.09 * CGFloat(i % 5)))
                         }
@@ -599,6 +593,59 @@ struct ThemeMarks: View {
         return a + d * e
     }
 
+    private static let sprinkleColors: [Color] = [GumPalette.rgb(0xFFFFFF), GumPalette.rgb(0x3DA5FF), GumPalette.rgb(0xFFD43B), GumPalette.rgb(0x3DDC97)]
+
+    /// One glaze sprinkle on the donut, catching the light in turn.
+    static func glazeSprinkle(_ i: Int, t: Double, w: CGFloat, h: CGFloat) -> some View {
+        let a: Double = Double(i) * 0.9
+        let glint: Double = max(0, sin(t * 2.2 + Double(i) * 1.7))
+        let x: CGFloat = CGFloat(cos(a)) * w * 0.3
+        let y: CGFloat = CGFloat(sin(a)) * h * 0.18 - h * 0.12
+        return Capsule().fill(sprinkleColors[i % 4])
+            .overlay(Capsule().fill(Color.white.opacity(glint * 0.8)))
+            .frame(width: max(4, w * 0.035), height: max(1.5, w * 0.012))
+            .scaleEffect(1 + 0.15 * glint)
+            .rotationEffect(.radians(a * 2))
+            .offset(x: x, y: y)
+    }
+
+    private static let soapColors: [Color] = [GumPalette.rgb(0xFFB3D9), GumPalette.rgb(0xB8E0FF), GumPalette.rgb(0xD7B8FF), GumPalette.rgb(0xFFB3D9)]
+
+    /// One tiny bubble drifting up off the soap bubble, wobbling and fading.
+    static func soapBubble(_ i: Int, t: Double, w: CGFloat, hidden: Bool) -> some View {
+        let d: Double = Double(i)
+        let period: Double = 4.5 + d.truncatingRemainder(dividingBy: 3) * 1.3
+        let phase: Double = ((t + d * 0.83) / period).truncatingRemainder(dividingBy: 1)
+        let size: CGFloat = w * (0.025 + 0.012 * CGFloat(i % 4))
+        let x: CGFloat = w * (0.25 + 0.5 * CGFloat((d * 0.37).truncatingRemainder(dividingBy: 1))) + w * 0.04 * CGFloat(sin(t * 2 + d))
+        let y: CGFloat = w * 0.12 - w * 0.75 * CGFloat(phase)
+        let fade: Double = hidden ? 0 : (phase < 0.1 ? phase * 10 : 1 - phase)
+        return Circle()
+            .stroke(AngularGradient(colors: soapColors, center: .center), lineWidth: max(1, size * 0.12))
+            .background(Circle().fill(Color.white.opacity(0.35)))
+            .overlay(Circle().fill(Color.white.opacity(0.9)).frame(width: size * 0.25, height: size * 0.25).offset(x: -size * 0.2, y: -size * 0.2))
+            .frame(width: size, height: size)
+            .position(x: x, y: y)
+            .opacity(fade)
+    }
+
+    private static let fallColors: [Color] = [GumPalette.rgb(0xFFFFFF), GumPalette.rgb(0x3DA5FF), GumPalette.rgb(0xFFD43B), GumPalette.rgb(0x3DDC97), GumPalette.rgb(0xF48FB1)]
+
+    /// One sprinkle tumbling down onto the donut from above.
+    static func fallingSprinkle(_ i: Int, t: Double, w: CGFloat, hidden: Bool) -> some View {
+        let d: Double = Double(i)
+        let period: Double = 2.2 + (d * 0.37).truncatingRemainder(dividingBy: 1) * 1.2
+        let phase: Double = ((t + d * 0.41) / period).truncatingRemainder(dividingBy: 1)
+        let x: CGFloat = w * (0.22 + 0.56 * CGFloat((d * 0.61).truncatingRemainder(dividingBy: 1)))
+        let y: CGFloat = -w * 0.55 + w * 0.7 * CGFloat(phase)
+        let fade: Double = hidden ? 0 : (phase > 0.85 ? (1 - phase) / 0.15 : 1)
+        return Capsule().fill(fallColors[i % 5])
+            .frame(width: max(4, w * 0.035), height: max(1.5, w * 0.012))
+            .rotationEffect(.degrees(phase * 540 + d * 40))
+            .position(x: x, y: y)
+            .opacity(fade)
+    }
+
     static let patches: [(CGFloat, CGFloat, CGFloat, Double)] = [
         (0.5, 0.38, 0.2, 0), (0.22, 0.3, 0.13, 20), (0.78, 0.3, 0.13, -20), (0.3, 0.68, 0.14, 40),
         (0.7, 0.68, 0.14, -40), (0.5, 0.92, 0.1, 0), (0.08, 0.55, 0.08, 10), (0.92, 0.55, 0.08, -10),
@@ -737,19 +784,7 @@ struct ThemeTopper: View {
                     let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
                     ZStack {
                         ForEach(0..<9, id: \.self) { i in
-                            let d = Double(i)
-                            let period = 4.5 + d.truncatingRemainder(dividingBy: 3) * 1.3
-                            let phase = ((t + d * 0.83) / period).truncatingRemainder(dividingBy: 1)
-                            let size = w * (0.025 + 0.012 * CGFloat(i % 4))
-                            Circle()
-                                .stroke(AngularGradient(colors: [GumPalette.rgb(0xFFB3D9), GumPalette.rgb(0xB8E0FF), GumPalette.rgb(0xD7B8FF), GumPalette.rgb(0xFFB3D9)], center: .center),
-                                        lineWidth: max(1, size * 0.12))
-                                .background(Circle().fill(.white.opacity(0.35)))
-                                .overlay(Circle().fill(.white.opacity(0.9)).frame(width: size * 0.25, height: size * 0.25).offset(x: -size * 0.2, y: -size * 0.2))
-                                .frame(width: size, height: size)
-                                .position(x: w * (0.25 + 0.5 * CGFloat((d * 0.37).truncatingRemainder(dividingBy: 1))) + w * 0.04 * CGFloat(sin(t * 2 + d)),
-                                          y: w * 0.12 - w * 0.75 * CGFloat(phase))
-                                .opacity(reduceMotion ? 0 : (phase < 0.1 ? phase * 10 : 1 - phase))
+                            ThemeMarks.soapBubble(i, t: t, w: w, hidden: reduceMotion)
                         }
                     }
                 }
@@ -759,15 +794,7 @@ struct ThemeTopper: View {
                     let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
                     ZStack {
                         ForEach(0..<12, id: \.self) { i in
-                            let d = Double(i)
-                            let period = 2.2 + (d * 0.37).truncatingRemainder(dividingBy: 1) * 1.2
-                            let phase = ((t + d * 0.41) / period).truncatingRemainder(dividingBy: 1)
-                            Capsule().fill([GumPalette.rgb(0xFFFFFF), GumPalette.rgb(0x3DA5FF), GumPalette.rgb(0xFFD43B), GumPalette.rgb(0x3DDC97), GumPalette.rgb(0xF48FB1)][i % 5])
-                                .frame(width: max(4, w * 0.035), height: max(1.5, w * 0.012))
-                                .rotationEffect(.degrees(phase * 540 + d * 40))
-                                .position(x: w * (0.22 + 0.56 * CGFloat((d * 0.61).truncatingRemainder(dividingBy: 1))),
-                                          y: -w * 0.55 + w * 0.7 * CGFloat(phase))
-                                .opacity(reduceMotion ? 0 : (phase > 0.85 ? (1 - phase) / 0.15 : 1))
+                            ThemeMarks.fallingSprinkle(i, t: t, w: w, hidden: reduceMotion)
                         }
                     }
                 }
