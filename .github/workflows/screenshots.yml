@@ -2,8 +2,13 @@ name: screenshots
 # Takes the App Store screenshots on GitHub's iPhone and iPad simulators, using Pop In's screenshot mode
 # (demo meetings, no calendar, no alarms). Run by hand; download the "app-store-screenshots" artifact.
 # Uploads nothing to App Store Connect.
+# Also runs on pull requests that change the screenshot tests or this workflow.
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - .github/workflows/screenshots.yml
+      - App/PromptlyUITests/**
 
 permissions:
   contents: read
