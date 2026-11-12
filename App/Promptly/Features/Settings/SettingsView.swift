@@ -89,7 +89,7 @@ struct SettingsView: View {
 
                 VStack(spacing: 6) {
                     Wordmark()
-                    Text("Reads your calendar. Never changes it. Nothing leaves your phone.")
+                    Text("Reads your calendar. Never changes it.\nNothing leaves your phone.")
                         .font(.footnote)
                         .foregroundStyle(Brand.secondary)
                         .multilineTextAlignment(.center)
