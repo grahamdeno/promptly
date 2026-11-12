@@ -87,12 +87,17 @@ struct ThemeMarks: View {
                     }
                 }
             case .soap:
-                // A thin, swirling rainbow film.
-                Ellipse()
-                    .fill(AngularGradient(colors: [GumPalette.rgb(0xFFB3D9), GumPalette.rgb(0xB8E0FF), GumPalette.rgb(0xC8F5D8),
-                                                   GumPalette.rgb(0xFFF1A8), GumPalette.rgb(0xD7B8FF), GumPalette.rgb(0xFFB3D9)], center: .center))
-                    .opacity(0.45)
-                    .blur(radius: max(4, w * 0.03))
+                // A thin rainbow film that swirls and shimmers while it rests.
+                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { tl in
+                    let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
+                    Ellipse()
+                        .fill(AngularGradient(colors: [GumPalette.rgb(0xFFB3D9), GumPalette.rgb(0xB8E0FF), GumPalette.rgb(0xC8F5D8),
+                                                       GumPalette.rgb(0xFFF1A8), GumPalette.rgb(0xD7B8FF), GumPalette.rgb(0xFFB3D9)],
+                                              center: UnitPoint(x: 0.5 + 0.08 * sin(t / 3), y: 0.45 + 0.08 * cos(t / 4)),
+                                              angle: .degrees(t * 18)))
+                        .opacity(0.4 + 0.1 * sin(t / 1.7))
+                        .blur(radius: max(4, w * 0.03))
+                }
                 Ellipse().stroke(GumPalette.rgb(0xB9AEE6).opacity(0.8), lineWidth: max(1.5, w * 0.006))
             case .planet:
                 // Cloud bands.
@@ -526,6 +531,28 @@ struct ThemeTopper: View {
                     .frame(width: w * 1.45, height: w * 0.28)
                     .rotationEffect(.degrees(-12))
                     .position(x: w / 2, y: (h ?? w) / 2)
+            case .soap:
+                // Tiny bubbles drifting up off the top, wobbling as they rise and fading away.
+                TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion)) { tl in
+                    let t = reduceMotion ? 0 : tl.date.timeIntervalSinceReferenceDate
+                    ZStack {
+                        ForEach(0..<9, id: \.self) { i in
+                            let d = Double(i)
+                            let period = 4.5 + d.truncatingRemainder(dividingBy: 3) * 1.3
+                            let phase = ((t + d * 0.83) / period).truncatingRemainder(dividingBy: 1)
+                            let size = w * (0.025 + 0.012 * CGFloat(i % 4))
+                            Circle()
+                                .stroke(AngularGradient(colors: [GumPalette.rgb(0xFFB3D9), GumPalette.rgb(0xB8E0FF), GumPalette.rgb(0xD7B8FF), GumPalette.rgb(0xFFB3D9)], center: .center),
+                                        lineWidth: max(1, size * 0.12))
+                                .background(Circle().fill(.white.opacity(0.35)))
+                                .overlay(Circle().fill(.white.opacity(0.9)).frame(width: size * 0.25, height: size * 0.25).offset(x: -size * 0.2, y: -size * 0.2))
+                                .frame(width: size, height: size)
+                                .position(x: w * (0.25 + 0.5 * CGFloat((d * 0.37).truncatingRemainder(dividingBy: 1))) + w * 0.04 * CGFloat(sin(t * 2 + d)),
+                                          y: w * 0.12 - w * 0.75 * CGFloat(phase))
+                                .opacity(reduceMotion ? 0 : (phase < 0.1 ? phase * 10 : 1 - phase))
+                        }
+                    }
+                }
             case .waterBalloon:
                 // The tied knot.
                 Ellipse().fill(palette.dark).frame(width: w * 0.06, height: w * 0.05).position(x: w / 2, y: -w * 0.005)
