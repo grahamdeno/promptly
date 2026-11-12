@@ -275,7 +275,7 @@ final class Journeys: XCTestCase {
         let a = Audit("J12-all-themes")
         defer { a.finish() }
         for theme in ["snowball", "ornament", "pumpkin", "disco", "soap", "planet", "basketball", "donut",
-                      "waterBalloon", "eyeball", "fishbowl", "moodRing", "lavaLamp"] {
+                      "waterBalloon", "eyeball", "fishbowl", "moodRing", "lavaLamp", "soccer"] {
             a.launch("fortune", theme: theme, settle: 2)
             a.shot("\(theme)")
             _ = popBubble(a)

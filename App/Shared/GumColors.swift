@@ -22,6 +22,8 @@ enum GumPalette: String, CaseIterable, Sendable {
     case pumpkin
     /// The novelty set (built 2026-11-12; held from the App Store with the holiday themes until released).
     case disco, soap, planet, basketball, donut, waterBalloon, eyeball, fishbowl, moodRing, lavaLamp
+    /// Soccer: the classic black and white ball (held; for the big tournaments).
+    case soccer
 
     var isPro: Bool { !(self == .bubblegum || self == .coral) }
 
@@ -37,7 +39,7 @@ enum GumPalette: String, CaseIterable, Sendable {
         #endif
     }
     var isSeasonal: Bool { self == .snowball || self == .ornament || self == .pumpkin }
-    static let novelty: [GumPalette] = [.disco, .soap, .planet, .basketball, .donut, .waterBalloon, .eyeball, .fishbowl, .moodRing, .lavaLamp]
+    static let novelty: [GumPalette] = [.disco, .soap, .planet, .basketball, .donut, .waterBalloon, .eyeball, .fishbowl, .moodRing, .lavaLamp, .soccer]
     /// Held back from the App Store (shown in TestFlight) until the owner decides how to release it.
     var isHeld: Bool { isSeasonal || Self.novelty.contains(self) }
     /// The colors offered in Settings.
@@ -64,6 +66,7 @@ enum GumPalette: String, CaseIterable, Sendable {
         case .eyeball: "eyeball_pop"
         case .fishbowl: "fishbowl_pop"
         case .lavaLamp: "lava_pop"
+        case .soccer: "soccer_pop"
         }
     }
 
@@ -96,6 +99,7 @@ enum GumPalette: String, CaseIterable, Sendable {
         case .fishbowl: "Fishbowl"
         case .moodRing: "Mood ring"
         case .lavaLamp: "Lava lamp"
+        case .soccer: "Soccer"
         }
     }
 
@@ -124,6 +128,7 @@ enum GumPalette: String, CaseIterable, Sendable {
         case .fishbowl: Self.rgb(0xCDEBF7)
         case .moodRing: Self.rgb(0x2E6FD8)
         case .lavaLamp: Self.rgb(0xC2321F)
+        case .soccer: Self.rgb(0xF2F2F0)
         }
     }
 
@@ -148,6 +153,7 @@ enum GumPalette: String, CaseIterable, Sendable {
         case .fishbowl: Self.rgb(0xFFFFFF)
         case .moodRing: Self.rgb(0x9CC2FF)
         case .lavaLamp: Self.rgb(0xFF8A4C)
+        case .soccer: Self.rgb(0xFFFFFF)
         }
     }
 
@@ -172,6 +178,7 @@ enum GumPalette: String, CaseIterable, Sendable {
         case .fishbowl: Self.rgb(0x6FA9C8)
         case .moodRing: Self.rgb(0x0E2F6B)
         case .lavaLamp: Self.rgb(0x4A0F08)
+        case .soccer: Self.rgb(0x9C9C98)
         }
     }
 
@@ -187,6 +194,7 @@ enum GumPalette: String, CaseIterable, Sendable {
         case .eyeball: Self.rgb(0x2E7DD8)
         case .fishbowl: Self.rgb(0x1E9BD8)
         case .disco: Self.rgb(0x8A6FE0)
+        case .soccer: Self.rgb(0x1E8E3E)
         default: base
         }
     }
@@ -226,6 +234,7 @@ enum GumPalette: String, CaseIterable, Sendable {
         case .fishbowl: Self.rgb(0x0B6E99)
         case .moodRing: Self.rgb(0x1E4FA8)
         case .lavaLamp: Self.rgb(0xA0280F)
+        case .soccer: Self.rgb(0x15703A)
         default: Self.rgb(0xB02E68)
         }
     }

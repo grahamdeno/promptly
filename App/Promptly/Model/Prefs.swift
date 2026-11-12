@@ -16,10 +16,12 @@ enum AlarmSoundChoice: String, CaseIterable, Sendable {
     case sonar
     /// "Sleigh bells": jingles and a bell tune, for the holiday themes; held back with them (Sounds/sleigh_alarm.wav). Pro.
     case sleighBells
+    /// "Whistle": a referee's whistle, trilling faster; for Soccer and held with it (Sounds/whistle_alarm.wav). Pro.
+    case whistle
 
     var isPro: Bool { !(self == .bubbleBlow || self == .appleDefault) }
     /// The sounds offered in Settings (seasonal ones wait for their themes).
-    static var available: [AlarmSoundChoice] { allCases.filter { GumPalette.seasonsReady || $0 != .sleighBells } }
+    static var available: [AlarmSoundChoice] { allCases.filter { GumPalette.seasonsReady || ($0 != .sleighBells && $0 != .whistle) } }
 
     var label: String {
         switch self {
@@ -29,6 +31,7 @@ enum AlarmSoundChoice: String, CaseIterable, Sendable {
         case .oracle: "Oracle"
         case .sonar: "Sonar"
         case .sleighBells: "Sleigh bells"
+        case .whistle: "Whistle"
         case .appleDefault: "Apple"
         }
     }
@@ -41,6 +44,7 @@ enum AlarmSoundChoice: String, CaseIterable, Sendable {
         case .oracle: "oracle_alarm.wav"
         case .sonar: "sonar_alarm.wav"
         case .sleighBells: "sleigh_alarm.wav"
+        case .whistle: "whistle_alarm.wav"
         default: "bubble_blow_alarm.wav"
         }
     }

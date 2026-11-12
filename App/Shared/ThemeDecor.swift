@@ -138,6 +138,15 @@ struct ThemeMarks: View {
                 let c: Color = level < 0.5 ? GumPalette.rgb(0x2E6FD8) : (level < 0.85 ? GumPalette.rgb(0x2EA86B) : GumPalette.rgb(0xD8342E))
                 Ellipse().fill(c.opacity(0.75)).blendMode(.color)
                 Ellipse().fill(RadialGradient(colors: [.white.opacity(0.35), .clear], center: UnitPoint(x: 0.35, y: 0.3), startRadius: 0, endRadius: w * 0.5))
+            case .soccer:
+                // Black pentagon patches, smaller toward the edge where the ball curves away.
+                ForEach(0..<Self.patches.count, id: \.self) { i in
+                    let p = Self.patches[i]
+                    Pentagon().fill(Color.black.opacity(0.85))
+                        .frame(width: w * p.2, height: w * p.2)
+                        .rotationEffect(.degrees(p.3))
+                        .position(x: w * p.0, y: h * p.1)
+                }
             case .lavaLamp:
                 // Warm blobs rising and sinking.
                 TimelineView(.animation(minimumInterval: 1.0 / 20, paused: reduceMotion)) { ctx in
@@ -165,6 +174,11 @@ struct ThemeMarks: View {
     static let craters: [(CGFloat, CGFloat, CGFloat)] = [
         (0.30, 0.30, 0.12), (0.62, 0.22, 0.08), (0.70, 0.45, 0.14), (0.42, 0.52, 0.09),
         (0.22, 0.58, 0.07), (0.55, 0.70, 0.11), (0.80, 0.68, 0.06), (0.35, 0.80, 0.08), (0.50, 0.36, 0.05),
+    ]
+    /// (x, y, size, angle) for the soccer ball's patches.
+    static let patches: [(CGFloat, CGFloat, CGFloat, Double)] = [
+        (0.5, 0.38, 0.2, 0), (0.22, 0.3, 0.13, 20), (0.78, 0.3, 0.13, -20), (0.3, 0.68, 0.14, 40),
+        (0.7, 0.68, 0.14, -40), (0.5, 0.92, 0.1, 0), (0.08, 0.55, 0.08, 10), (0.92, 0.55, 0.08, -10),
     ]
     static let flakes: [(CGFloat, CGFloat, CGFloat)] = [
         (0.38, 0.22, 0.06), (0.65, 0.32, 0.045), (0.48, 0.45, 0.035), (0.25, 0.48, 0.04), (0.72, 0.58, 0.05),
@@ -340,6 +354,10 @@ enum ThemeDebris {
         case .moodRing:
             FourPointStar().fill([GumPalette.rgb(0x2E6FD8), GumPalette.rgb(0x2EA86B), GumPalette.rgb(0xD8342E), GumPalette.rgb(0x9B5CFF)][i % 4])
                 .frame(width: small, height: small)
+        case .soccer:
+            if i == 0 { Text("⚽").font(.system(size: emoji)) }
+            else if i % 3 == 0 { Pentagon().fill(Color.black.opacity(0.85)).frame(width: small * 0.7, height: small * 0.7) }
+            else { Capsule().fill(i % 2 == 0 ? GumPalette.rgb(0x2EA84F) : GumPalette.rgb(0x1E7A38)).frame(width: 3, height: small * 0.8) }
         case .lavaLamp:
             Ellipse().fill(i % 2 == 0 ? GumPalette.rgb(0xFFC23A) : GumPalette.rgb(0xFF7A3D)).frame(width: side * 0.7, height: side * 0.8).blur(radius: 3)
         default:
@@ -360,5 +378,19 @@ struct SeededRandom {
     mutating func next() -> Double {
         state ^= state << 13; state ^= state >> 7; state ^= state << 17
         return Double(state % 1_000_000) / 1_000_000
+    }
+}
+
+/// A regular pentagon, point up, for the soccer ball.
+struct Pentagon: Shape {
+    func path(in r: CGRect) -> Path {
+        var p = Path()
+        for k in 0..<5 {
+            let a = -Double.pi / 2 + Double(k) * 2 * .pi / 5
+            let pt = CGPoint(x: r.midX + cos(a) * r.width / 2, y: r.midY + sin(a) * r.height / 2)
+            if k == 0 { p.move(to: pt) } else { p.addLine(to: pt) }
+        }
+        p.closeSubpath()
+        return p
     }
 }
