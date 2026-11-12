@@ -503,10 +503,6 @@ struct GumBubbleShape: View {
                         }
                         .opacity(1 - words)
                         .position(x: w * (0.5 + 0.16 * sin(t / 7)), y: h * (0.26 + 0.05 * sin(t / 5)))
-                        if let fortuneText {
-                            FortuneWords(text: fortuneText, w: w, amount: words)
-                                .position(x: w * 0.5, y: h * 0.3)
-                        }
                     }
                     .clipShape(Ellipse())
                 }
@@ -561,6 +557,15 @@ struct GumBubbleShape: View {
                 }
             }
             .modifier(EggMask(on: GumPalette.current == .waterBalloon || GumPalette.current == .easterEgg))
+                if GumPalette.current == .fortune, let fortuneText {
+                    // The fortune's words, on top of every other layer of the ball so nothing covers them.
+                    TimelineView(.animation(minimumInterval: 1.0 / 20, paused: reduceMotion || ScreenshotMode.isOn)) { ctx in
+                        let t = reduceMotion || ScreenshotMode.isOn ? 0 : ctx.date.timeIntervalSinceReferenceDate
+                        FortuneWords(text: fortuneText, w: w, amount: FortuneSurface.amount(t, still: reduceMotion || ScreenshotMode.isOn))
+                            .frame(width: w, height: h)
+                    }
+                    .clipShape(Ellipse())
+                }
                 ThemeTopper(palette: GumPalette.current, w: w, h: h)
             }
         }
@@ -672,30 +677,32 @@ enum FortuneSurface {
     }
 }
 
-/// The fortune's words, soft violet-white, floating up out of the mist inside the black ball.
+/// The fortune's words, soft white with a violet glow, rising out of the mist inside the black ball (upper middle,
+/// where the glass is most visible above the card).
 struct FortuneWords: View {
     let text: String
     let w: CGFloat
     let amount: Double
 
     var body: some View {
-        let size: CGFloat = max(13, w * 0.05)
-        let blur: CGFloat = CGFloat(1 - amount) * size * 0.5
-        ZStack {
-            Circle().fill(GumPalette.violet.opacity(0.35 * amount))
-                .frame(width: w * 0.62, height: w * 0.62)
-                .blur(radius: w * 0.08)
-            Text(text)
-                .font(.system(size: size, weight: .semibold, design: .serif).italic())
-                .multilineTextAlignment(.center)
-                .foregroundStyle(Color.white.opacity(0.95))
-                .shadow(color: GumPalette.violet.opacity(0.9), radius: size * 0.4)
-                .lineLimit(4)
-                .minimumScaleFactor(0.6)
-                .frame(width: w * 0.46)
-                .blur(radius: blur)
-                .opacity(amount)
-                .offset(y: CGFloat(1 - amount) * size * 0.8)
+        let size: CGFloat = min(30, max(15, w * 0.045))
+        GeometryReader { geo in
+            ZStack {
+                Circle().fill(GumPalette.violet.opacity(0.4 * amount))
+                    .frame(width: w * 0.6, height: w * 0.6)
+                    .blur(radius: w * 0.07)
+                Text(text)
+                    .font(.system(size: size, weight: .semibold, design: .serif).italic())
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(.white)
+                    .shadow(color: GumPalette.violet, radius: size * 0.35)
+                    .lineLimit(4)
+                    .minimumScaleFactor(0.6)
+                    .frame(width: w * 0.5)
+                    .offset(y: CGFloat(1 - amount) * size)
+                    .opacity(amount)
+            }
+            .position(x: geo.size.width * 0.5, y: geo.size.height * 0.32)
         }
         .accessibilityHidden(true)
     }
