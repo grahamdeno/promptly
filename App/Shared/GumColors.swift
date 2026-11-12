@@ -112,11 +112,13 @@ struct UnicornSheen: View {
 /// A thin rainbow edge so the unicorn bubble keeps a crisp outline against white.
 struct UnicornRim: View {
     var lineWidth: CGFloat
+    /// Where the colors start around the edge; the bubble turns this slowly so the rim seems to spin.
+    var angle: Double = -60
 
     var body: some View {
         Ellipse()
             .strokeBorder(AngularGradient(colors: GumPalette.rainbow + [GumPalette.rainbow[0]], center: .center,
-                                          angle: .degrees(-60)), lineWidth: lineWidth)
+                                          angle: .degrees(angle)), lineWidth: lineWidth)
             .opacity(0.9)
     }
 }

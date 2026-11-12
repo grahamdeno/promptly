@@ -486,7 +486,12 @@ struct GumBubbleShape: View {
                     .stroke(.white.opacity(0.35 + thinness * 0.15), style: StrokeStyle(lineWidth: max(2, w * 0.006), lineCap: .round))
                     .padding(w * 0.012)
                 if GumPalette.current == .unicorn {
-                    UnicornRim(lineWidth: max(2.5, w * 0.008))
+                    // The rainbow rim turns once every 6 seconds (still with Reduce Motion and in screenshots).
+                    TimelineView(.animation(minimumInterval: 1.0 / 30, paused: reduceMotion || ScreenshotMode.isOn)) { ctx in
+                        let spin = ctx.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 6) / 6 * 360
+                        UnicornRim(lineWidth: max(2.5, w * 0.008),
+                                   angle: reduceMotion || ScreenshotMode.isOn ? -60 : -60 + spin)
+                    }
                 }
             }
             .shadow(color: GumColors.coral.opacity(0.3), radius: 30, y: -12)
