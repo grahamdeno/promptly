@@ -151,6 +151,7 @@ struct HomeView: View {
                         Label(how, systemImage: rings ? "bell.fill" : "bell.slash")
                             .font(.footnote.weight(.medium))
                             .foregroundStyle(rings ? Brand.accentText : Brand.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
                             .padding(.bottom, 10)
                     }
                     Text(meeting.title)

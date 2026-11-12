@@ -113,22 +113,29 @@ struct SettingsView: View {
         }
     }
 
+    @Environment(\.dynamicTypeSize) private var typeSize
+
     private var proRow: some View {
         Button { model.showPro = true } label: {
             HStack(spacing: 14) {
-                GumBall().frame(width: 36, height: 36)
+                if !typeSize.isAccessibilitySize { GumBall().frame(width: 36, height: 36) }
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Pop In Pro").font(.body.weight(.semibold)).foregroundStyle(Brand.ink).fixedSize(horizontal: false, vertical: true)
+                    Text("Pop In Pro").font(.body.weight(.semibold)).foregroundStyle(Brand.ink)
                     Text(model.store.isPro ? "Unlocked" : "Unicorn mode, more sounds, desk mode")
                         .font(.footnote).foregroundStyle(Brand.secondary)
+                    if typeSize.isAccessibilitySize && !model.store.isPro {
+                        Text(model.store.price).font(.subheadline.weight(.semibold)).foregroundStyle(Brand.ink)
+                    }
                 }
-                Spacer()
-                if !model.store.isPro {
-                    Text(model.store.price).font(.subheadline.weight(.semibold)).foregroundStyle(Brand.ink)
+                .fixedSize(horizontal: false, vertical: true)
+                Spacer(minLength: 8)
+                if !model.store.isPro && !typeSize.isAccessibilitySize {
+                    Text(model.store.price).font(.subheadline.weight(.semibold)).foregroundStyle(Brand.ink).fixedSize()
                 }
                 Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(Brand.secondary)
             }
             .padding(.horizontal, 18)
+            .padding(.vertical, 10)
             .frame(minHeight: 68)
             .background(RoundedRectangle(cornerRadius: 20).fill(.white))
         }
