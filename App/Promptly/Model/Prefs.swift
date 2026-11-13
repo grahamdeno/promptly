@@ -202,6 +202,12 @@ final class Prefs: @unchecked Sendable {
         set { defaults.set(newValue, forKey: "whatsNewLastShown") }
     }
 
+    /// Ring for Apple Reminders that have a time.
+    var appleReminders: Bool {
+        get { defaults.bool(forKey: "appleReminders") }
+        set { defaults.set(newValue, forKey: "appleReminders") }
+    }
+
     /// Reminders made inside Pop In.
     var ownReminders: [OwnReminder] {
         get { (defaults.data(forKey: "ownReminders")).flatMap { try? JSONDecoder().decode([OwnReminder].self, from: $0) } ?? [] }

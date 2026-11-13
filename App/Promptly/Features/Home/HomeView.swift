@@ -243,7 +243,7 @@ struct HomeView: View {
         let parts = Countdown.parts(now: now, start: meeting.start)
         let started = meeting.start <= now
         let nextWord = model.gumColor == .moon ? "Next transmission" : "Next"
-        let label = isDemo(meeting) ? "Practice" : meeting.calendarID == OwnReminder.calendarID ? "Reminder" : [started ? "Happening now" : nextWord, meeting.service?.rawValue].compactMap { $0 }.joined(separator: " · ")
+        let label = isDemo(meeting) ? "Practice" : meeting.calendarID == OwnReminder.calendarID || meeting.calendarID == CalendarService.remindersCalendarID ? "Reminder" : [started ? "Happening now" : nextWord, meeting.service?.rawValue].compactMap { $0 }.joined(separator: " · ")
         // How Pop In will alert, so a quiet one is never a surprise.
         let paused = model.isPaused(meeting, now: now)
         let rings = model.ringsFully(meeting) && !paused

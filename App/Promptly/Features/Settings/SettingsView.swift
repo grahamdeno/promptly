@@ -41,6 +41,12 @@ struct SettingsView: View {
                             }
                         }
                     }
+                    SettingsToggle("Apple Reminders", detail: model.appleReminders
+                                   ? "Reminders with a time ring like a meeting"
+                                   : "Ring for reminders with a time, like ones you ask Siri for",
+                                   isOn: Binding(get: { model.appleReminders }, set: { on in
+                                       if on { Task { await model.enableAppleReminders() } } else { model.appleReminders = false }
+                                   }))
                     SettingsToggle("Accepted meetings only", detail: "Skip meetings you haven't accepted yet",
                                    isOn: Binding(get: { model.acceptedOnly }, set: { model.acceptedOnly = $0 }))
                 }

@@ -29,6 +29,7 @@ targets:
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_FILE: Config/Info.plist
         INFOPLIST_KEY_CFBundleDisplayName: Pop In
+        INFOPLIST_KEY_NSRemindersFullAccessUsageDescription: "Pop In reads reminders that have a time, like ones you ask Siri for, so they ring like a meeting. It never changes or completes a reminder, and nothing leaves this iPhone."
         INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription: "Pop In reads your calendars to ring before each meeting. It never changes your calendar, and nothing leaves this iPhone."
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES: AppIcon-Coral AppIcon-Unicorn AppIcon-Fortune AppIcon-Moon AppIcon-Grenade AppIcon-Snowball AppIcon-Ornament AppIcon-Pumpkin

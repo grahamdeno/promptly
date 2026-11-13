@@ -366,3 +366,7 @@ Code needed after approval (Sonnet): per-theme release dates replacing the singl
 - Now: once a later ringing meeting reaches its ring time, a started, unpopped meeting counts as missed: it leaves Home, loses its backup alarm, and the open alarm screen switches to the new meeting with "Missed: 1:00 Standup · Join" while the old one is still running. NewestWins in Model, unit tested.
 - Sticking-point hunt: AlarmScreenRule (the watcher's per-tick decision) is pure and covered by SimulatedDayTests (back-to-back unpopped, popped, snooze, two at once, quiet, paused, overlapping, cancelled). The extraction also fixed a latent snag: when two meetings were due together and the first had been shown, the second never got its screen.
 - Simulator walk-through J13 (edge-case scenes missed, paused, outside, reminder, dupes, playground, the More menu and Add a reminder sheet) runs in ux-audit.
+
+## Sprint 30: Apple Reminders (owner, 2026-11-13: "I used Siri to create the reminder... a lot of people might do that")
+- Settings > Meetings > Apple Reminders (off until turned on; turning it on asks for Reminders access). Unfinished reminders with a due time in the next 48 hours ring like a meeting, labeled Reminder. Date-only reminders are skipped.
+- Read only: Pop In never creates, completes or changes a reminder; popping only clears it inside Pop In. read_only_guard now allows reading reminders and blocks saving, removing, creating or completing them.

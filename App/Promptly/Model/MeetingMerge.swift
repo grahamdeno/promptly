@@ -38,7 +38,11 @@ enum MeetingMerge {
                 kept.append(m)
             }
         }
-        return kept
+        // Whichever copy was kept, show the tidy title (without FW:, RE:).
+        return kept.map { m in
+            Meeting(id: m.id, eventID: m.eventID, title: cleanTitle(m.title), start: m.start, end: m.end,
+                    calendarID: m.calendarID, joinURL: m.joinURL)
+        }
     }
 
     static func same(_ a: Meeting, _ b: Meeting) -> Bool {
