@@ -44,11 +44,11 @@ struct SettingsView: View {
                     .buttonStyle(.plain)
                     SettingsLink("Sound", value: model.alarmSound.label) {
                         ChoicePage(title: "Alarm sound",
-                                   note: "Tap one to hear it. It starts quietly and gets louder until the meeting starts. Apple's tone rings on the Lock Screen only; while Pop In is open you'll hear Gum pops instead.",
+                                   note: "Tap one to hear it. It starts quietly and gets louder until the meeting starts. Apple plays Apple's alarm beep here and while Pop In is open, and Apple's default alarm on the Lock Screen.",
                                    options: AlarmSoundChoice.available, selected: model.alarmSound, label: \.label,
                                    locked: { $0.isPro && !model.store.isPro }) { choice in
                             model.alarmSound = choice
-                            if choice != .appleDefault { AlarmLoop.preview(choice) }
+                            AlarmLoop.preview(choice)
                         }
                     }
                     SettingsToggle("Lock Screen countdown", detail: "The bubble on your Lock Screen before it rings",
