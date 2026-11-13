@@ -6,6 +6,7 @@ struct HomeView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.openURL) private var openURL
     @State private var addingReminder = false
+    @State private var showGallery = false
     @State private var showCalendars = ScreenshotMode.scene.map { [ScreenshotScene.settings, .pro, .manycals].contains($0) } ?? false
 
     @Environment(\.horizontalSizeClass) private var sizeClass
@@ -71,6 +72,13 @@ struct HomeView: View {
         .hapticRamp(until: model.upcoming(at: .now).first?.start, enabled: model.buzz && model.arrived == nil)
         .overlay { DiscoLights().ignoresSafeArea().environment(\.themeStill, quiet || PowerWatch.shared.strained) }
         .overlay(alignment: .bottom) { undoToast }
+        .sheet(isPresented: $showGallery) {
+            NavigationStack { ThemeGalleryPage() }
+                .environment(model)
+                .sheet(isPresented: Binding(get: { model.showPro }, set: { model.showPro = $0 })) {
+                    ProView().environment(model)
+                }
+        }
         .sheet(isPresented: $addingReminder) {
             AddReminderSheet().environment(model)
         }
@@ -109,16 +117,52 @@ struct HomeView: View {
 
     /// The text sits on a glass pane so it stays readable when the bubble rises behind it.
     private func textColumn(now: Date, upcoming: [Meeting], next: Meeting?, showThen: Bool) -> some View {
-        Group {
-            if !model.calendarAuthorized || !model.alarmsAuthorized {
-                permissionNotice.glassCard()
-            } else if let next {
-                meetingBlock(next, now: now, then: showThen ? upcoming.dropFirst().first : nil)
-            } else {
-                emptyBlock.glassCard()
+        VStack(alignment: .leading, spacing: 14) {
+            Group {
+                if !model.calendarAuthorized || !model.alarmsAuthorized {
+                    permissionNotice.glassCard()
+                } else if let next {
+                    meetingBlock(next, now: now, then: showThen ? upcoming.dropFirst().first : nil)
+                } else {
+                    emptyBlock.glassCard()
+                }
             }
+            whatsNewCard
         }
         .padding(.horizontal, -12)
+    }
+
+    /// At most once a month: the themes that just arrived. Opening it or waving it away both count as seen.
+    @ViewBuilder
+    private var whatsNewCard: some View {
+        let _ = model.whatsNewTick
+        let fresh = model.whatsNew
+        if !fresh.isEmpty {
+            HStack(spacing: 12) {
+                HStack(spacing: -10) {
+                    ForEach(fresh.prefix(3), id: \.self) { SwatchBall(palette: $0).frame(width: 30, height: 30) }
+                }
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("New this month").font(.footnote.weight(.medium)).foregroundStyle(Brand.secondary)
+                    Text(fresh.map(\.label).formatted(.list(type: .and)))
+                        .font(.subheadline.weight(.semibold)).foregroundStyle(Brand.ink).lineLimit(2)
+                    Text(model.store.isPro ? "Included with Pro" : "Try one free for a day")
+                        .font(.footnote).foregroundStyle(Brand.accentText)
+                }
+                Spacer(minLength: 4)
+                Button { model.whatsNewDismissed(fresh) } label: {
+                    Image(systemName: "xmark").font(.footnote.weight(.semibold)).foregroundStyle(Brand.secondary)
+                        .frame(width: 44, height: 44)
+                }
+                .accessibilityLabel("Dismiss")
+            }
+            .padding(.leading, 16)
+            .contentShape(Rectangle())
+            .onTapGesture { model.whatsNewOpened(fresh); showGallery = true }
+            .glassEffect(.regular, in: .rect(cornerRadius: 22))
+            .accessibilityElement(children: .combine)
+            .accessibilityAddTraits(.isButton)
+        }
     }
 
     private func todayList(_ items: [Meeting]) -> some View {

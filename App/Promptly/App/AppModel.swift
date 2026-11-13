@@ -61,6 +61,62 @@ final class AppModel {
     var countdownCard: Bool {
         didSet { prefs.countdownCard = countdownCard; Task { await syncAlarms() } }
     }
+    // MARK: Try a theme, and New this month
+
+    /// Whether this theme can be used now: owned, or today's one-day trial.
+    func canUse(_ palette: GumPalette) -> Bool {
+        store.unlocks(palette)
+            || ThemeTrial.active(theme: palette.rawValue, day: ThemeTrial.today(), trialTheme: prefs.trialTheme, trialDay: prefs.trialDay)
+    }
+
+    /// A free user hasn't tried this theme yet.
+    func canTry(_ palette: GumPalette) -> Bool {
+        palette.isPro && !store.isPro && !prefs.triedThemes.contains(palette.rawValue)
+    }
+
+    /// Use a Pro theme for the rest of today. Once per theme.
+    func tryTheme(_ palette: GumPalette) {
+        guard canTry(palette) else { showPro = true; return }
+        prefs.triedThemes.insert(palette.rawValue)
+        prefs.trialTheme = palette.rawValue
+        prefs.trialDay = ThemeTrial.today()
+        surprise = false
+        gumColor = palette
+    }
+
+    /// A trial ends with the day: back to Bubblegum unless the theme is owned.
+    func endTrialIfOver() {
+        if !canUse(gumColor) { gumColor = .bubblegum }
+    }
+
+    /// Themes for the "New this month" card on Home, or empty when it shouldn't show.
+    var whatsNew: [GumPalette] {
+        let fresh = GumPalette.recentlyReleased(at: .now)
+        guard !ScreenshotMode.isOn, WhatsNew.shouldShow(new: fresh.map(\.rawValue), seen: prefs.whatsNewSeen,
+                                                       ignoredInARow: prefs.whatsNewIgnored, lastShown: prefs.whatsNewLastShown, now: .now)
+        else { return [] }
+        return fresh
+    }
+
+    /// Opened the card (tried or looked): it counts as seen and resets the wave-away count.
+    func whatsNewOpened(_ themes: [GumPalette]) {
+        prefs.whatsNewSeen.formUnion(themes.map(\.rawValue))
+        prefs.whatsNewIgnored = 0
+        prefs.whatsNewLastShown = .now
+        whatsNewTick += 1
+    }
+
+    /// Waved away: seen, and two in a row stops the cards.
+    func whatsNewDismissed(_ themes: [GumPalette]) {
+        prefs.whatsNewSeen.formUnion(themes.map(\.rawValue))
+        prefs.whatsNewIgnored += 1
+        prefs.whatsNewLastShown = .now
+        whatsNewTick += 1
+    }
+
+    /// Bumped so Home redraws after the card is handled.
+    var whatsNewTick = 0
+
     /// Reminders made inside Pop In; they ring like meetings.
     var ownReminders: [OwnReminder] = [] {
         didSet { prefs.ownReminders = ownReminders }
@@ -197,7 +253,7 @@ final class AppModel {
         // If Pro goes away (refund), fall back to free choices.
         store.onLost = { [weak self] in
             guard let self else { return }
-            if !self.store.unlocks(self.gumColor) { self.gumColor = .bubblegum }
+            if !self.canUse(self.gumColor) { self.gumColor = .bubblegum }
             guard !self.store.isPro else { return }
             if self.alarmSound.isPro { self.alarmSound = .bubbleBlow }
             if self.popChoice.isPro { self.popChoice = .pop }
@@ -385,6 +441,7 @@ final class AppModel {
         isForeground = true
         if ScreenshotMode.isOn { return }
         surpriseIfNewDay()
+        endTrialIfOver()
         applyKeepAwake()
         calendarAuthorized = calendarService.isAuthorized
         alarmsAuthorized = alarmService.isAuthorized

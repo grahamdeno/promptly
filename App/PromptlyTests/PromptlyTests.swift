@@ -288,7 +288,7 @@ final class ThemeTests: XCTestCase {
         XCTAssertTrue(GumPalette.unicorn.isReleased(at: before), "1.0 themes have no date")
         XCTAssertTrue(GumPalette.disco.isReleased(at: before))
         XCTAssertFalse(GumPalette.moon.isReleased(at: after), "Moon waits for the Apollo 11 anniversary")
-        XCTAssertEqual(GumPalette.recentlyReleased(at: after), [.snowball, .ornament].sorted { $0.rawValue < $1.rawValue }.sorted { _, _ in false })
+        XCTAssertEqual(Set(GumPalette.recentlyReleased(at: after)), [.snowball, .ornament])
         let launchSet = GumPalette.allCases.filter { $0.releaseDate == nil }
         XCTAssertEqual(Set(launchSet), [.bubblegum, .coral, .unicorn, .fortune, .gumball, .planet, .soap, .lavaLamp, .moodRing, .zen, .fishbowl, .disco, .clock, .marble])
         XCTAssertTrue(AlarmSoundChoice.available.contains(.sonar))
@@ -416,5 +416,24 @@ final class AlertRulesTests: XCTestCase {
         XCTAssertFalse(PauseRule.silences(now.addingTimeInterval(4000), pausedUntil: now.addingTimeInterval(3600), now: now))
         XCTAssertFalse(PauseRule.silences(now.addingTimeInterval(60), pausedUntil: now.addingTimeInterval(-1), now: now))
         XCTAssertFalse(PauseRule.silences(now, pausedUntil: nil, now: now))
+    }
+}
+
+
+final class TrialTests: XCTestCase {
+    func testOneDayTrialPerTheme() {
+        let day = "2026-12-01"
+        XCTAssertTrue(ThemeTrial.active(theme: "disco", day: day, trialTheme: "disco", trialDay: day))
+        XCTAssertFalse(ThemeTrial.active(theme: "disco", day: "2026-12-02", trialTheme: "disco", trialDay: day))
+        XCTAssertFalse(ThemeTrial.active(theme: "soap", day: day, trialTheme: "disco", trialDay: day))
+    }
+
+    func testWhatsNewAtMostMonthly() {
+        let now = Date()
+        XCTAssertTrue(WhatsNew.shouldShow(new: ["snowball"], seen: [], ignoredInARow: 0, lastShown: nil, now: now))
+        XCTAssertFalse(WhatsNew.shouldShow(new: ["snowball"], seen: ["snowball"], ignoredInARow: 0, lastShown: nil, now: now))
+        XCTAssertFalse(WhatsNew.shouldShow(new: ["duck"], seen: [], ignoredInARow: 2, lastShown: nil, now: now))
+        XCTAssertFalse(WhatsNew.shouldShow(new: ["duck"], seen: [], ignoredInARow: 0, lastShown: now.addingTimeInterval(-10 * 86400), now: now))
+        XCTAssertTrue(WhatsNew.shouldShow(new: ["duck"], seen: [], ignoredInARow: 1, lastShown: now.addingTimeInterval(-29 * 86400), now: now))
     }
 }

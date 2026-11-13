@@ -348,3 +348,11 @@ Code needed after approval (Sonnet): per-theme release dates replacing the singl
 - Work hours (Settings > Meetings): outside them meetings get the quiet notification; the card says so.
 - Widgets: Lock Screen (rectangular, circular, inline) and a "Coming up" list widget.
 - Later (6-11): multiple alerts per meeting, own reminders, Apple Reminders, travel time, Watch app, Mac app.
+
+## Sprint 27: launch prep (owner: "all your best suggestions", 2026-11-12)
+- Pro only: packs removed (packID nil, never created in App Store Connect). Pro sheet: every theme, including new ones.
+- Tip jar in Settings: three consumable tips (com.grahamdeno.promptly.tip.small/medium/large), unlock nothing. Grok creates them later.
+- Release calendar in code: GumPalette.releaseDays; App Store copies show a theme from its Monday; TestFlight shows all.
+- Try it: a free user can use any Pro theme for one day, once per theme; it ends at midnight.
+- New this month: a card under the meeting card, at most every four weeks, stops after two wave-aways in a row.
+- Holds: Apple Reminders and travel buffer until after 1.0.

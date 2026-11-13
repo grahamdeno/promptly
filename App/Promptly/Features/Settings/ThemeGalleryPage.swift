@@ -6,6 +6,7 @@ import SwiftUI
 struct ThemeGalleryPage: View {
     @Environment(AppModel.self) private var model
     @State private var bounced: GumPalette?
+    @State private var offer: GumPalette?
 
     var body: some View {
         SettingsPage {
@@ -45,6 +46,13 @@ struct ThemeGalleryPage: View {
                 }
             }
         }
+        .confirmationDialog(offer.map { "Try \($0.label)" } ?? "", isPresented: Binding(get: { offer != nil }, set: { if !$0 { offer = nil } }),
+                            titleVisibility: .visible, presenting: offer) { palette in
+            Button("Try it for today") { model.tryTheme(palette); PopSound.play() }
+            Button("Get Pop In Pro") { model.showPro = true }
+        } message: { _ in
+            Text("Use it for the rest of today, free. Each theme can be tried once. Pro keeps every theme, now and later.")
+        }
         .navigationTitle("Theme")
         .safeAreaInset(edge: .bottom) {
             if let message = model.store.message {
@@ -57,9 +65,12 @@ struct ThemeGalleryPage: View {
 
     private func tile(_ palette: GumPalette) -> some View {
         let selected = model.gumColor == palette && !model.surprise
-        let locked = !model.store.unlocks(palette)
+        let locked = !model.canUse(palette)
         return Button {
-            if locked { model.showPro = true; return }
+            if locked {
+                if model.canTry(palette) { offer = palette } else { model.showPro = true }
+                return
+            }
             model.surprise = false
             model.gumColor = palette
             PopSound.play()

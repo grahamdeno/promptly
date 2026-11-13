@@ -175,6 +175,33 @@ final class Prefs: @unchecked Sendable {
         set { defaults.set(newValue, forKey: "popSound") }
     }
 
+    /// The one-day theme trial for free users.
+    var trialTheme: String? {
+        get { defaults.string(forKey: "trialTheme") }
+        set { defaults.set(newValue, forKey: "trialTheme") }
+    }
+    var trialDay: String? {
+        get { defaults.string(forKey: "trialDay") }
+        set { defaults.set(newValue, forKey: "trialDay") }
+    }
+    var triedThemes: Set<String> {
+        get { Set(defaults.stringArray(forKey: "triedThemes") ?? []) }
+        set { defaults.set(Array(newValue), forKey: "triedThemes") }
+    }
+    /// The monthly "New this month" card.
+    var whatsNewSeen: Set<String> {
+        get { Set(defaults.stringArray(forKey: "whatsNewSeen") ?? []) }
+        set { defaults.set(Array(newValue), forKey: "whatsNewSeen") }
+    }
+    var whatsNewIgnored: Int {
+        get { defaults.integer(forKey: "whatsNewIgnored") }
+        set { defaults.set(newValue, forKey: "whatsNewIgnored") }
+    }
+    var whatsNewLastShown: Date? {
+        get { defaults.object(forKey: "whatsNewLastShown") as? Date }
+        set { defaults.set(newValue, forKey: "whatsNewLastShown") }
+    }
+
     /// Reminders made inside Pop In.
     var ownReminders: [OwnReminder] {
         get { (defaults.data(forKey: "ownReminders")).flatMap { try? JSONDecoder().decode([OwnReminder].self, from: $0) } ?? [] }

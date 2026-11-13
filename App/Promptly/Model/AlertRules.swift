@@ -56,3 +56,24 @@ enum PauseRule {
 enum Snooze {
     static let length: TimeInterval = 2 * 60
 }
+
+/// Free users can try any Pro theme for one day, once per theme. Pure, tested.
+enum ThemeTrial {
+    static func active(theme: String, day: String, trialTheme: String?, trialDay: String?) -> Bool {
+        trialTheme == theme && trialDay == day
+    }
+
+    static func today(_ now: Date = .now) -> String {
+        Calendar.current.startOfDay(for: now).formatted(.iso8601.year().month().day())
+    }
+}
+
+/// The "New this month" card: themes released lately, at most once every four weeks, and not at all for someone
+/// who has waved two cards away in a row. Pure, tested.
+enum WhatsNew {
+    static func shouldShow(new: [String], seen: Set<String>, ignoredInARow: Int, lastShown: Date?, now: Date) -> Bool {
+        guard ignoredInARow < 2, new.contains(where: { !seen.contains($0) }) else { return false }
+        if let lastShown, now.timeIntervalSince(lastShown) < 28 * 86400 { return false }
+        return true
+    }
+}
