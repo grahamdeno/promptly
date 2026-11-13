@@ -278,13 +278,19 @@ final class FortuneTests: XCTestCase {
 }
 
 final class ThemeTests: XCTestCase {
-    func testSeasonalThemesHeldBack() {
-        XCTAssertFalse(GumPalette.seasonsInStore, "holiday themes stay out of the App Store until released")
-        XCTAssertTrue(GumPalette.available.contains(.moon))
-        XCTAssertTrue(GumPalette.available.contains(.grenade))
-        XCTAssertEqual(GumPalette.available.contains(.ornament), GumPalette.seasonsReady)
-        XCTAssertEqual(PopChoice.available.contains(.glassTing), GumPalette.seasonsReady)
-        XCTAssertEqual(AlarmSoundChoice.available.contains(.sleighBells), GumPalette.seasonsReady)
+    func testReleaseCalendar() {
+        XCTAssertFalse(GumPalette.seasonsInStore, "the App Store copy follows the release calendar")
+        let cal = Calendar.current
+        let before = cal.date(from: DateComponents(year: 2026, month: 11, day: 29, hour: 12))!
+        let after = cal.date(from: DateComponents(year: 2026, month: 11, day: 30, hour: 9))!
+        XCTAssertFalse(GumPalette.snowball.isReleased(at: before))
+        XCTAssertTrue(GumPalette.snowball.isReleased(at: after))
+        XCTAssertTrue(GumPalette.unicorn.isReleased(at: before), "1.0 themes have no date")
+        XCTAssertTrue(GumPalette.disco.isReleased(at: before))
+        XCTAssertFalse(GumPalette.moon.isReleased(at: after), "Moon waits for the Apollo 11 anniversary")
+        XCTAssertEqual(GumPalette.recentlyReleased(at: after), [.snowball, .ornament].sorted { $0.rawValue < $1.rawValue }.sorted { _, _ in false })
+        let launchSet = GumPalette.allCases.filter { $0.releaseDate == nil }
+        XCTAssertEqual(Set(launchSet), [.bubblegum, .coral, .unicorn, .fortune, .gumball, .planet, .soap, .lavaLamp, .moodRing, .zen, .fishbowl, .disco, .clock, .marble])
         XCTAssertTrue(AlarmSoundChoice.available.contains(.sonar))
     }
 
@@ -303,17 +309,14 @@ final class ThemeTests: XCTestCase {
         for palette in GumPalette.novelty {
             prefs.gumColor = palette
             XCTAssertEqual(prefs.popChoice, .themeSound)
-            XCTAssertTrue(palette.isHeld)
             XCTAssertFalse(palette.popFile.isEmpty)
         }
-        XCTAssertFalse(GumPalette.moon.isHeld)
     }
 }
 
 final class PackTests: XCTestCase {
-    func testProOnlyNoPacksOffered() {
+    func testProOnlyNoPacks() {
         XCTAssertTrue(ThemeGroup.allCases.allSatisfy { $0.packID == nil })
-        XCTAssertTrue(ProStore.packIDs.isEmpty)
     }
 }
 

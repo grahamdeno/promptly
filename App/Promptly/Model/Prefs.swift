@@ -23,7 +23,16 @@ enum AlarmSoundChoice: String, CaseIterable, Sendable {
 
     var isPro: Bool { !(self == .bubbleBlow || self == .appleDefault) }
     /// The sounds offered in Settings (seasonal ones wait for their themes).
-    static var available: [AlarmSoundChoice] { allCases.filter { GumPalette.seasonsReady || ![.sleighBells, .whistle, .skates].contains($0) } }
+    /// A theme's own alarm sound appears once its theme is released.
+    var theme: GumPalette? {
+        switch self {
+        case .sleighBells: .ornament
+        case .whistle: .soccer
+        case .skates: .hockey
+        default: nil
+        }
+    }
+    static var available: [AlarmSoundChoice] { allCases.filter { GumPalette.seasonsReady || !($0.theme?.isHeld ?? false) } }
 
     var label: String {
         switch self {
@@ -93,7 +102,10 @@ enum PopChoice: String, CaseIterable, Sendable {
         }
     }
     static var available: [PopChoice] {
-        allCases.filter { GumPalette.seasonsReady || ![.crunch, .glassTing, .leafThunk].contains($0) }
+        allCases.filter { c in
+            let theme: GumPalette? = [.crunch: .snowball, .glassTing: .ornament, .leafThunk: .pumpkin][c]
+            return GumPalette.seasonsReady || !(theme?.isHeld ?? false)
+        }
     }
 
     var label: String {

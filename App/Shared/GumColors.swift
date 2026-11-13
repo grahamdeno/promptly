@@ -31,8 +31,8 @@ enum GumPalette: String, CaseIterable, Sendable {
 
     var isPro: Bool { !(self == .bubblegum || self == .coral) }
 
-    /// The holiday themes are held back from the App Store until the owner decides how to release them. TestFlight
-    /// and Xcode builds show them so they can be tried. Set `seasonsInStore` to true to release them everywhere.
+    /// TestFlight and Xcode builds show every theme so they can be tried. Set `seasonsInStore` to true to show every
+    /// theme in the App Store copy too, ignoring the release calendar.
     static let seasonsInStore = false
     static var seasonsReady: Bool {
         if seasonsInStore { return true }
@@ -44,10 +44,44 @@ enum GumPalette: String, CaseIterable, Sendable {
     }
     var isSeasonal: Bool { [.snowball, .ornament, .pumpkin, .easterEgg, .valentine, .fireworks, .beachBall].contains(self) }
     static let novelty: [GumPalette] = [.disco, .soap, .planet, .basketball, .donut, .waterBalloon, .eyeball, .fishbowl, .moodRing, .lavaLamp, .soccer, .hockey, .tennis, .golf, .baseball, .bowling, .pixel, .gumball, .cherry, .orange, .macaron, .cakePop, .earth, .sun, .dandelion, .atom, .geode, .yarn, .arcadeButton, .clock, .marble, .duck, .zen]
-    /// Held back from the App Store (shown in TestFlight) until the owner decides how to release it.
-    var isHeld: Bool { isSeasonal || Self.novelty.contains(self) }
-    /// The colors offered in Settings.
+    /// The release calendar (docs/plan.md, approved 2026-11-12). Themes not in 1.0 turn on in the App Store copy on
+    /// these Mondays, ahead of their occasion. TestFlight and Xcode builds show every theme regardless.
+    static let releaseDays: [GumPalette: String] = [
+        .snowball: "2026-11-30", .ornament: "2026-11-30", .fireworks: "2026-12-14", .duck: "2027-01-04",
+        .valentine: "2027-02-01", .cakePop: "2027-02-01", .cherry: "2027-02-08", .basketball: "2027-03-01",
+        .atom: "2027-03-08", .easterEgg: "2027-03-15", .baseball: "2027-03-22", .golf: "2027-03-29",
+        .earth: "2027-04-12", .hockey: "2027-04-19", .macaron: "2027-04-26", .dandelion: "2027-04-26",
+        .sun: "2027-05-17", .orange: "2027-05-17", .donut: "2027-05-24", .beachBall: "2027-06-07",
+        .soccer: "2027-06-14", .tennis: "2027-06-21", .waterBalloon: "2027-06-21", .moon: "2027-07-12",
+        .bowling: "2027-08-02", .pumpkin: "2027-08-23", .pixel: "2027-08-30", .arcadeButton: "2027-08-30",
+        .geode: "2027-10-04", .eyeball: "2027-10-18", .grenade: "2027-11-01", .yarn: "2027-11-01",
+    ]
+
+    /// Local midnight on the release day, or nil for a 1.0 theme.
+    var releaseDate: Date? {
+        guard let day = Self.releaseDays[self] else { return nil }
+        let p = day.split(separator: "-").compactMap { Int($0) }
+        guard p.count == 3 else { return nil }
+        return Calendar.current.date(from: DateComponents(year: p[0], month: p[1], day: p[2]))
+    }
+
+    /// Pure rule, tested: released when it has no date or the date has come.
+    func isReleased(at now: Date) -> Bool { releaseDate.map { now >= $0 } ?? true }
+
+    /// Not yet released in the App Store copy.
+    var isHeld: Bool { !isReleased(at: .now) }
+    /// The themes offered in Settings.
     static var available: [GumPalette] { allCases.filter { seasonsReady || !$0.isHeld } }
+
+    /// Themes released in the month before `now`, newest first: what the monthly "New this month" card shows.
+    static func recentlyReleased(at now: Date, within days: Double = 30) -> [GumPalette] {
+        allCases.compactMap { p -> (GumPalette, Date)? in
+            guard let d = p.releaseDate, d <= now, now.timeIntervalSince(d) < days * 86400 else { return nil }
+            return (p, d)
+        }
+        .sorted { $0.1 > $1.1 }
+        .map(\.0)
+    }
     /// Groups for the theme gallery.
     var group: ThemeGroup {
         switch self {
@@ -533,6 +567,8 @@ enum ThemeGroup: String, CaseIterable, Sendable {
     /// The App Store product for this group's theme pack; nil for groups only Pro unlocks.
     /// Theme packs were dropped for Pro only (owner, 2026-11-12): Pro unlocks every theme, including each new one
     /// through the year. No pack product IDs were ever created, so none are offered.
+    /// Theme packs were dropped for Pro only (owner, 2026-11-12): Pro includes every theme, now and later.
+    /// No pack product was ever created, so none can be bought.
     var packID: String? { nil }
     var title: String {
         switch self {
