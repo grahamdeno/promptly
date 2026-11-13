@@ -146,6 +146,20 @@ struct HomeView: View {
         HStack {
             Wordmark()
             Spacer()
+            Menu {
+                if let until = model.pausedUntil, until > .now {
+                    Button("Resume alerts", systemImage: "bell") { model.resume() }
+                } else {
+                    Button("Pause for 1 hour", systemImage: "pause") { model.pause(until: .now.addingTimeInterval(3600)) }
+                    Button("Pause for the rest of today", systemImage: "moon") { model.pause(until: PauseRule.endOfDay(from: .now)) }
+                }
+            } label: {
+                Image(systemName: (model.pausedUntil ?? .distantPast) > .now ? "pause.circle.fill" : "pause.circle")
+                    .font(.title3)
+                    .foregroundStyle((model.pausedUntil ?? .distantPast) > .now ? Brand.accentText : Brand.ink)
+                    .frame(width: 44, height: 44)
+            }
+            .accessibilityLabel((model.pausedUntil ?? .distantPast) > .now ? "Alerts paused. Resume" : "Pause alerts")
             Button { showCalendars = true } label: {
                 Image(systemName: "gearshape")
                     .font(.title3)
@@ -164,8 +178,11 @@ struct HomeView: View {
         let nextWord = model.gumColor == .moon ? "Next transmission" : "Next"
         let label = isDemo(meeting) ? "Practice" : [started ? "Happening now" : nextWord, meeting.service?.rawValue].compactMap { $0 }.joined(separator: " · ")
         // How Pop In will alert, so a quiet one is never a surprise.
-        let rings = model.ringsFully(meeting)
-        let how = rings ? "Rings \(model.leadMinutes) min before" : "Quiet notification only"
+        let paused = model.isPaused(meeting, now: now)
+        let rings = model.ringsFully(meeting) && !paused
+        let how: String = paused ? "Paused until \(model.pausedUntil.map { $0.formatted(date: .omitted, time: .shortened) } ?? "later")"
+            : rings ? "Rings \(model.leadMinutes) min before"
+            : model.workHours.contains(meeting.start) ? "Quiet notification only" : "Outside work hours, quiet notification"
         return VStack(alignment: .leading, spacing: 22) {
             VStack(alignment: .leading, spacing: 20) {
                 VStack(alignment: .leading, spacing: 0) {

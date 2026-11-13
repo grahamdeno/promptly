@@ -340,3 +340,11 @@ Code needed after approval (Sonnet): per-theme release dates replacing the singl
 - Opening Pop In while an alarm rings (tapping the banner) always shows the full alarm screen.
 - Video services: 8 to 30 recognized.
 - Known iOS limit: unlocked, AlarmKit shows a banner, not full screen. Full-screen takeover while unlocked would need a Mac app (later).
+
+## Sprint 26: parity 1-5 with In Your Face (owner, 2026-11-12)
+- Snooze: "In 2 min" beside Not going on the alarm screen; rings again (Apple alarm plus the alarm screen if open).
+- Pause: pause button on Home (1 hour, rest of today, Resume); paused meetings get no alarm or notification; the card says "Paused until".
+- Accepted meetings only (Settings > Meetings): skips tentative and unanswered.
+- Work hours (Settings > Meetings): outside them meetings get the quiet notification; the card says so.
+- Widgets: Lock Screen (rectangular, circular, inline) and a "Coming up" list widget.
+- Later (6-11): multiple alerts per meeting, own reminders, Apple Reminders, travel time, Watch app, Mac app.

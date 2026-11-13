@@ -21,6 +21,11 @@ struct SettingsView: View {
                                    options: [1, 2, 5, 10], selected: model.leadMinutes, label: { "\($0) minute\($0 == 1 ? "" : "s")" },
                                    locked: { $0 > 5 && !model.store.isPro }) { model.leadMinutes = $0 }
                     }
+                    SettingsLink("Work hours", value: model.workHours.summary()) {
+                        WorkHoursPage()
+                    }
+                    SettingsToggle("Accepted meetings only", detail: "Skip meetings you haven't accepted yet",
+                                   isOn: Binding(get: { model.acceptedOnly }, set: { model.acceptedOnly = $0 }))
                 }
 
                 SettingsGroup("Alarm", note: model.testMessage) {

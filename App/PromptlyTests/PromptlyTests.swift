@@ -385,3 +385,38 @@ final class MeetingMergeTests: XCTestCase {
         }
     }
 }
+
+
+final class AlertRulesTests: XCTestCase {
+    private var cal: Calendar { var c = Calendar(identifier: .gregorian); c.timeZone = TimeZone(identifier: "America/New_York")!; return c }
+    private func date(_ y: Int, _ m: Int, _ d: Int, _ h: Int, _ min: Int = 0) -> Date {
+        cal.date(from: DateComponents(year: y, month: m, day: d, hour: h, minute: min))!
+    }
+
+    func testWorkHoursOffAllowsEverything() {
+        XCTAssertTrue(WorkHours.standard.contains(date(2026, 11, 14, 22), calendar: cal))
+    }
+
+    func testWorkHoursWeekdaysNineToFive() {
+        var w = WorkHours.standard; w.on = true
+        XCTAssertTrue(w.contains(date(2026, 11, 12, 9), calendar: cal))     // Thursday morning
+        XCTAssertFalse(w.contains(date(2026, 11, 12, 17), calendar: cal))   // 5 PM is the end
+        XCTAssertFalse(w.contains(date(2026, 11, 12, 7, 59), calendar: cal))
+        XCTAssertFalse(w.contains(date(2026, 11, 14, 10), calendar: cal))   // Saturday
+    }
+
+    func testOvernightHours() {
+        let w = WorkHours(on: true, start: 22 * 60, end: 6 * 60, days: Set(1...7))
+        XCTAssertTrue(w.contains(date(2026, 11, 12, 23), calendar: cal))
+        XCTAssertTrue(w.contains(date(2026, 11, 12, 5), calendar: cal))
+        XCTAssertFalse(w.contains(date(2026, 11, 12, 12), calendar: cal))
+    }
+
+    func testPauseSilencesMeetingsBeforeItEnds() {
+        let now = Date()
+        XCTAssertTrue(PauseRule.silences(now.addingTimeInterval(1800), pausedUntil: now.addingTimeInterval(3600), now: now))
+        XCTAssertFalse(PauseRule.silences(now.addingTimeInterval(4000), pausedUntil: now.addingTimeInterval(3600), now: now))
+        XCTAssertFalse(PauseRule.silences(now.addingTimeInterval(60), pausedUntil: now.addingTimeInterval(-1), now: now))
+        XCTAssertFalse(PauseRule.silences(now, pausedUntil: nil, now: now))
+    }
+}

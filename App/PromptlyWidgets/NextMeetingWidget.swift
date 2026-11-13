@@ -11,7 +11,7 @@ struct NextMeetingWidget: Widget {
         }
         .configurationDisplayName("Next meeting")
         .description("The next meeting and its bubble. Tap the bubble to pop it.")
-        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
+        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge, .accessoryRectangular, .accessoryCircular, .accessoryInline])
         .contentMarginsDisabled()
     }
 }
@@ -57,7 +57,9 @@ struct NextMeetingView: View {
     private static let secondary = Color(white: 0.42)
 
     var body: some View {
-        if let next = entry.next {
+        if family == .accessoryRectangular || family == .accessoryCircular || family == .accessoryInline {
+            LockScreenNext(entry: entry, family: family)
+        } else if let next = entry.next {
             let progress = WidgetTimeline.progress(now: entry.date, start: next.start)
             switch family {
             case .systemMedium: medium(next, progress: progress)
@@ -191,5 +193,108 @@ struct NextMeetingView: View {
         f.timeStyle = .short
         f.dateStyle = .none
         return f.string(from: date)
+    }
+}
+
+
+/// Lock Screen widgets: the next meeting and its countdown, in the system's tinted style.
+private struct LockScreenNext: View {
+    let entry: NextMeetingEntry
+    let family: WidgetFamily
+
+    var body: some View {
+        Group {
+            if let next = entry.next {
+                switch family {
+                case .accessoryCircular:
+                    ZStack {
+                        AccessoryWidgetBackground()
+                        VStack(spacing: 0) {
+                            Image(systemName: "circle.fill").font(.system(size: 9))
+                            countdown(next).font(.system(size: 13, weight: .semibold).monospacedDigit())
+                                .multilineTextAlignment(.center).minimumScaleFactor(0.6)
+                        }
+                        .padding(4)
+                    }
+                case .accessoryInline:
+                    Text(next.start > entry.date ? "\(next.title) at \(next.start.formatted(date: .omitted, time: .shortened))" : "\(next.title) now")
+                default:
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text(next.title).font(.headline).lineLimit(1)
+                        Text(next.start.formatted(date: .omitted, time: .shortened) + (next.service.isEmpty ? "" : " · \(next.service)"))
+                            .font(.caption).lineLimit(1)
+                        countdown(next).font(.system(size: 17, weight: .semibold).monospacedDigit())
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            } else {
+                switch family {
+                case .accessoryCircular: ZStack { AccessoryWidgetBackground(); Image(systemName: "checkmark") }
+                case .accessoryInline: Text("No meetings coming up")
+                default: Text("Nothing coming up").font(.headline)
+                }
+            }
+        }
+        .widgetURL(entry.next.flatMap { WidgetTimeline.popURL(meetingID: $0.id) })
+    }
+
+    @ViewBuilder
+    private func countdown(_ next: WidgetSnapshot.Item) -> some View {
+        if next.start > entry.date {
+            Text(timerInterval: entry.date...next.start, countsDown: true)
+        } else {
+            Text("Now")
+        }
+    }
+}
+
+/// Home Screen widget: today's coming meetings as a list, the next one marked.
+struct UpcomingWidget: Widget {
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: "UpcomingMeetings", provider: NextMeetingProvider()) { entry in
+            UpcomingView(entry: entry)
+                .containerBackground(.white, for: .widget)
+        }
+        .configurationDisplayName("Coming up")
+        .description("Your next few meetings at a glance.")
+        .supportedFamilies([.systemMedium, .systemLarge])
+    }
+}
+
+private struct UpcomingView: View {
+    let entry: NextMeetingEntry
+    @Environment(\.widgetFamily) private var family
+
+    var body: some View {
+        let items = ([entry.next].compactMap { $0 } + entry.then).prefix(family == .systemLarge ? 6 : 3)
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 6) {
+                GumBall().frame(width: 16, height: 16)
+                Text("Coming up").font(.system(size: 13, weight: .semibold)).foregroundStyle(Color(white: 0.42))
+            }
+            if items.isEmpty {
+                Text("Nothing in the next two days").font(.system(size: 15, weight: .semibold)).foregroundStyle(Color(white: 0.08))
+            }
+            ForEach(Array(items.enumerated()), id: \.element.id) { i, item in
+                HStack(alignment: .firstTextBaseline, spacing: 10) {
+                    Text(item.start.formatted(date: .omitted, time: .shortened))
+                        .font(.system(size: 13, weight: .semibold).monospacedDigit())
+                        .foregroundStyle(GumColors.dark)
+                        .frame(width: 72, alignment: .leading)
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text(item.title).font(.system(size: i == 0 ? 15 : 13, weight: i == 0 ? .semibold : .regular))
+                            .foregroundStyle(Color(white: 0.08)).lineLimit(1)
+                        if i == 0, item.start > entry.date {
+                            Text(timerInterval: entry.date...item.start, countsDown: true)
+                                .font(.system(size: 12).monospacedDigit()).foregroundStyle(Color(white: 0.42))
+                        }
+                    }
+                }
+            }
+            Spacer(minLength: 0)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .padding(16)
+        .widgetURL(entry.next.flatMap { WidgetTimeline.popURL(meetingID: $0.id) })
     }
 }
