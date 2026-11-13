@@ -6,6 +6,7 @@ struct HomeView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.openURL) private var openURL
     @State private var addingReminder = false
+    @State private var playing = false
     @State private var showGallery = false
     @State private var showCalendars = ScreenshotMode.scene.map { [ScreenshotScene.settings, .pro, .manycals].contains($0) } ?? false
 
@@ -79,6 +80,7 @@ struct HomeView: View {
                     ProView().environment(model)
                 }
         }
+        .fullScreenCover(isPresented: $playing) { PopPlayground() }
         .sheet(isPresented: $addingReminder) {
             AddReminderSheet().environment(model)
         }
@@ -196,6 +198,7 @@ struct HomeView: View {
             Spacer()
             Menu {
                 Button("Add a reminder", systemImage: "plus") { addingReminder = true }
+                Button("Pop for fun", systemImage: "circle.hexagongrid") { playing = true }
                 if let until = model.pausedUntil, until > .now {
                     Button("Resume alerts", systemImage: "bell") { model.resume() }
                 } else {
@@ -213,7 +216,7 @@ struct HomeView: View {
                     .foregroundStyle(Brand.ink)
                     .frame(width: 44, height: 44)
             }
-            .accessibilityLabel("More: add a reminder, pause alerts, settings")
+            .accessibilityLabel("More: add a reminder, pop for fun, pause alerts, settings")
         }
         .padding(.top, 8)
         .overlay(alignment: .bottomLeading) {

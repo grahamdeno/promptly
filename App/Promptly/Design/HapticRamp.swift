@@ -49,6 +49,12 @@ enum PopHaptics {
         PopSound.prepare()
     }
 
+    /// Just the feel of a pop, no sound (the playground plays each theme's own sound).
+    @MainActor static func tap() {
+        impact.impactOccurred(intensity: 0.8)
+        impact.prepare()
+    }
+
     @MainActor static func pop() {
         PopSound.play()
         impact.impactOccurred(intensity: 1)
@@ -185,6 +191,24 @@ enum PopSound {
 
     /// Pop or Sparkle, as chosen in settings (Unicorn mode defaults to Sparkle). Never activates the audio session
     /// by hand: that call can stall the main thread for a moment, which showed as a hitch at the pop.
+    /// A theme's own pop, for the playground: a fresh player each time so pops can overlap.
+    private static var fileData: [String: Data] = [:]
+    private static var playing: [AVAudioPlayer] = []
+
+    static func play(file name: String) {
+        let session = AVAudioSession.sharedInstance()
+        if session.category != .ambient, !AlarmLoop.isPlaying {
+            try? session.setCategory(.ambient, options: [.mixWithOthers])
+        }
+        if fileData[name] == nil, let url = Bundle.main.url(forResource: name, withExtension: "wav") {
+            fileData[name] = try? Data(contentsOf: url)
+        }
+        guard let data = fileData[name] ?? fileData["pop"], let p = try? AVAudioPlayer(data: data) else { return }
+        playing.removeAll { !$0.isPlaying }
+        p.play()
+        playing.append(p)
+    }
+
     static func play() {
         let choice = Prefs().popChoice
         guard choice != .off else { return }
