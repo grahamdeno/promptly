@@ -164,22 +164,34 @@ struct HomeView: View {
                     Button("Pause for 1 hour", systemImage: "pause") { model.pause(until: .now.addingTimeInterval(3600)) }
                     Button("Pause for the rest of today", systemImage: "moon") { model.pause(until: PauseRule.endOfDay(from: .now)) }
                 }
+                Divider()
+                Button("Settings", systemImage: "gearshape") { showCalendars = true }
             } label: {
-                Image(systemName: (model.pausedUntil ?? .distantPast) > .now ? "pause.circle.fill" : "pause.circle")
-                    .font(.title3)
-                    .foregroundStyle((model.pausedUntil ?? .distantPast) > .now ? Brand.accentText : Brand.ink)
-                    .frame(width: 44, height: 44)
-            }
-            .accessibilityLabel((model.pausedUntil ?? .distantPast) > .now ? "Alerts paused. Resume" : "Pause alerts")
-            Button { showCalendars = true } label: {
                 Image(systemName: "gearshape")
                     .font(.title3)
                     .foregroundStyle(Brand.ink)
                     .frame(width: 44, height: 44)
+            } primaryAction: {
+                showCalendars = true
             }
             .accessibilityLabel("Settings")
+            .accessibilityHint("Hold for pause options")
         }
         .padding(.top, 8)
+        .overlay(alignment: .bottomLeading) {
+            if let until = model.pausedUntil, until > .now {
+                Button { model.resume() } label: {
+                    Label("Paused until \(until.formatted(date: .omitted, time: .shortened)) · Resume", systemImage: "pause.fill")
+                        .font(.footnote.weight(.medium))
+                        .foregroundStyle(Brand.accentText)
+                        .padding(.horizontal, 14)
+                        .frame(minHeight: 36)
+                }
+                .buttonStyle(.plain)
+                .glassEffect(.regular, in: .capsule)
+                .offset(y: 42)
+            }
+        }
     }
 
     /// One card holds the meeting and its countdown; what comes after is a quiet line below it.

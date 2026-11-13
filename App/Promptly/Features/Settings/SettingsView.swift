@@ -30,6 +30,17 @@ struct SettingsView: View {
                     SettingsLink("Work hours", value: model.workHours.summary()) {
                         WorkHoursPage()
                     }
+                    SettingsLink("Pause alerts", value: (model.pausedUntil ?? .distantPast) > .now ? "Until \(model.pausedUntil!.formatted(date: .omitted, time: .shortened))" : "Off") {
+                        ChoicePage(title: "Pause alerts", note: "No alarms or notifications until then. You can also hold the gear on Home.",
+                                   options: [0, 1, 2, 99], selected: (model.pausedUntil ?? .distantPast) > .now ? 1 : 0,
+                                   label: { [0: "Off", 1: "1 hour", 2: "2 hours", 99: "Rest of today"][$0] ?? "" }) { v in
+                            switch v {
+                            case 0: model.resume()
+                            case 99: model.pause(until: PauseRule.endOfDay(from: .now))
+                            default: model.pause(until: .now.addingTimeInterval(Double(v) * 3600))
+                            }
+                        }
+                    }
                     SettingsToggle("Accepted meetings only", detail: "Skip meetings you haven't accepted yet",
                                    isOn: Binding(get: { model.acceptedOnly }, set: { model.acceptedOnly = $0 }))
                 }
