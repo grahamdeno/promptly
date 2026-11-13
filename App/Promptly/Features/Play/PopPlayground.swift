@@ -96,31 +96,63 @@ struct PlayBubble: Identifiable {
 
     static func random(in area: CGSize, entering: Bool) -> PlayBubble {
         let s = CGFloat.random(in: 64...150)
-        let speed = CGFloat.random(in: 14...38)
-        let angle = Double.random(in: 0..<(2 * .pi))
+        let speed = CGFloat.random(in: 18...42)
+        let palette = GumPalette.available.randomElement() ?? .bubblegum
         let maxX = max(s + 1, area.width - s / 2)
         let maxY = max(141, area.height - s / 2)
-        // New ones rise in from below; the first set starts scattered.
-        let start: CGPoint = entering
-            ? CGPoint(x: CGFloat.random(in: s / 2...maxX), y: area.height + s * 0.4)
-            : CGPoint(x: CGFloat.random(in: s / 2...maxX), y: CGFloat.random(in: 140...maxY))
-        let dx = CGFloat(cos(angle)) * speed
-        let v: CGVector = entering ? CGVector(dx: dx * 0.5, dy: -speed - 20) : CGVector(dx: dx, dy: CGFloat(sin(angle)) * speed)
-        return PlayBubble(palette: GumPalette.available.randomElement() ?? .bubblegum, size: s, start: start,
-                          velocity: v, born: .now, phase: Double.random(in: 0..<10))
+        guard entering else {
+            // The first set starts scattered, drifting any way.
+            let angle = Double.random(in: 0..<(2 * .pi))
+            return PlayBubble(palette: palette, size: s,
+                              start: CGPoint(x: CGFloat.random(in: s / 2...maxX), y: CGFloat.random(in: 140...maxY)),
+                              velocity: CGVector(dx: CGFloat(cos(angle)) * speed, dy: CGFloat(sin(angle)) * speed),
+                              born: .now, phase: Double.random(in: 0..<10))
+        }
+        // Newcomers float in from any side, heading inward at a slant.
+        let slant = CGFloat.random(in: -0.6...0.6)
+        let start: CGPoint
+        let v: CGVector
+        switch Int.random(in: 0..<4) {
+        case 0:  // left
+            start = CGPoint(x: -s * 0.6, y: CGFloat.random(in: 140...maxY))
+            v = CGVector(dx: speed + 12, dy: speed * slant)
+        case 1:  // right
+            start = CGPoint(x: area.width + s * 0.6, y: CGFloat.random(in: 140...maxY))
+            v = CGVector(dx: -speed - 12, dy: speed * slant)
+        case 2:  // top
+            start = CGPoint(x: CGFloat.random(in: s / 2...maxX), y: -s * 0.6)
+            v = CGVector(dx: speed * slant, dy: speed + 12)
+        default: // bottom
+            start = CGPoint(x: CGFloat.random(in: s / 2...maxX), y: area.height + s * 0.6)
+            v = CGVector(dx: speed * slant, dy: -speed - 12)
+        }
+        return PlayBubble(palette: palette, size: s, start: start, velocity: v, born: .now, phase: Double.random(in: 0..<10))
     }
 
-    /// Drifts in a straight line and bounces off the edges (a folded path), with a gentle bob.
+    /// Drifts in a straight line and bounces off the edges (a folded path), with a gentle bob. A newcomer glides
+    /// in from off screen first, and only starts bouncing once it is fully inside.
     func position(at now: Date, in area: CGSize, still: Bool) -> CGPoint {
         let t: CGFloat = still ? 0 : CGFloat(now.timeIntervalSince(born))
         let r = size / 2
+        let xLo = r, xHi = area.width - r
+        let yLo = 110 + r, yHi = area.height - r
         let rawX = start.x + velocity.dx * t
         let rawY = start.y + velocity.dy * t
-        let bottom = area.height - r
-        // A newcomer rises freely until it is fully on screen, then bounces like the rest.
-        let y = rawY > bottom ? rawY : Self.fold(rawY, 110 + r, bottom)
         let bob: CGFloat = still ? 0 : CGFloat(sin(Double(t) * 1.3 + phase)) * 4
-        return CGPoint(x: Self.fold(rawX, r, area.width - r), y: y + bob)
+        if t < entryTime(xLo, xHi, yLo, yHi) {
+            return CGPoint(x: rawX, y: rawY + bob)
+        }
+        return CGPoint(x: Self.fold(rawX, xLo, xHi), y: Self.fold(rawY, yLo, yHi) + bob)
+    }
+
+    /// Seconds until the bubble is fully on screen on both axes (0 if it starts inside).
+    private func entryTime(_ xLo: CGFloat, _ xHi: CGFloat, _ yLo: CGFloat, _ yHi: CGFloat) -> CGFloat {
+        func axis(_ p: CGFloat, _ v: CGFloat, _ lo: CGFloat, _ hi: CGFloat) -> CGFloat {
+            if p < lo { return v > 0 ? (lo - p) / v : .infinity }
+            if p > hi { return v < 0 ? (hi - p) / v : .infinity }
+            return 0
+        }
+        return max(axis(start.x, velocity.dx, xLo, xHi), axis(start.y, velocity.dy, yLo, yHi))
     }
 
     static func fold(_ v: CGFloat, _ lo: CGFloat, _ hi: CGFloat) -> CGFloat {
