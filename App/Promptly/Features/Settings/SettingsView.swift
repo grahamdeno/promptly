@@ -104,7 +104,8 @@ struct SettingsView: View {
                                    }))
                 }
 
-                SettingsGroup("Support Pop In", note: model.store.thanked ? "Thank you. It means a lot." : "Like Pop In? A tip helps keep it going. Tips don't unlock anything.") {
+                SettingsGroup("Support Pop In", note: model.store.thanked ? "Thank you. It means a lot."
+                               : model.store.message ?? "Like Pop In? A tip helps keep it going. Tips don't unlock anything.") {
                     HStack(spacing: 10) {
                         ForEach(0..<3, id: \.self) { i in
                             Button {

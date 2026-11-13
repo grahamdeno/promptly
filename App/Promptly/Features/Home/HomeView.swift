@@ -6,6 +6,7 @@ struct HomeView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.openURL) private var openURL
     @State private var addingReminder = false
+    @State private var playing = false
     @State private var showGallery = false
     @State private var showCalendars = ScreenshotMode.scene.map { [ScreenshotScene.settings, .pro, .manycals].contains($0) } ?? false
 
@@ -15,6 +16,7 @@ struct HomeView: View {
     @ScaledMetric(relativeTo: .title2) private var unitSize: CGFloat = 22
 
     @State private var lastTouch = Date()
+    @Environment(\.scenePhase) private var scenePhase
     @State private var quiet = false
 
     var body: some View {
@@ -64,7 +66,8 @@ struct HomeView: View {
             .onChange(of: quietNow, initial: true) { _, q in quiet = q }
         }
         .environment(\.themeStill, quiet || PowerWatch.shared.strained)
-        .modifier(QuietBrightness(quiet: quiet))
+        // Coming back to Pop In counts as a touch, so it never opens already in quiet mode.
+        .onChange(of: scenePhase) { _, p in if p == .active { lastTouch = .now; quiet = false } }
         .simultaneousGesture(DragGesture(minimumDistance: 0).onChanged { _ in
             lastTouch = .now
             quiet = false
@@ -79,6 +82,7 @@ struct HomeView: View {
                     ProView().environment(model)
                 }
         }
+        .fullScreenCover(isPresented: $playing) { PopPlayground() }
         .sheet(isPresented: $addingReminder) {
             AddReminderSheet().environment(model)
         }
@@ -196,6 +200,7 @@ struct HomeView: View {
             Spacer()
             Menu {
                 Button("Add a reminder", systemImage: "plus") { addingReminder = true }
+                Button("Pop for fun", systemImage: "circle.hexagongrid") { playing = true }
                 if let until = model.pausedUntil, until > .now {
                     Button("Resume alerts", systemImage: "bell") { model.resume() }
                 } else {
@@ -213,7 +218,7 @@ struct HomeView: View {
                     .foregroundStyle(Brand.ink)
                     .frame(width: 44, height: 44)
             }
-            .accessibilityLabel("More: add a reminder, pause alerts, settings")
+            .accessibilityLabel("More: add a reminder, pop for fun, pause alerts, settings")
         }
         .padding(.top, 8)
         .overlay(alignment: .bottomLeading) {

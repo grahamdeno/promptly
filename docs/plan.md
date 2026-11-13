@@ -356,3 +356,7 @@ Code needed after approval (Sonnet): per-theme release dates replacing the singl
 - Try it: a free user can use any Pro theme for one day, once per theme; it ends at midnight.
 - New this month: a card under the meeting card, at most every four weeks, stops after two wave-aways in a row.
 - Holds: Apple Reminders and travel buffer until after 1.0.
+
+## Sprint 28: Pop for fun (owner, 2026-11-12)
+- Home menu > Pop for fun: a full-screen playground of every released theme drifting at different sizes; tap to pop with that theme's sound and pieces; a new one floats in. Pop counter, no timer. Everyone gets every released theme (a showcase for Pro).
+- Tips: the three consumables exist in App Store Connect (Prepare for Submission). Selling needs the Paid Applications agreement active.

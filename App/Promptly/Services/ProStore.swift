@@ -130,7 +130,7 @@ final class ProStore {
         let id = Self.tipIDs[i]
         if tipProducts[id] == nil { await load() }
         guard let product = tipProducts[id] else {
-            message = "The App Store isn't reachable right now. Try again in a moment."
+            message = "Tips aren't available yet. Try again later."
             return
         }
         purchasing = true
