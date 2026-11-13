@@ -61,6 +61,10 @@ final class AppModel {
     var countdownCard: Bool {
         didSet { prefs.countdownCard = countdownCard; Task { await syncAlarms() } }
     }
+    /// A second, earlier alarm (a heads-up), minutes before the start; 0 for none.
+    var earlyMinutes: Int {
+        didSet { prefs.earlyMinutes = earlyMinutes; Task { await syncAlarms() } }
+    }
     /// Skip tentative and unanswered meetings.
     var acceptedOnly: Bool {
         didSet { prefs.acceptedOnly = acceptedOnly; Task { await refresh() } }
@@ -155,6 +159,7 @@ final class AppModel {
         disabledCalendarIDs = prefs.disabledCalendarIDs
         countdownCard = prefs.countdownCard
         acceptedOnly = prefs.acceptedOnly
+        earlyMinutes = prefs.earlyMinutes
         workHours = prefs.workHours
         pausedUntil = prefs.pausedUntil
         buzz = prefs.buzz
@@ -459,7 +464,12 @@ final class AppModel {
         nextAlarm = all.first?.fireDate
         // While Pop In is open it handles anything soon itself; Apple's alarm covers later meetings, and a backup one
         // minute after each soon ring covers Pop In being killed. A meeting Pop In has already taken over gets none.
-        let toSchedule: [PlannedAlarm]
+        // The early heads-up alarm, when set and earlier than the main one. Always left to Apple's alarm.
+        let early: [PlannedAlarm] = earlyMinutes > leadMinutes
+            ? AlarmPlanner.plan(meetings: alarmMeetings.filter { m in !snoozedIDs.contains(m.id) },
+                                leadMinutes: earlyMinutes, now: now, cleared: cleared)
+            : []
+        var toSchedule: [PlannedAlarm]
         if isForeground {
             let soonCutoff = now.addingTimeInterval(Self.openQuietWindow)
             let later = all.filter { $0.scheduleDate > soonCutoff }
@@ -469,6 +479,7 @@ final class AppModel {
         } else {
             toSchedule = all
         }
+        toSchedule += early
         do {
             try await alarmService.sync(toSchedule, keep: Set((testPlanned + snoozePlanned).map(\.id)))
             syncProblem = nil

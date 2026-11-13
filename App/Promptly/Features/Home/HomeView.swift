@@ -181,7 +181,7 @@ struct HomeView: View {
         let paused = model.isPaused(meeting, now: now)
         let rings = model.ringsFully(meeting) && !paused
         let how: String = paused ? "Paused until \(model.pausedUntil.map { $0.formatted(date: .omitted, time: .shortened) } ?? "later")"
-            : rings ? "Rings \(model.leadMinutes) min before"
+            : rings ? (model.earlyMinutes > model.leadMinutes ? "Rings \(model.earlyMinutes) and \(model.leadMinutes) min before" : "Rings \(model.leadMinutes) min before")
             : model.workHours.contains(meeting.start) ? "Quiet notification only" : "Outside work hours, quiet notification"
         return VStack(alignment: .leading, spacing: 22) {
             VStack(alignment: .leading, spacing: 20) {

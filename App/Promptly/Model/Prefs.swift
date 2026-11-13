@@ -163,6 +163,12 @@ final class Prefs: @unchecked Sendable {
         set { defaults.set(newValue, forKey: "popSound") }
     }
 
+    /// An extra, earlier alarm before the main one (minutes before the start); 0 for none.
+    var earlyMinutes: Int {
+        get { defaults.integer(forKey: "earlyMinutes") }
+        set { defaults.set(newValue, forKey: "earlyMinutes") }
+    }
+
     /// Skip meetings not yet accepted (tentative or unanswered). Declined ones are always skipped.
     var acceptedOnly: Bool {
         get { defaults.bool(forKey: "acceptedOnly") }

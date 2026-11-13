@@ -21,6 +21,12 @@ struct SettingsView: View {
                                    options: [1, 2, 5, 10], selected: model.leadMinutes, label: { "\($0) minute\($0 == 1 ? "" : "s")" },
                                    locked: { $0 > 5 && !model.store.isPro }) { model.leadMinutes = $0 }
                     }
+                    SettingsLink("Early alarm", value: model.earlyMinutes > model.leadMinutes ? "\(model.earlyMinutes) min" : "Off") {
+                        ChoicePage(title: "Early alarm", note: "A second alarm before the main one, so you can wrap up. It rings like the main alarm.",
+                                   options: [0, 5, 10, 15, 30].filter { $0 == 0 || $0 > model.leadMinutes }, selected: model.earlyMinutes > model.leadMinutes ? model.earlyMinutes : 0,
+                                   label: { $0 == 0 ? "Off" : "\($0) minutes before" },
+                                   locked: { _ in false }) { model.earlyMinutes = $0 }
+                    }
                     SettingsLink("Work hours", value: model.workHours.summary()) {
                         WorkHoursPage()
                     }
