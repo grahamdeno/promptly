@@ -311,14 +311,9 @@ final class ThemeTests: XCTestCase {
 }
 
 final class PackTests: XCTestCase {
-    func testPacksCoverEveryHeldGroup() {
-        XCTAssertNil(ThemeGroup.classic.packID)
-        XCTAssertNil(ThemeGroup.favorites.packID)
-        XCTAssertEqual(Set(ThemeGroup.allCases.compactMap(\.packID)).count, 5)
-        // Favorites are Pro only by design; every other held theme can be bought in a pack.
-        for palette in GumPalette.allCases where palette.isHeld && palette.group != .favorites {
-            XCTAssertNotNil(palette.group.packID, "\(palette) should be in a pack")
-        }
+    func testProOnlyNoPacksOffered() {
+        XCTAssertTrue(ThemeGroup.allCases.allSatisfy { $0.packID == nil })
+        XCTAssertTrue(ProStore.packIDs.isEmpty)
     }
 }
 

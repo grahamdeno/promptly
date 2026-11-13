@@ -531,16 +531,9 @@ struct FourPointStar: Shape {
 enum ThemeGroup: String, CaseIterable, Sendable {
     case classic, favorites, sports, food, nature, objects, seasons
     /// The App Store product for this group's theme pack; nil for groups only Pro unlocks.
-    var packID: String? {
-        switch self {
-        case .classic, .favorites: nil
-        case .sports: "com.grahamdeno.promptly.pack.sports"
-        case .food: "com.grahamdeno.promptly.pack.treats"
-        case .nature: "com.grahamdeno.promptly.pack.space"
-        case .objects: "com.grahamdeno.promptly.pack.objects"
-        case .seasons: "com.grahamdeno.promptly.pack.seasons"
-        }
-    }
+    /// Theme packs were dropped for Pro only (owner, 2026-11-12): Pro unlocks every theme, including each new one
+    /// through the year. No pack product IDs were ever created, so none are offered.
+    var packID: String? { nil }
     var title: String {
         switch self {
         case .classic: "Classic"
