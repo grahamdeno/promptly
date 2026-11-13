@@ -3,7 +3,7 @@ import UIKit
 
 /// Keeps the phone cool while Pop In sits open.
 /// - Quiet mode: after two minutes untouched, with the meeting more than fifteen minutes off, the decoration holds
-///   still and the screen dims a little. A touch, or the meeting coming within fifteen minutes, wakes it.
+///   still. (The screen used to dim too; the owner disliked coming back to a dim app, so brightness is never touched.) A touch, or the meeting coming within fifteen minutes, wakes it.
 /// - Warm phone or Low Power Mode: the decoration holds still until the phone cools or Low Power Mode is off.
 @MainActor @Observable
 final class PowerWatch {

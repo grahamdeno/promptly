@@ -16,6 +16,7 @@ struct HomeView: View {
     @ScaledMetric(relativeTo: .title2) private var unitSize: CGFloat = 22
 
     @State private var lastTouch = Date()
+    @Environment(\.scenePhase) private var scenePhase
     @State private var quiet = false
 
     var body: some View {
@@ -65,7 +66,8 @@ struct HomeView: View {
             .onChange(of: quietNow, initial: true) { _, q in quiet = q }
         }
         .environment(\.themeStill, quiet || PowerWatch.shared.strained)
-        .modifier(QuietBrightness(quiet: quiet))
+        // Coming back to Pop In counts as a touch, so it never opens already in quiet mode.
+        .onChange(of: scenePhase) { _, p in if p == .active { lastTouch = .now; quiet = false } }
         .simultaneousGesture(DragGesture(minimumDistance: 0).onChanged { _ in
             lastTouch = .now
             quiet = false
