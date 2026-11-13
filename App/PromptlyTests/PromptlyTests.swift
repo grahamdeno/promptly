@@ -352,8 +352,9 @@ final class MeetingMergeTests: XCTestCase {
 
     func testForwardedCopyMergesIntoOne() {
         let t = Date(timeIntervalSince1970: 1_800_000_000)
-        let merged = MeetingMerge.merge([m("1", "1430: Scale WG", t), m("2", "FW: 1430: Scale WG", t)])
+        let merged = MeetingMerge.merge([m("2", "FW: 1430: Scale WG", t), m("1", "1430: Scale WG", t)])
         XCTAssertEqual(merged.count, 1)
+        XCTAssertEqual(merged.first?.title, "1430: Scale WG", "the kept copy shows the tidy title")
     }
 
     func testSameLinkDifferentTitleMerges() {
