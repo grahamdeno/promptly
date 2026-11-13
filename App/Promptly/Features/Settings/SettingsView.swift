@@ -104,6 +104,30 @@ struct SettingsView: View {
                                    }))
                 }
 
+                SettingsGroup("Support Pop In", note: model.store.thanked ? "Thank you. It means a lot." : "Like Pop In? A tip helps keep it going. Tips don't unlock anything.") {
+                    HStack(spacing: 10) {
+                        ForEach(0..<3, id: \.self) { i in
+                            Button {
+                                Task {
+                                    await model.store.tip(i)
+                                    if model.store.thanked { PopSound.play() }
+                                }
+                            } label: {
+                                VStack(spacing: 4) {
+                                    Image(systemName: ["cup.and.saucer", "birthday.cake", "gift"][i]).font(.title3)
+                                    Text(model.store.tipPrice(i)).font(.subheadline.weight(.semibold))
+                                }
+                                .foregroundStyle(Brand.accentText)
+                                .frame(maxWidth: .infinity, minHeight: 64)
+                                .background(RoundedRectangle(cornerRadius: 14).fill(Brand.accentText.opacity(0.08)))
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel("Tip \(model.store.tipPrice(i))")
+                        }
+                    }
+                    .padding(.vertical, 8)
+                }
+
                 SettingsGroup("Help") {
                     SettingsExternal("Help and support", url: "https://popin.tangomike.app/support.html")
                     SettingsExternal("Privacy", url: "https://popin.tangomike.app/privacy.html")

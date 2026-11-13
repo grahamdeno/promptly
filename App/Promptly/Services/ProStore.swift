@@ -9,6 +9,9 @@ final class ProStore {
     static let productID = "com.grahamdeno.promptly.pro"
     /// Theme packs: each unlocks one group of themes (Pro unlocks everything, packs included).
     static let packIDs: [String] = ThemeGroup.allCases.compactMap(\.packID)
+    /// Tip jar: consumable tips for people who like Pop In but don't need Pro. Tips unlock nothing.
+    static let tipIDs = ["com.grahamdeno.promptly.tip.small", "com.grahamdeno.promptly.tip.medium", "com.grahamdeno.promptly.tip.large"]
+    static let tipFallbackPrices = ["$0.99", "$2.99", "$4.99"]
 
     /// True when Pro is unlocked: bought, or a TestFlight / development build (beta access).
     var isPro: Bool { purchased || betaAccess }
@@ -20,6 +23,9 @@ final class ProStore {
     /// Theme packs the buyer owns (product IDs).
     private(set) var ownedPacks: Set<String>
     private(set) var packProducts: [String: Product] = [:]
+    private(set) var tipProducts: [String: Product] = [:]
+    /// Set for a moment after a tip goes through, so Settings can say thank you.
+    var thanked = false
     private(set) var purchasing = false
     var message: String?
 
@@ -91,10 +97,11 @@ final class ProStore {
 
     func load() async {
         await checkBetaAccess()
-        if product == nil || packProducts.isEmpty {
-            let all = (try? await Product.products(for: [Self.productID] + Self.packIDs)) ?? []
+        if product == nil || tipProducts.isEmpty {
+            let all = (try? await Product.products(for: [Self.productID] + Self.packIDs + Self.tipIDs)) ?? []
             product = all.first { $0.id == Self.productID }
-            packProducts = Dictionary(uniqueKeysWithValues: all.filter { $0.id != Self.productID }.map { ($0.id, $0) })
+            packProducts = Dictionary(uniqueKeysWithValues: all.filter { Self.packIDs.contains($0.id) }.map { ($0.id, $0) })
+            tipProducts = Dictionary(uniqueKeysWithValues: all.filter { Self.tipIDs.contains($0.id) }.map { ($0.id, $0) })
         }
         await refreshEntitlement()
     }
@@ -112,6 +119,31 @@ final class ProStore {
         defaults.set(Array(packs), forKey: "ownedPacks")
         setPro(owned)
         if lostPack { onLost?() }
+    }
+
+    func tipPrice(_ i: Int) -> String {
+        tipProducts[Self.tipIDs[i]]?.displayPrice ?? Self.tipFallbackPrices[i]
+    }
+
+    /// Leaves a tip. Consumable: it can be given again any time and unlocks nothing.
+    func tip(_ i: Int) async {
+        let id = Self.tipIDs[i]
+        if tipProducts[id] == nil { await load() }
+        guard let product = tipProducts[id] else {
+            message = "The App Store isn't reachable right now. Try again in a moment."
+            return
+        }
+        purchasing = true
+        defer { purchasing = false }
+        do {
+            if case .success(let result) = try await product.purchase(), case .verified(let t) = result {
+                await t.finish()
+                message = nil
+                thanked = true
+            }
+        } catch {
+            message = "The tip didn't go through: \(error.localizedDescription)"
+        }
     }
 
     /// Buys one theme pack.

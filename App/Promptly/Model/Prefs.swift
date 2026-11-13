@@ -23,7 +23,16 @@ enum AlarmSoundChoice: String, CaseIterable, Sendable {
 
     var isPro: Bool { !(self == .bubbleBlow || self == .appleDefault) }
     /// The sounds offered in Settings (seasonal ones wait for their themes).
-    static var available: [AlarmSoundChoice] { allCases.filter { GumPalette.seasonsReady || ![.sleighBells, .whistle, .skates].contains($0) } }
+    /// A theme's own alarm sound appears once its theme is released.
+    var theme: GumPalette? {
+        switch self {
+        case .sleighBells: .ornament
+        case .whistle: .soccer
+        case .skates: .hockey
+        default: nil
+        }
+    }
+    static var available: [AlarmSoundChoice] { allCases.filter { GumPalette.seasonsReady || !($0.theme?.isHeld ?? false) } }
 
     var label: String {
         switch self {
@@ -93,7 +102,10 @@ enum PopChoice: String, CaseIterable, Sendable {
         }
     }
     static var available: [PopChoice] {
-        allCases.filter { GumPalette.seasonsReady || ![.crunch, .glassTing, .leafThunk].contains($0) }
+        allCases.filter { c in
+            let theme: GumPalette? = [.crunch: .snowball, .glassTing: .ornament, .leafThunk: .pumpkin][c]
+            return GumPalette.seasonsReady || !(theme?.isHeld ?? false)
+        }
     }
 
     var label: String {
@@ -161,6 +173,33 @@ final class Prefs: @unchecked Sendable {
     var popSound: Bool {
         get { defaults.object(forKey: "popSound") as? Bool ?? true }
         set { defaults.set(newValue, forKey: "popSound") }
+    }
+
+    /// The one-day theme trial for free users.
+    var trialTheme: String? {
+        get { defaults.string(forKey: "trialTheme") }
+        set { defaults.set(newValue, forKey: "trialTheme") }
+    }
+    var trialDay: String? {
+        get { defaults.string(forKey: "trialDay") }
+        set { defaults.set(newValue, forKey: "trialDay") }
+    }
+    var triedThemes: Set<String> {
+        get { Set(defaults.stringArray(forKey: "triedThemes") ?? []) }
+        set { defaults.set(Array(newValue), forKey: "triedThemes") }
+    }
+    /// The monthly "New this month" card.
+    var whatsNewSeen: Set<String> {
+        get { Set(defaults.stringArray(forKey: "whatsNewSeen") ?? []) }
+        set { defaults.set(Array(newValue), forKey: "whatsNewSeen") }
+    }
+    var whatsNewIgnored: Int {
+        get { defaults.integer(forKey: "whatsNewIgnored") }
+        set { defaults.set(newValue, forKey: "whatsNewIgnored") }
+    }
+    var whatsNewLastShown: Date? {
+        get { defaults.object(forKey: "whatsNewLastShown") as? Date }
+        set { defaults.set(newValue, forKey: "whatsNewLastShown") }
     }
 
     /// Reminders made inside Pop In.
