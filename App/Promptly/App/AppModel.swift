@@ -325,7 +325,20 @@ final class AppModel {
 
     /// Meetings not yet cleared that haven't ended.
     func upcoming(at now: Date) -> [Meeting] {
-        (meetings + testMeetings).filter { !cleared.contains($0.id) && $0.end > now }.sorted { $0.start < $1.start }
+        let open = (meetings + testMeetings).filter { !cleared.contains($0.id) && $0.end > now }
+        return open.filter { !isMissed($0, among: open, now: now) }.sorted { $0.start < $1.start }
+    }
+
+    /// Superseded by a later meeting whose alarm has come due (see NewestWins).
+    func isMissed(_ m: Meeting, among open: [Meeting], now: Date) -> Bool {
+        NewestWins.isMissed(m, among: open, now: now, lead: TimeInterval(leadMinutes * 60),
+                            rings: { self.ringsFully($0) && !self.isPaused($0, now: now) })
+    }
+
+    /// Meetings missed because this one took over and still running, for the alarm screen's "Missed" line.
+    func missed(before meeting: Meeting, now: Date = .now) -> [Meeting] {
+        let open = (meetings + testMeetings).filter { !cleared.contains($0.id) && $0.end > now }
+        return open.filter { $0.start < meeting.start && isMissed($0, among: open, now: now) }.sorted { $0.start < $1.start }
     }
 
     // MARK: Permissions and first run
@@ -479,9 +492,15 @@ final class AppModel {
                 tick += 1
                 // Every half minute, hold back any alarm that has come within the quiet window.
                 if tick % 15 == 0 { await self?.syncAlarms() }
-                guard let self, UIApplication.shared.applicationState == .active, self.arrived == nil,
-                      !self.settingsOpen else { continue }
+                guard let self, UIApplication.shared.applicationState == .active, !self.settingsOpen else { continue }
                 let now = Date.now
+                // An unpopped alarm screen gives way when the next meeting's alarm comes due.
+                if let showing = self.arrived {
+                    let open = (self.meetings + self.testMeetings).filter { !self.cleared.contains($0.id) && $0.end > now }
+                    guard self.isMissed(showing, among: open, now: now) else { continue }
+                    AlarmLoop.stop()
+                    self.arrived = nil
+                }
                 if let hit = self.snoozedUntil.first(where: { $0.value <= now }) {
                     let id = hit.key
                     self.snoozedUntil[id] = nil
@@ -528,7 +547,8 @@ final class AppModel {
         guard alarmsAuthorized else { return }
         let now = Date.now
         if let p = pausedUntil, p <= now { pausedUntil = nil; return }
-        let live = meetings.filter { !isPaused($0, now: now) }
+        let open = meetings.filter { !cleared.contains($0.id) && $0.end > now }
+        let live = meetings.filter { !isPaused($0, now: now) && !isMissed($0, among: open, now: now) }
         let alarmMeetings = live.filter { ringsFully($0) }
         let gentleMeetings = live.filter { !ringsFully($0) }
         let planned = AlarmPlanner.plan(meetings: alarmMeetings, leadMinutes: leadMinutes, now: now, cleared: cleared,

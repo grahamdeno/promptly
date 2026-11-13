@@ -77,3 +77,15 @@ enum WhatsNew {
         return true
     }
 }
+
+/// When an alarm goes unpopped and the next meeting's alarm comes due, the newer meeting takes over: the older one
+/// counts as missed. It leaves Home and stops ringing, and the alarm screen mentions it. Pure, tested.
+enum NewestWins {
+    /// A started meeting is missed once a later ringing meeting has reached its own ring time.
+    static func isMissed(_ m: Meeting, among all: [Meeting], now: Date, lead: TimeInterval, rings: (Meeting) -> Bool) -> Bool {
+        guard m.start <= now, rings(m) else { return false }
+        return all.contains { n in
+            n.id != m.id && n.start > m.start && rings(n) && now >= n.start.addingTimeInterval(-lead)
+        }
+    }
+}

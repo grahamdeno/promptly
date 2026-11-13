@@ -360,3 +360,7 @@ Code needed after approval (Sonnet): per-theme release dates replacing the singl
 ## Sprint 28: Pop for fun (owner, 2026-11-12)
 - Home menu > Pop for fun: a full-screen playground of every released theme drifting at different sizes; tap to pop with that theme's sound and pieces; a new one floats in. Pop counter, no timer. Everyone gets every released theme (a showcase for Pro).
 - Tips: the three consumables exist in App Store Connect (Prepare for Submission). Selling needs the Paid Applications agreement active.
+
+## Sprint 29: newest meeting wins (owner, 2026-11-13)
+- Checked: an unpopped alarm screen stayed up when the next meeting's alarm came due (the watcher waited for it to close), and Home kept showing the old meeting until it ended.
+- Now: once a later ringing meeting reaches its ring time, a started, unpopped meeting counts as missed: it leaves Home, loses its backup alarm, and the open alarm screen switches to the new meeting with "Missed: 1:00 Standup · Join" while the old one is still running. NewestWins in Model, unit tested.

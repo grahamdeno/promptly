@@ -437,3 +437,32 @@ final class TrialTests: XCTestCase {
         XCTAssertTrue(WhatsNew.shouldShow(new: ["duck"], seen: [], ignoredInARow: 1, lastShown: now.addingTimeInterval(-29 * 86400), now: now))
     }
 }
+
+
+final class NewestWinsTests: XCTestCase {
+    private func m(_ id: String, _ start: Date) -> Meeting {
+        Meeting(id: id, eventID: id, title: id, start: start, end: start.addingTimeInterval(3600), calendarID: "a", joinURL: nil)
+    }
+
+    func testOlderMeetingIsMissedWhenTheNextOneRings() {
+        let now = Date()
+        let old = m("old", now.addingTimeInterval(-25 * 60))
+        let next = m("next", now.addingTimeInterval(60))
+        XCTAssertTrue(NewestWins.isMissed(old, among: [old, next], now: now, lead: 120, rings: { _ in true }))
+        XCTAssertFalse(NewestWins.isMissed(next, among: [old, next], now: now, lead: 120, rings: { _ in true }))
+    }
+
+    func testNotMissedBeforeTheNextAlarm() {
+        let now = Date()
+        let old = m("old", now.addingTimeInterval(-10 * 60))
+        let next = m("next", now.addingTimeInterval(20 * 60))
+        XCTAssertFalse(NewestWins.isMissed(old, among: [old, next], now: now, lead: 120, rings: { _ in true }))
+    }
+
+    func testQuietMeetingsDoNotTakeOver() {
+        let now = Date()
+        let old = m("old", now.addingTimeInterval(-25 * 60))
+        let quiet = m("quiet", now.addingTimeInterval(60))
+        XCTAssertFalse(NewestWins.isMissed(old, among: [old, quiet], now: now, lead: 120, rings: { $0.id != "quiet" }))
+    }
+}
