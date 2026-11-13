@@ -329,6 +329,12 @@ final class AppModel {
         return open.filter { !isMissed($0, among: open, now: now) }.sorted { $0.start < $1.start }
     }
 
+    /// The rules the alarm screen runs by right now.
+    func screenConfig(_ now: Date) -> AlarmScreenRule.Config {
+        AlarmScreenRule.Config(lead: TimeInterval(leadMinutes * 60), rings: { self.ringsFully($0) },
+                               paused: { self.isPaused($0, now: now) })
+    }
+
     /// Superseded by a later meeting whose alarm has come due (see NewestWins).
     func isMissed(_ m: Meeting, among open: [Meeting], now: Date) -> Bool {
         NewestWins.isMissed(m, among: open, now: now, lead: TimeInterval(leadMinutes * 60),
@@ -492,27 +498,21 @@ final class AppModel {
                 tick += 1
                 // Every half minute, hold back any alarm that has come within the quiet window.
                 if tick % 15 == 0 { await self?.syncAlarms() }
-                guard let self, UIApplication.shared.applicationState == .active, !self.settingsOpen else { continue }
+                guard let self, UIApplication.shared.applicationState == .active, !self.settingsOpen, !ScreenshotMode.isOn else { continue }
                 let now = Date.now
-                // An unpopped alarm screen gives way when the next meeting's alarm comes due.
-                if let showing = self.arrived {
-                    let open = (self.meetings + self.testMeetings).filter { !self.cleared.contains($0.id) && $0.end > now }
-                    guard self.isMissed(showing, among: open, now: now) else { continue }
+                let open = (self.meetings + self.testMeetings).filter { !self.cleared.contains($0.id) && $0.end > now }
+                let state = AlarmScreenRule.State(showing: self.arrived?.id, shown: self.shownNowFor, snoozedUntil: self.snoozedUntil)
+                let (action, next) = AlarmScreenRule.tick(open: open, state: state, now: now, config: self.screenConfig(now))
+                self.snoozedUntil = next.snoozedUntil
+                switch action {
+                case .none:
+                    break
+                case .close:
                     AlarmLoop.stop()
                     self.arrived = nil
-                }
-                if let hit = self.snoozedUntil.first(where: { $0.value <= now }) {
-                    let id = hit.key
-                    self.snoozedUntil[id] = nil
-                    if let m = self.upcoming(at: now).first(where: { $0.id == id }) { self.show(m, ring: true) }
-                    continue
-                }
-                let lead = TimeInterval(self.leadMinutes * 60)
-                if let due = self.upcoming(at: now).first(where: {
-                    self.ringsFully($0) && !self.isPaused($0, now: now) && self.snoozedUntil[$0.id] == nil
-                        && now >= $0.start.addingTimeInterval(-lead) && now <= $0.start.addingTimeInterval(5 * 60)
-                }), !self.shownNowFor.contains(due.id) {
-                    self.show(due, ring: true)
+                case .show(let id), .replace(let id):
+                    if case .replace = action { AlarmLoop.stop(); self.arrived = nil }
+                    if let m = open.first(where: { $0.id == id }) { self.show(m, ring: true) }
                 }
             }
         }

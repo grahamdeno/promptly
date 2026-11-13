@@ -466,3 +466,107 @@ final class NewestWinsTests: XCTestCase {
         XCTAssertFalse(NewestWins.isMissed(old, among: [old, quiet], now: now, lead: 120, rings: { $0.id != "quiet" }))
     }
 }
+
+
+/// A simulated working day with a fake clock, run through the same alarm-screen rule the app's watcher uses.
+/// It looks for sticking points: screens that won't give way, meetings shown twice, Home showing the wrong meeting.
+final class SimulatedDayTests: XCTestCase {
+    private let day = Calendar.current.date(bySettingHour: 8, minute: 0, second: 0, of: Date(timeIntervalSince1970: 1_800_000_000))!
+    private func at(_ h: Int, _ m: Int) -> Date { day.addingTimeInterval(TimeInterval((h - 8) * 3600 + m * 60)) }
+    private func meeting(_ id: String, _ h: Int, _ m: Int, minutes: Int = 30, cal: String = "work") -> Meeting {
+        Meeting(id: id, eventID: id, title: id, start: at(h, m), end: at(h, m).addingTimeInterval(TimeInterval(minutes * 60)),
+                calendarID: cal, joinURL: nil)
+    }
+
+    enum Do { case pop, notGoing, snooze }
+
+    struct Log { var shown: [(String, Date)] = []; var replaced: [String] = []; var homeNext: [Date: String] = [:] }
+
+    /// Steps every 30 seconds from `from` to `to`, doing the given actions to whatever is on screen.
+    private func run(_ meetings: [Meeting], from: Date, to: Date, actions: [Date: (String, Do)] = [:],
+                     rings: @escaping (Meeting) -> Bool = { $0.calendarID != "quiet" },
+                     paused: @escaping (Meeting) -> Bool = { _ in false }) -> Log {
+        let config = AlarmScreenRule.Config(lead: 120, rings: rings, paused: paused)
+        var state = AlarmScreenRule.State()
+        var cleared: Set<String> = []
+        var log = Log()
+        var t = from
+        while t <= to {
+            if let (named, what) = actions.first(where: { abs($0.key.timeIntervalSince(t)) < 15 })?.value,
+               let id = named == "*" ? state.showing : named {
+                switch what {
+                case .pop, .notGoing: cleared.insert(id); if state.showing == id { state.showing = nil }
+                case .snooze: state.snoozedUntil[id] = t.addingTimeInterval(Snooze.length); if state.showing == id { state.showing = nil }
+                }
+            }
+            let open = meetings.filter { !cleared.contains($0.id) && $0.end > t }
+            let (action, next) = AlarmScreenRule.tick(open: open, state: state, now: t, config: config)
+            state = next
+            switch action {
+            case .show(let id): log.shown.append((id, t))
+            case .replace(let id): log.shown.append((id, t)); log.replaced.append(id)
+            default: break
+            }
+            if let s = state.showing { XCTAssertTrue(open.contains { $0.id == s }, "screen shows \(s), which is no longer open, at \(t)") }
+            log.homeNext[t] = AlarmScreenRule.upcoming(open, now: t, config: config).first?.id
+            t = t.addingTimeInterval(30)
+        }
+        return log
+    }
+
+    func testUnpoppedAlarmGivesWayToTheNextMeeting() {
+        let log = run([meeting("A", 9, 0), meeting("B", 9, 30)], from: at(8, 50), to: at(9, 40))
+        XCTAssertEqual(log.shown.map(\.0), ["A", "B"])
+        XCTAssertEqual(log.replaced, ["B"])
+        XCTAssertEqual(log.homeNext[at(9, 29)], "B", "Home should show the meeting that is ringing, not the missed one")
+    }
+
+    func testEachMeetingShowsOnceWhenPopped() {
+        let log = run([meeting("A", 9, 0), meeting("B", 9, 30)], from: at(8, 50), to: at(9, 40),
+                      actions: [at(9, 0): ("A", .pop), at(9, 29): ("B", .pop)])
+        XCTAssertEqual(log.shown.map(\.0), ["A", "B"])
+        XCTAssertTrue(log.replaced.isEmpty)
+    }
+
+    func testSnoozeRingsAgainOnce() {
+        let snoozeAt = at(8, 58).addingTimeInterval(30)
+        let log = run([meeting("A", 9, 0)], from: at(8, 50), to: at(9, 10), actions: [snoozeAt: ("A", .snooze), at(9, 2): ("A", .pop)])
+        XCTAssertEqual(log.shown.map(\.0), ["A", "A"])
+        XCTAssertEqual(log.shown.last?.1, snoozeAt.addingTimeInterval(Snooze.length), "rings again two minutes after the snooze")
+    }
+
+    func testTwoAtTheSameTimeBothShowOneAfterTheOther() {
+        let log = run([meeting("Standup", 10, 0), meeting("Reminder", 10, 0, minutes: 5, cal: OwnReminder.calendarID)],
+                      from: at(9, 50), to: at(10, 6), actions: [at(9, 59): ("*", .pop)])
+        XCTAssertEqual(Set(log.shown.map(\.0)), ["Standup", "Reminder"])
+        XCTAssertEqual(log.shown.count, 2)
+    }
+
+    func testQuietMeetingsNeverTakeOverOrShow() {
+        let log = run([meeting("A", 9, 0), meeting("Quiet", 9, 20, cal: "quiet")], from: at(8, 50), to: at(9, 40))
+        XCTAssertEqual(log.shown.map(\.0), ["A"])
+        XCTAssertTrue(log.replaced.isEmpty)
+    }
+
+    func testPausedMeetingsNeverShow() {
+        let pausedUntil = at(10, 0)
+        let log = run([meeting("A", 9, 30), meeting("B", 10, 30)], from: at(9, 0), to: at(10, 40),
+                      paused: { $0.start < pausedUntil })
+        XCTAssertEqual(log.shown.map(\.0), ["B"])
+    }
+
+    func testOverlappingMeetingTakesOverMidway() {
+        let log = run([meeting("Long", 9, 0, minutes: 60), meeting("Short", 9, 15)], from: at(8, 55), to: at(9, 20))
+        XCTAssertEqual(log.shown.map(\.0), ["Long", "Short"])
+        XCTAssertEqual(log.homeNext[at(9, 14)], "Short")
+    }
+
+    func testMeetingCancelledWhileItsScreenIsUp() {
+        // The screen closes when its meeting disappears from the calendar.
+        let config = AlarmScreenRule.Config(lead: 120, rings: { _ in true }, paused: { _ in false })
+        let state = AlarmScreenRule.State(showing: "Gone", shown: ["Gone"])
+        let (action, next) = AlarmScreenRule.tick(open: [], state: state, now: at(9, 0), config: config)
+        XCTAssertEqual(action, .close)
+        XCTAssertNil(next.showing)
+    }
+}
