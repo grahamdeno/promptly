@@ -163,6 +163,12 @@ final class Prefs: @unchecked Sendable {
         set { defaults.set(newValue, forKey: "popSound") }
     }
 
+    /// Reminders made inside Pop In.
+    var ownReminders: [OwnReminder] {
+        get { (defaults.data(forKey: "ownReminders")).flatMap { try? JSONDecoder().decode([OwnReminder].self, from: $0) } ?? [] }
+        set { defaults.set(try? JSONEncoder().encode(newValue), forKey: "ownReminders") }
+    }
+
     /// An extra, earlier alarm before the main one (minutes before the start); 0 for none.
     var earlyMinutes: Int {
         get { defaults.integer(forKey: "earlyMinutes") }

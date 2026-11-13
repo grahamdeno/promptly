@@ -5,6 +5,7 @@ import UIKit
 struct HomeView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.openURL) private var openURL
+    @State private var addingReminder = false
     @State private var showCalendars = ScreenshotMode.scene.map { [ScreenshotScene.settings, .pro, .manycals].contains($0) } ?? false
 
     @Environment(\.horizontalSizeClass) private var sizeClass
@@ -70,6 +71,9 @@ struct HomeView: View {
         .hapticRamp(until: model.upcoming(at: .now).first?.start, enabled: model.buzz && model.arrived == nil)
         .overlay { DiscoLights().ignoresSafeArea().environment(\.themeStill, quiet || PowerWatch.shared.strained) }
         .overlay(alignment: .bottom) { undoToast }
+        .sheet(isPresented: $addingReminder) {
+            AddReminderSheet().environment(model)
+        }
         .sheet(isPresented: $showCalendars) {
             SettingsView()
                 .environment(model)
@@ -146,6 +150,13 @@ struct HomeView: View {
         HStack {
             Wordmark()
             Spacer()
+            Button { addingReminder = true } label: {
+                Image(systemName: "plus.circle")
+                    .font(.title3)
+                    .foregroundStyle(Brand.ink)
+                    .frame(width: 44, height: 44)
+            }
+            .accessibilityLabel("Add a reminder")
             Menu {
                 if let until = model.pausedUntil, until > .now {
                     Button("Resume alerts", systemImage: "bell") { model.resume() }
@@ -176,7 +187,7 @@ struct HomeView: View {
         let parts = Countdown.parts(now: now, start: meeting.start)
         let started = meeting.start <= now
         let nextWord = model.gumColor == .moon ? "Next transmission" : "Next"
-        let label = isDemo(meeting) ? "Practice" : [started ? "Happening now" : nextWord, meeting.service?.rawValue].compactMap { $0 }.joined(separator: " · ")
+        let label = isDemo(meeting) ? "Practice" : meeting.calendarID == OwnReminder.calendarID ? "Reminder" : [started ? "Happening now" : nextWord, meeting.service?.rawValue].compactMap { $0 }.joined(separator: " · ")
         // How Pop In will alert, so a quiet one is never a surprise.
         let paused = model.isPaused(meeting, now: now)
         let rings = model.ringsFully(meeting) && !paused

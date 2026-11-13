@@ -61,6 +61,22 @@ final class AppModel {
     var countdownCard: Bool {
         didSet { prefs.countdownCard = countdownCard; Task { await syncAlarms() } }
     }
+    /// Reminders made inside Pop In; they ring like meetings.
+    var ownReminders: [OwnReminder] = [] {
+        didSet { prefs.ownReminders = ownReminders }
+    }
+
+    func addReminder(title: String, at date: Date) {
+        let t = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        ownReminders.append(OwnReminder(id: UUID().uuidString, title: t.isEmpty ? "Reminder" : t, date: date))
+        Task { await refresh() }
+    }
+
+    func deleteReminder(_ id: String) {
+        ownReminders.removeAll { $0.id == id }
+        Task { await refresh() }
+    }
+
     /// A second, earlier alarm (a heads-up), minutes before the start; 0 for none.
     var earlyMinutes: Int {
         didSet { prefs.earlyMinutes = earlyMinutes; Task { await syncAlarms() } }
@@ -160,6 +176,7 @@ final class AppModel {
         countdownCard = prefs.countdownCard
         acceptedOnly = prefs.acceptedOnly
         earlyMinutes = prefs.earlyMinutes
+        ownReminders = OwnReminder.live(prefs.ownReminders, now: .now)
         workHours = prefs.workHours
         pausedUntil = prefs.pausedUntil
         buzz = prefs.buzz
@@ -297,7 +314,7 @@ final class AppModel {
 
     /// Whether this meeting gets the full alarm (and Pop In's takeover) rather than a gentle notification.
     func ringsFully(_ meeting: Meeting) -> Bool {
-        if meeting.calendarID == "test" { return true }
+        if meeting.calendarID == "test" || meeting.calendarID == OwnReminder.calendarID { return true }
         guard workHours.contains(meeting.start) else { return false }
         switch rule(forCalendar: meeting.calendarID) {
         case .alarm: return true
@@ -435,10 +452,13 @@ final class AppModel {
         guard calendarAuthorized else { meetings = []; calendars = []; return }
         calendars = calendarService.calendars()
         // One meeting in two calendars (say the invite and a forwarded copy) gets one alarm, not two.
-        meetings = MeetingMerge.merge(calendarService.upcoming(disabled: disabledCalendarIDs, acceptedOnly: acceptedOnly), preferred: { self.ringsFully($0) })
+        let live = OwnReminder.live(ownReminders, now: .now)
+        if live != ownReminders { ownReminders = live }
+        meetings = (MeetingMerge.merge(calendarService.upcoming(disabled: disabledCalendarIDs, acceptedOnly: acceptedOnly), preferred: { self.ringsFully($0) })
+            + live.map(\.meeting)).sorted { $0.start < $1.start }
         // Forget cleared meetings that have dropped out of the window.
-        let live = Set(meetings.map(\.id))
-        let pruned = cleared.intersection(live)
+        let liveIDs = Set(meetings.map(\.id))
+        let pruned = cleared.intersection(liveIDs)
         if pruned != cleared { cleared = pruned; prefs.clearedMeetingIDs = pruned }
         writeWidgetSnapshot()
         await syncAlarms()
