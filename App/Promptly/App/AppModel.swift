@@ -117,6 +117,19 @@ final class AppModel {
     /// Bumped so Home redraws after the card is handled.
     var whatsNewTick = 0
 
+    /// Ring for Apple Reminders with a time (Siri reminders). Turning it on asks for Reminders access.
+    var appleReminders: Bool {
+        didSet { prefs.appleReminders = appleReminders; Task { await refresh() } }
+    }
+
+    /// Turn Apple Reminders on, asking iOS for access first. False if access was refused.
+    @discardableResult
+    func enableAppleReminders() async -> Bool {
+        let ok = calendarService.remindersAuthorized ? true : await calendarService.requestRemindersAccess()
+        appleReminders = ok
+        return ok
+    }
+
     /// Reminders made inside Pop In; they ring like meetings.
     var ownReminders: [OwnReminder] = [] {
         didSet { prefs.ownReminders = ownReminders }
@@ -232,6 +245,7 @@ final class AppModel {
         countdownCard = prefs.countdownCard
         acceptedOnly = prefs.acceptedOnly
         earlyMinutes = prefs.earlyMinutes
+        appleReminders = prefs.appleReminders
         ownReminders = OwnReminder.live(prefs.ownReminders, now: .now)
         workHours = prefs.workHours
         pausedUntil = prefs.pausedUntil
@@ -397,7 +411,8 @@ final class AppModel {
 
     /// Whether this meeting gets the full alarm (and Pop In's takeover) rather than a gentle notification.
     func ringsFully(_ meeting: Meeting) -> Bool {
-        if meeting.calendarID == "test" || meeting.calendarID == OwnReminder.calendarID { return true }
+        if meeting.calendarID == "test" || meeting.calendarID == OwnReminder.calendarID
+            || meeting.calendarID == CalendarService.remindersCalendarID { return true }
         guard workHours.contains(meeting.start) else { return false }
         switch rule(forCalendar: meeting.calendarID) {
         case .alarm: return true
@@ -538,8 +553,9 @@ final class AppModel {
         // One meeting in two calendars (say the invite and a forwarded copy) gets one alarm, not two.
         let live = OwnReminder.live(ownReminders, now: .now)
         if live != ownReminders { ownReminders = live }
+        let siri = appleReminders ? await calendarService.timedReminders() : []
         meetings = (MeetingMerge.merge(calendarService.upcoming(disabled: disabledCalendarIDs, acceptedOnly: acceptedOnly), preferred: { self.ringsFully($0) })
-            + live.map(\.meeting)).sorted { $0.start < $1.start }
+            + live.map(\.meeting) + siri).sorted { $0.start < $1.start }
         // Forget cleared meetings that have dropped out of the window.
         // Test and practice meetings live outside the calendar list; keep them cleared too, or a popped test
         // alarm comes back the next time Settings refreshes the calendar.

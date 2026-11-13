@@ -9,6 +9,35 @@ final class CalendarService {
     var isAuthorized: Bool { EKEventStore.authorizationStatus(for: .event) == .fullAccess }
     var wasAsked: Bool { EKEventStore.authorizationStatus(for: .event) != .notDetermined }
 
+    // MARK: Reminders (read only)
+
+    static let remindersCalendarID = "apple-reminders"
+
+    var remindersAuthorized: Bool { EKEventStore.authorizationStatus(for: .reminder) == .fullAccess }
+
+    func requestRemindersAccess() async -> Bool {
+        (try? await store.requestFullAccessToReminders()) ?? false
+    }
+
+    /// Unfinished reminders with a due time in the next two days (ones you ask Siri for: "remind me at 3 to call
+    /// Mom"), as meetings so they ring the same way. Reminders with only a date and no time are skipped.
+    /// Read only: Pop In never completes or changes a reminder.
+    func timedReminders(hours: Double = 48, now: Date = .now) async -> [Meeting] {
+        guard remindersAuthorized else { return [] }
+        let predicate = store.predicateForIncompleteReminders(withDueDateStarting: now.addingTimeInterval(-3600),
+                                                              ending: now.addingTimeInterval(hours * 3600), calendars: nil)
+        let found: [EKReminder] = await withCheckedContinuation { done in
+            store.fetchReminders(matching: predicate) { done.resume(returning: $0 ?? []) }
+        }
+        return found.compactMap { r -> Meeting? in
+            guard let c = r.dueDateComponents, c.hour != nil, let due = Calendar.current.date(from: c) else { return nil }
+            let title = (r.title ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+            let key = "rem-\(r.calendarItemIdentifier)"
+            return Meeting(id: Meeting.makeID(eventID: key, start: due), eventID: key, title: title.isEmpty ? "Reminder" : title,
+                           start: due, end: due.addingTimeInterval(5 * 60), calendarID: Self.remindersCalendarID, joinURL: nil)
+        }
+    }
+
     func requestAccess() async -> Bool {
         (try? await store.requestFullAccessToEvents()) ?? false
     }

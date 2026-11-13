@@ -2,7 +2,7 @@
 """Fails CI if app code could change the calendar or reach the network.
 
 Promptly reads the calendar and keeps everything on the iPhone. This guard keeps it that way:
-no EventKit writes, no URLSession or other network clients, no analytics SDKs.
+no EventKit writes (calendar or reminders), no URLSession or other network clients, no analytics SDKs.
 Usage: read_only_guard.py check | selftest
 """
 import re
@@ -14,7 +14,12 @@ FORBIDDEN = [
     (r"\.remove\s*\(\s*\w*[Ee]vent", "EventKit remove"),
     (r"\bstore\.(save|remove|commit|reset)\b", "EventKit store write"),
     (r"\bEKEvent\s*\(\s*eventStore", "creating an event"),
-    (r"\bEKReminder\b", "reminders"),
+    # Reminders are read (timed ones ring like meetings) but never created, completed or changed.
+    (r"\.save\s*\(\s*\w*[Rr]eminder", "Reminders save"),
+    (r"\.remove\s*\(\s*\w*[Rr]eminder", "Reminders remove"),
+    (r"\bEKReminder\s*\(\s*eventStore", "creating a reminder"),
+    (r"\.isCompleted\s*=(?!=)", "completing a reminder"),
+    (r"\.completionDate\s*=(?!=)", "completing a reminder"),
     (r"\bURLSession\b", "network (URLSession)"),
     (r"\bNWConnection\b", "network (Network.framework)"),
     (r"\bURLRequest\b", "network request"),
@@ -47,6 +52,11 @@ def selftest() -> int:
     assert scan("let s = URLSession.shared")
     assert scan("store.remove(ev, span: .thisEvent)")
     assert scan("import FirebaseAnalytics")
+    assert scan("try store.save(reminder, commit: true)")
+    assert scan("let r = EKReminder(eventStore: store)")
+    assert scan("reminder.isCompleted = true")
+    assert not scan("if reminder.isCompleted == false {}")
+    assert not scan("store.fetchReminders(matching: predicate) { _ in }")
     assert not scan("let events = store.events(matching: predicate)")
     assert not scan("prefs.clearedMeetingIDs = cleared")
     print("Read-only guard self-test passed.")
