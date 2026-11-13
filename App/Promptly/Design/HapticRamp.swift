@@ -75,9 +75,7 @@ enum AlarmLoop {
     private static var ramp: Task<Void, Never>?
 
     static func start(meetingStart: Date? = nil) {
-        let file = Prefs().alarmSound.fileName
-        guard player?.isPlaying != true,
-              let url = Bundle.main.url(forResource: (file as NSString).deletingPathExtension, withExtension: "wav"),
+        guard player?.isPlaying != true, let url = soundURL(Prefs().alarmSound),
               let p = try? AVAudioPlayer(contentsOf: url) else { return }
         try? AVAudioSession.sharedInstance().setCategory(.playback, options: [.duckOthers])
         try? AVAudioSession.sharedInstance().setActive(true)
@@ -100,10 +98,22 @@ enum AlarmLoop {
 
     /// A short sample when a sound is picked in settings, so each choice can be heard right away.
     /// Uses the playback category so it's audible with the silent switch on, like the alarm itself.
+    /// Apple's own alarm beep, from the system's built-in sounds. Used for the Apple choice in previews and while
+    /// Pop In is open (Apple's Lock Screen tone itself can't be played by an app). Falls back to Bubble blow.
+    private static let appleAlarmFile = URL(fileURLWithPath: "/System/Library/Audio/UISounds/alarm.caf")
+
+    static func soundURL(_ choice: AlarmSoundChoice) -> URL? {
+        if choice == .appleDefault, FileManager.default.isReadableFile(atPath: appleAlarmFile.path) {
+            return appleAlarmFile
+        }
+        let file = choice.fileName
+        return Bundle.main.url(forResource: (file as NSString).deletingPathExtension, withExtension: "wav")
+    }
+
     static func preview(_ choice: AlarmSoundChoice, seconds: Double = 4) {
         stop()
-        guard let url = Bundle.main.url(forResource: (choice.fileName as NSString).deletingPathExtension, withExtension: "wav"),
-              let p = try? AVAudioPlayer(contentsOf: url) else { return }
+        guard let url = soundURL(choice), let p = try? AVAudioPlayer(contentsOf: url) else { return }
+        if choice == .appleDefault { p.numberOfLoops = -1 }
         try? AVAudioSession.sharedInstance().setCategory(.playback, options: [.duckOthers])
         try? AVAudioSession.sharedInstance().setActive(true)
         p.volume = 1
