@@ -31,7 +31,7 @@ struct SettingsView: View {
                         WorkHoursPage()
                     }
                     SettingsLink("Pause alerts", value: (model.pausedUntil ?? .distantPast) > .now ? "Until \(model.pausedUntil!.formatted(date: .omitted, time: .shortened))" : "Off") {
-                        ChoicePage(title: "Pause alerts", note: "No alarms or notifications until then. You can also hold the gear on Home.",
+                        ChoicePage(title: "Pause alerts", note: "No alarms or notifications until then. You can also pause from the menu on Home.",
                                    options: [0, 1, 2, 99], selected: (model.pausedUntil ?? .distantPast) > .now ? 1 : 0,
                                    label: { [0: "Off", 1: "1 hour", 2: "2 hours", 99: "Rest of today"][$0] ?? "" }) { v in
                             switch v {

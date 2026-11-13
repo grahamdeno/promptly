@@ -150,32 +150,26 @@ struct HomeView: View {
         HStack {
             Wordmark()
             Spacer()
-            Button { addingReminder = true } label: {
-                Image(systemName: "plus.circle")
-                    .font(.title3)
-                    .foregroundStyle(Brand.ink)
-                    .frame(width: 44, height: 44)
-            }
-            .accessibilityLabel("Add a reminder")
             Menu {
+                Button("Add a reminder", systemImage: "plus") { addingReminder = true }
                 if let until = model.pausedUntil, until > .now {
                     Button("Resume alerts", systemImage: "bell") { model.resume() }
                 } else {
-                    Button("Pause for 1 hour", systemImage: "pause") { model.pause(until: .now.addingTimeInterval(3600)) }
-                    Button("Pause for the rest of today", systemImage: "moon") { model.pause(until: PauseRule.endOfDay(from: .now)) }
+                    Menu("Pause alerts", systemImage: "pause") {
+                        Button("For 1 hour") { model.pause(until: .now.addingTimeInterval(3600)) }
+                        Button("For 2 hours") { model.pause(until: .now.addingTimeInterval(7200)) }
+                        Button("For the rest of today") { model.pause(until: PauseRule.endOfDay(from: .now)) }
+                    }
                 }
                 Divider()
                 Button("Settings", systemImage: "gearshape") { showCalendars = true }
             } label: {
-                Image(systemName: "gearshape")
-                    .font(.title3)
+                Image(systemName: "ellipsis.circle")
+                    .font(.title2)
                     .foregroundStyle(Brand.ink)
                     .frame(width: 44, height: 44)
-            } primaryAction: {
-                showCalendars = true
             }
-            .accessibilityLabel("Settings")
-            .accessibilityHint("Hold for pause options")
+            .accessibilityLabel("More: add a reminder, pause alerts, settings")
         }
         .padding(.top, 8)
         .overlay(alignment: .bottomLeading) {

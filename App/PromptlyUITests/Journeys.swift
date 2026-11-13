@@ -67,7 +67,7 @@ final class Journeys: XCTestCase {
         a.expect("the card says how long", a.any(containing: "min"), severity: 3)
         a.expect("the card says it will ring", a.any(containing: "Rings"), severity: 3)
         a.expect("Not going is visible", a.app.buttons["Not going"], severity: 4)
-        a.expect("Settings is reachable", a.app.buttons["Settings"], severity: 3)
+        a.expect("Settings is reachable", a.app.buttons["More: add a reminder, pause alerts, settings"], severity: 3)
         a.begin("Join the next meeting")
         let ok = popBubble(a)
         a.pause(0.3)
