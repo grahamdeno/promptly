@@ -514,7 +514,9 @@ final class AppModel {
         meetings = (MeetingMerge.merge(calendarService.upcoming(disabled: disabledCalendarIDs, acceptedOnly: acceptedOnly), preferred: { self.ringsFully($0) })
             + live.map(\.meeting)).sorted { $0.start < $1.start }
         // Forget cleared meetings that have dropped out of the window.
-        let liveIDs = Set(meetings.map(\.id))
+        // Test and practice meetings live outside the calendar list; keep them cleared too, or a popped test
+        // alarm comes back the next time Settings refreshes the calendar.
+        let liveIDs = Set((meetings + testMeetings).map(\.id))
         let pruned = cleared.intersection(liveIDs)
         if pruned != cleared { cleared = pruned; prefs.clearedMeetingIDs = pruned }
         writeWidgetSnapshot()
@@ -678,6 +680,7 @@ final class AppModel {
         alarmService.stopAlerting()
         AlarmLoop.stop()
         cleared.insert(meeting.id)
+        if meeting.calendarID == "test" { testPlanned.removeAll { $0.meeting.id == meeting.id } }
         if !ScreenshotMode.isOn { prefs.clearedMeetingIDs = cleared }
         lastCleared = meeting
         if skipped { skipCount += 1 } else { popCount += 1 }
