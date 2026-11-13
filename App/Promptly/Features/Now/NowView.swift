@@ -53,20 +53,18 @@ struct NowView: View {
                 .glassCard()
                 .frame(maxWidth: 680, alignment: .leading)
                 .overlay(alignment: .bottomLeading) {
-                    Button {
-                        skips += 1
-                        model.clear(meeting)
-                        leave {}
-                    } label: {
-                        Text("Not going")
-                            .font(.subheadline.weight(.medium))
-                            .foregroundStyle(Brand.ink)
-                            .padding(.horizontal, 20)
-                            .frame(minHeight: 48)
-                            .contentShape(Capsule())
+                    HStack(spacing: 10) {
+                        pill("Not going") {
+                            skips += 1
+                            model.clear(meeting)
+                            leave {}
+                        }
+                        pill("In 2 min", icon: "zzz") {
+                            model.snooze(meeting)
+                            dismiss()
+                        }
+                        .accessibilityLabel("Snooze two minutes")
                     }
-                    .buttonStyle(.plain)
-                    .glassEffect(.regular, in: .capsule)
                     .offset(y: 60)
                 }
                 .padding(.horizontal, 12)
@@ -76,6 +74,21 @@ struct NowView: View {
         }
         .hapticRamp(until: meeting.start, enabled: model.buzz)
         .onDisappear { AlarmLoop.stop() }
+    }
+
+    private func pill(_ text: String, icon: String? = nil, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 6) {
+                if let icon { Image(systemName: icon).font(.footnote.weight(.semibold)) }
+                Text(text).font(.subheadline.weight(.medium))
+            }
+            .foregroundStyle(Brand.ink)
+            .padding(.horizontal, 20)
+            .frame(minHeight: 48)
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .glassEffect(.regular, in: .capsule)
     }
 
     /// Let the pop play, then leave.

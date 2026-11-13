@@ -61,6 +61,41 @@ final class AppModel {
     var countdownCard: Bool {
         didSet { prefs.countdownCard = countdownCard; Task { await syncAlarms() } }
     }
+    /// Reminders made inside Pop In; they ring like meetings.
+    var ownReminders: [OwnReminder] = [] {
+        didSet { prefs.ownReminders = ownReminders }
+    }
+
+    func addReminder(title: String, at date: Date) {
+        let t = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        ownReminders.append(OwnReminder(id: UUID().uuidString, title: t.isEmpty ? "Reminder" : t, date: date))
+        Task { await refresh() }
+    }
+
+    func deleteReminder(_ id: String) {
+        ownReminders.removeAll { $0.id == id }
+        Task { await refresh() }
+    }
+
+    /// A second, earlier alarm (a heads-up), minutes before the start; 0 for none.
+    var earlyMinutes: Int {
+        didSet { prefs.earlyMinutes = earlyMinutes; Task { await syncAlarms() } }
+    }
+    /// Skip tentative and unanswered meetings.
+    var acceptedOnly: Bool {
+        didSet { prefs.acceptedOnly = acceptedOnly; Task { await refresh() } }
+    }
+    /// Ring full screen only inside these hours; outside, a quiet notification.
+    var workHours: WorkHours {
+        didSet { prefs.workHours = workHours; writeWidgetSnapshot(); Task { await syncAlarms() } }
+    }
+    /// Alerts paused until this time (Home's pause menu).
+    var pausedUntil: Date? {
+        didSet { prefs.pausedUntil = pausedUntil; Task { await syncAlarms() } }
+    }
+    /// Meetings snoozed from the alarm screen, and when to ring again.
+    var snoozedUntil: [String: Date] = [:]
+    @ObservationIgnored private var snoozePlanned: [PlannedAlarm] = []
     var buzz: Bool {
         didSet { prefs.buzz = buzz }
     }
@@ -139,6 +174,11 @@ final class AppModel {
         ballStyle = prefs.ballStyle
         disabledCalendarIDs = prefs.disabledCalendarIDs
         countdownCard = prefs.countdownCard
+        acceptedOnly = prefs.acceptedOnly
+        earlyMinutes = prefs.earlyMinutes
+        ownReminders = OwnReminder.live(prefs.ownReminders, now: .now)
+        workHours = prefs.workHours
+        pausedUntil = prefs.pausedUntil
         buzz = prefs.buzz
         popChoice = prefs.popChoice
         alarmSound = prefs.alarmSound
@@ -274,12 +314,33 @@ final class AppModel {
 
     /// Whether this meeting gets the full alarm (and Pop In's takeover) rather than a gentle notification.
     func ringsFully(_ meeting: Meeting) -> Bool {
-        if meeting.calendarID == "test" { return true }
+        if meeting.calendarID == "test" || meeting.calendarID == OwnReminder.calendarID { return true }
+        guard workHours.contains(meeting.start) else { return false }
         switch rule(forCalendar: meeting.calendarID) {
         case .alarm: return true
         case .gentle: return false
         case .smart: return meeting.joinURL != nil
         }
+    }
+
+    /// Whether alerts are paused for this meeting.
+    func isPaused(_ meeting: Meeting, now: Date = .now) -> Bool {
+        meeting.calendarID != "test" && PauseRule.silences(meeting.start, pausedUntil: pausedUntil, now: now)
+    }
+
+    func pause(until date: Date) { pausedUntil = date }
+    func resume() { pausedUntil = nil }
+
+    /// Snooze from the alarm screen: silence it now and ring again in two minutes, with the alarm screen.
+    func snooze(_ meeting: Meeting) {
+        alarmService.stopAlerting()
+        AlarmLoop.stop()
+        let when = Date.now.addingTimeInterval(Snooze.length)
+        snoozedUntil[meeting.id] = when
+        snoozePlanned.removeAll { $0.meeting.id == meeting.id }
+        snoozePlanned.append(PlannedAlarm(id: UUID(), meeting: meeting, fireDate: when, countdownSeconds: nil))
+        arrived = nil
+        Task { await syncAlarms() }
     }
 
     var alarmCalendarIDs: Set<String> {
@@ -364,9 +425,16 @@ final class AppModel {
                 guard let self, UIApplication.shared.applicationState == .active, self.arrived == nil,
                       !self.settingsOpen else { continue }
                 let now = Date.now
+                if let hit = self.snoozedUntil.first(where: { $0.value <= now }) {
+                    let id = hit.key
+                    self.snoozedUntil[id] = nil
+                    if let m = self.upcoming(at: now).first(where: { $0.id == id }) { self.show(m, ring: true) }
+                    continue
+                }
                 let lead = TimeInterval(self.leadMinutes * 60)
                 if let due = self.upcoming(at: now).first(where: {
-                    self.ringsFully($0) && now >= $0.start.addingTimeInterval(-lead) && now <= $0.start.addingTimeInterval(5 * 60)
+                    self.ringsFully($0) && !self.isPaused($0, now: now) && self.snoozedUntil[$0.id] == nil
+                        && now >= $0.start.addingTimeInterval(-lead) && now <= $0.start.addingTimeInterval(5 * 60)
                 }), !self.shownNowFor.contains(due.id) {
                     self.show(due, ring: true)
                 }
@@ -384,10 +452,13 @@ final class AppModel {
         guard calendarAuthorized else { meetings = []; calendars = []; return }
         calendars = calendarService.calendars()
         // One meeting in two calendars (say the invite and a forwarded copy) gets one alarm, not two.
-        meetings = MeetingMerge.merge(calendarService.upcoming(disabled: disabledCalendarIDs), preferred: { self.ringsFully($0) })
+        let live = OwnReminder.live(ownReminders, now: .now)
+        if live != ownReminders { ownReminders = live }
+        meetings = (MeetingMerge.merge(calendarService.upcoming(disabled: disabledCalendarIDs, acceptedOnly: acceptedOnly), preferred: { self.ringsFully($0) })
+            + live.map(\.meeting)).sorted { $0.start < $1.start }
         // Forget cleared meetings that have dropped out of the window.
-        let live = Set(meetings.map(\.id))
-        let pruned = cleared.intersection(live)
+        let liveIDs = Set(meetings.map(\.id))
+        let pruned = cleared.intersection(liveIDs)
         if pruned != cleared { cleared = pruned; prefs.clearedMeetingIDs = pruned }
         writeWidgetSnapshot()
         await syncAlarms()
@@ -396,18 +467,29 @@ final class AppModel {
     func syncAlarms() async {
         if ScreenshotMode.isOn { return }
         guard alarmsAuthorized else { return }
-        let alarmMeetings = meetings.filter { ringsFully($0) }
-        let gentleMeetings = meetings.filter { !ringsFully($0) }
         let now = Date.now
+        if let p = pausedUntil, p <= now { pausedUntil = nil; return }
+        let live = meetings.filter { !isPaused($0, now: now) }
+        let alarmMeetings = live.filter { ringsFully($0) }
+        let gentleMeetings = live.filter { !ringsFully($0) }
         let planned = AlarmPlanner.plan(meetings: alarmMeetings, leadMinutes: leadMinutes, now: now, cleared: cleared,
                                         countdown: countdownCard)
         let gentlePlanned = AlarmPlanner.plan(meetings: gentleMeetings, leadMinutes: leadMinutes, now: now, cleared: cleared)
         testPlanned = testPlanned.filter { $0.fireDate > now && !cleared.contains($0.meeting.id) }
-        let all = (planned + testPlanned).sorted { $0.fireDate < $1.fireDate }
+        snoozePlanned = snoozePlanned.filter { $0.fireDate > now && !cleared.contains($0.meeting.id) }
+        // A snoozed meeting's original alarm is replaced by the snooze.
+        let snoozedIDs = Set(snoozePlanned.map(\.meeting.id))
+        let all = (planned.filter { !snoozedIDs.contains($0.meeting.id) } + testPlanned + snoozePlanned)
+            .sorted { $0.fireDate < $1.fireDate }
         nextAlarm = all.first?.fireDate
         // While Pop In is open it handles anything soon itself; Apple's alarm covers later meetings, and a backup one
         // minute after each soon ring covers Pop In being killed. A meeting Pop In has already taken over gets none.
-        let toSchedule: [PlannedAlarm]
+        // The early heads-up alarm, when set and earlier than the main one. Always left to Apple's alarm.
+        let early: [PlannedAlarm] = earlyMinutes > leadMinutes
+            ? AlarmPlanner.plan(meetings: alarmMeetings.filter { m in !snoozedIDs.contains(m.id) },
+                                leadMinutes: earlyMinutes, now: now, cleared: cleared)
+            : []
+        var toSchedule: [PlannedAlarm]
         if isForeground {
             let soonCutoff = now.addingTimeInterval(Self.openQuietWindow)
             let later = all.filter { $0.scheduleDate > soonCutoff }
@@ -417,8 +499,9 @@ final class AppModel {
         } else {
             toSchedule = all
         }
+        toSchedule += early
         do {
-            try await alarmService.sync(toSchedule, keep: Set(testPlanned.map(\.id)))
+            try await alarmService.sync(toSchedule, keep: Set((testPlanned + snoozePlanned).map(\.id)))
             syncProblem = nil
             scheduledAlarms = alarmService.scheduledCount
         } catch {
@@ -475,7 +558,8 @@ final class AppModel {
         }
         let lead = TimeInterval(leadMinutes * 60)
         if let due = upcoming(at: now).first(where: {
-            ringsFully($0) && now >= $0.start.addingTimeInterval(-lead - 60) && now <= $0.start.addingTimeInterval(5 * 60)
+            ringsFully($0) && !isPaused($0, now: now) && (force || snoozedUntil[$0.id] == nil)
+                && now >= $0.start.addingTimeInterval(-lead - 60) && now <= $0.start.addingTimeInterval(5 * 60)
         }), force || !shownNowFor.contains(due.id) {
             show(due)
         }

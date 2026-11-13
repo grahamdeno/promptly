@@ -5,6 +5,7 @@ import UIKit
 struct HomeView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.openURL) private var openURL
+    @State private var addingReminder = false
     @State private var showCalendars = ScreenshotMode.scene.map { [ScreenshotScene.settings, .pro, .manycals].contains($0) } ?? false
 
     @Environment(\.horizontalSizeClass) private var sizeClass
@@ -70,6 +71,9 @@ struct HomeView: View {
         .hapticRamp(until: model.upcoming(at: .now).first?.start, enabled: model.buzz && model.arrived == nil)
         .overlay { DiscoLights().ignoresSafeArea().environment(\.themeStill, quiet || PowerWatch.shared.strained) }
         .overlay(alignment: .bottom) { undoToast }
+        .sheet(isPresented: $addingReminder) {
+            AddReminderSheet().environment(model)
+        }
         .sheet(isPresented: $showCalendars) {
             SettingsView()
                 .environment(model)
@@ -146,15 +150,42 @@ struct HomeView: View {
         HStack {
             Wordmark()
             Spacer()
-            Button { showCalendars = true } label: {
-                Image(systemName: "gearshape")
-                    .font(.title3)
+            Menu {
+                Button("Add a reminder", systemImage: "plus") { addingReminder = true }
+                if let until = model.pausedUntil, until > .now {
+                    Button("Resume alerts", systemImage: "bell") { model.resume() }
+                } else {
+                    Menu("Pause alerts", systemImage: "pause") {
+                        Button("For 1 hour") { model.pause(until: .now.addingTimeInterval(3600)) }
+                        Button("For 2 hours") { model.pause(until: .now.addingTimeInterval(7200)) }
+                        Button("For the rest of today") { model.pause(until: PauseRule.endOfDay(from: .now)) }
+                    }
+                }
+                Divider()
+                Button("Settings", systemImage: "gearshape") { showCalendars = true }
+            } label: {
+                Image(systemName: "ellipsis.circle")
+                    .font(.title2)
                     .foregroundStyle(Brand.ink)
                     .frame(width: 44, height: 44)
             }
-            .accessibilityLabel("Settings")
+            .accessibilityLabel("More: add a reminder, pause alerts, settings")
         }
         .padding(.top, 8)
+        .overlay(alignment: .bottomLeading) {
+            if let until = model.pausedUntil, until > .now {
+                Button { model.resume() } label: {
+                    Label("Paused until \(until.formatted(date: .omitted, time: .shortened)) · Resume", systemImage: "pause.fill")
+                        .font(.footnote.weight(.medium))
+                        .foregroundStyle(Brand.accentText)
+                        .padding(.horizontal, 14)
+                        .frame(minHeight: 36)
+                }
+                .buttonStyle(.plain)
+                .glassEffect(.regular, in: .capsule)
+                .offset(y: 42)
+            }
+        }
     }
 
     /// One card holds the meeting and its countdown; what comes after is a quiet line below it.
@@ -162,10 +193,13 @@ struct HomeView: View {
         let parts = Countdown.parts(now: now, start: meeting.start)
         let started = meeting.start <= now
         let nextWord = model.gumColor == .moon ? "Next transmission" : "Next"
-        let label = isDemo(meeting) ? "Practice" : [started ? "Happening now" : nextWord, meeting.service?.rawValue].compactMap { $0 }.joined(separator: " · ")
+        let label = isDemo(meeting) ? "Practice" : meeting.calendarID == OwnReminder.calendarID ? "Reminder" : [started ? "Happening now" : nextWord, meeting.service?.rawValue].compactMap { $0 }.joined(separator: " · ")
         // How Pop In will alert, so a quiet one is never a surprise.
-        let rings = model.ringsFully(meeting)
-        let how = rings ? "Rings \(model.leadMinutes) min before" : "Quiet notification only"
+        let paused = model.isPaused(meeting, now: now)
+        let rings = model.ringsFully(meeting) && !paused
+        let how: String = paused ? "Paused until \(model.pausedUntil.map { $0.formatted(date: .omitted, time: .shortened) } ?? "later")"
+            : rings ? (model.earlyMinutes > model.leadMinutes ? "Rings \(model.earlyMinutes) and \(model.leadMinutes) min before" : "Rings \(model.leadMinutes) min before")
+            : model.workHours.contains(meeting.start) ? "Quiet notification only" : "Outside work hours, quiet notification"
         return VStack(alignment: .leading, spacing: 22) {
             VStack(alignment: .leading, spacing: 20) {
                 VStack(alignment: .leading, spacing: 0) {

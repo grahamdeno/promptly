@@ -21,6 +21,28 @@ struct SettingsView: View {
                                    options: [1, 2, 5, 10], selected: model.leadMinutes, label: { "\($0) minute\($0 == 1 ? "" : "s")" },
                                    locked: { $0 > 5 && !model.store.isPro }) { model.leadMinutes = $0 }
                     }
+                    SettingsLink("Early alarm", value: model.earlyMinutes > model.leadMinutes ? "\(model.earlyMinutes) min" : "Off") {
+                        ChoicePage(title: "Early alarm", note: "A second alarm before the main one, so you can wrap up. It rings like the main alarm.",
+                                   options: [0, 5, 10, 15, 30].filter { $0 == 0 || $0 > model.leadMinutes }, selected: model.earlyMinutes > model.leadMinutes ? model.earlyMinutes : 0,
+                                   label: { $0 == 0 ? "Off" : "\($0) minutes before" },
+                                   locked: { _ in false }) { model.earlyMinutes = $0 }
+                    }
+                    SettingsLink("Work hours", value: model.workHours.summary()) {
+                        WorkHoursPage()
+                    }
+                    SettingsLink("Pause alerts", value: (model.pausedUntil ?? .distantPast) > .now ? "Until \(model.pausedUntil!.formatted(date: .omitted, time: .shortened))" : "Off") {
+                        ChoicePage(title: "Pause alerts", note: "No alarms or notifications until then. You can also pause from the menu on Home.",
+                                   options: [0, 1, 2, 99], selected: (model.pausedUntil ?? .distantPast) > .now ? 1 : 0,
+                                   label: { [0: "Off", 1: "1 hour", 2: "2 hours", 99: "Rest of today"][$0] ?? "" }) { v in
+                            switch v {
+                            case 0: model.resume()
+                            case 99: model.pause(until: PauseRule.endOfDay(from: .now))
+                            default: model.pause(until: .now.addingTimeInterval(Double(v) * 3600))
+                            }
+                        }
+                    }
+                    SettingsToggle("Accepted meetings only", detail: "Skip meetings you haven't accepted yet",
+                                   isOn: Binding(get: { model.acceptedOnly }, set: { model.acceptedOnly = $0 }))
                 }
 
                 SettingsGroup("Alarm", note: model.testMessage) {
@@ -44,11 +66,11 @@ struct SettingsView: View {
                     .buttonStyle(.plain)
                     SettingsLink("Sound", value: model.alarmSound.label) {
                         ChoicePage(title: "Alarm sound",
-                                   note: "Tap one to hear it. It starts quietly and gets louder until the meeting starts. Apple's tone rings on the Lock Screen only; while Pop In is open you'll hear Gum pops instead.",
+                                   note: "Tap one to hear it. It starts quietly and gets louder until the meeting starts. Apple plays Apple's alarm beep here and while Pop In is open, and Apple's default alarm on the Lock Screen.",
                                    options: AlarmSoundChoice.available, selected: model.alarmSound, label: \.label,
                                    locked: { $0.isPro && !model.store.isPro }) { choice in
                             model.alarmSound = choice
-                            if choice != .appleDefault { AlarmLoop.preview(choice) }
+                            AlarmLoop.preview(choice)
                         }
                     }
                     SettingsToggle("Lock Screen countdown", detail: "The bubble on your Lock Screen before it rings",

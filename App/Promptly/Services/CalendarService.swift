@@ -22,7 +22,7 @@ final class CalendarService {
 
     /// Timed events from now (and the last 15 minutes) through the next `hours`, skipping all-day,
     /// canceled and declined events.
-    func upcoming(hours: Double = 48, disabled: Set<String>, now: Date = .now) -> [Meeting] {
+    func upcoming(hours: Double = 48, disabled: Set<String>, acceptedOnly: Bool = false, now: Date = .now) -> [Meeting] {
         let calendars = store.calendars(for: .event).filter { !disabled.contains($0.calendarIdentifier) }
         guard !calendars.isEmpty else { return [] }
         let predicate = store.predicateForEvents(withStart: now.addingTimeInterval(-15 * 60),
@@ -30,8 +30,9 @@ final class CalendarService {
                                                  calendars: calendars)
         return store.events(matching: predicate).compactMap { event -> Meeting? in
             guard !event.isAllDay, event.status != .canceled else { return nil }
-            if let me = event.attendees?.first(where: { $0.isCurrentUser }), me.participantStatus == .declined {
-                return nil
+            if let me = event.attendees?.first(where: { $0.isCurrentUser }) {
+                if me.participantStatus == .declined { return nil }
+                if acceptedOnly, me.participantStatus == .tentative || me.participantStatus == .pending { return nil }
             }
             let link = MeetingLinkDetector.firstMeetingLink(in: [event.url?.absoluteString, event.location, event.notes])
             let eventID = event.eventIdentifier ?? event.calendarItemIdentifier

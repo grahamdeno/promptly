@@ -163,6 +163,46 @@ final class Prefs: @unchecked Sendable {
         set { defaults.set(newValue, forKey: "popSound") }
     }
 
+    /// Reminders made inside Pop In.
+    var ownReminders: [OwnReminder] {
+        get { (defaults.data(forKey: "ownReminders")).flatMap { try? JSONDecoder().decode([OwnReminder].self, from: $0) } ?? [] }
+        set { defaults.set(try? JSONEncoder().encode(newValue), forKey: "ownReminders") }
+    }
+
+    /// An extra, earlier alarm before the main one (minutes before the start); 0 for none.
+    var earlyMinutes: Int {
+        get { defaults.integer(forKey: "earlyMinutes") }
+        set { defaults.set(newValue, forKey: "earlyMinutes") }
+    }
+
+    /// Skip meetings not yet accepted (tentative or unanswered). Declined ones are always skipped.
+    var acceptedOnly: Bool {
+        get { defaults.bool(forKey: "acceptedOnly") }
+        set { defaults.set(newValue, forKey: "acceptedOnly") }
+    }
+
+    var workHours: WorkHours {
+        get {
+            let d = WorkHours.standard
+            return WorkHours(on: defaults.bool(forKey: "workHoursOn"),
+                             start: defaults.object(forKey: "workStart") as? Int ?? d.start,
+                             end: defaults.object(forKey: "workEnd") as? Int ?? d.end,
+                             days: Set(defaults.array(forKey: "workDays") as? [Int] ?? Array(d.days)))
+        }
+        set {
+            defaults.set(newValue.on, forKey: "workHoursOn")
+            defaults.set(newValue.start, forKey: "workStart")
+            defaults.set(newValue.end, forKey: "workEnd")
+            defaults.set(Array(newValue.days), forKey: "workDays")
+        }
+    }
+
+    /// Alerts paused until this time, if any.
+    var pausedUntil: Date? {
+        get { defaults.object(forKey: "pausedUntil") as? Date }
+        set { defaults.set(newValue, forKey: "pausedUntil") }
+    }
+
     /// Surprise me: a different theme each day.
     var surprise: Bool {
         get { defaults.bool(forKey: "surprise") }
