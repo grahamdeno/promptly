@@ -83,6 +83,7 @@ struct HomeView: View {
                 }
         }
         .fullScreenCover(isPresented: $playing) { PopPlayground() }
+        .onAppear { if ScreenshotMode.scene == .playground { playing = true } }
         .sheet(isPresented: $addingReminder) {
             AddReminderSheet().environment(model)
         }

@@ -41,6 +41,19 @@ struct NowView: View {
                     Text(status(now))
                         .font(.subheadline.weight(.medium))
                         .foregroundStyle(Brand.secondary)
+                    ForEach(model.missed(before: meeting)) { old in
+                        Button {
+                            if let url = old.joinURL { openURL(url) }
+                        } label: {
+                            Label("Missed: \(old.start.formatted(date: .omitted, time: .shortened)) \(old.title)" + (old.joinURL != nil ? " · Join" : ""),
+                                  systemImage: "clock.badge.exclamationmark")
+                                .font(.footnote.weight(.medium))
+                                .foregroundStyle(Brand.secondary)
+                                .lineLimit(1)
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(old.joinURL == nil)
+                    }
                     Text(meeting.title)
                         .font(.system(size: titleSize, weight: .semibold))
                         .tracking(-1)

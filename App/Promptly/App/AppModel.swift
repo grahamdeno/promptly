@@ -283,11 +283,19 @@ final class AppModel {
             leadMinutes = 2
             cleared = []
             calendars = scene == .manycals ? ScreenshotMode.manyCalendars : ScreenshotMode.calendars
-            meetings = scene == .empty ? [] : ScreenshotMode.meetings()
+            meetings = scene == .empty ? [] : MeetingMerge.merge(ScreenshotMode.meetings())
+            pausedUntil = scene == .paused ? Date.now.addingTimeInterval(3600) : nil
+            var hours = WorkHours.standard
+            if scene == .outside {
+                // Work hours that have already ended today, so the next meeting is outside them.
+                hours = WorkHours(on: true, start: 6 * 60, end: 6 * 60 + 1, days: Set(1...7))
+            }
+            workHours = hours
             // The Pro sheet scene shows the App Store version of the sheet (price and buy button), for Apple's
             // in-app purchase review screenshot; every other scene shows Pro features unlocked.
             store.setDemoAccess(![.pro, .settings].contains(scene) && !ScreenshotMode.free)   // App Store pictures of Settings and Pro show the price
             if scene == .now || scene == .late { arrived = meetings.first }
+            if scene == .missed { arrived = meetings.first { $0.id == "shot-design" } }
             if scene == .pro { showPro = true }
             return
         }
@@ -325,7 +333,26 @@ final class AppModel {
 
     /// Meetings not yet cleared that haven't ended.
     func upcoming(at now: Date) -> [Meeting] {
-        (meetings + testMeetings).filter { !cleared.contains($0.id) && $0.end > now }.sorted { $0.start < $1.start }
+        let open = (meetings + testMeetings).filter { !cleared.contains($0.id) && $0.end > now }
+        return open.filter { !isMissed($0, among: open, now: now) }.sorted { $0.start < $1.start }
+    }
+
+    /// The rules the alarm screen runs by right now.
+    func screenConfig(_ now: Date) -> AlarmScreenRule.Config {
+        AlarmScreenRule.Config(lead: TimeInterval(leadMinutes * 60), rings: { self.ringsFully($0) },
+                               paused: { self.isPaused($0, now: now) })
+    }
+
+    /// Superseded by a later meeting whose alarm has come due (see NewestWins).
+    func isMissed(_ m: Meeting, among open: [Meeting], now: Date) -> Bool {
+        NewestWins.isMissed(m, among: open, now: now, lead: TimeInterval(leadMinutes * 60),
+                            rings: { self.ringsFully($0) && !self.isPaused($0, now: now) })
+    }
+
+    /// Meetings missed because this one took over and still running, for the alarm screen's "Missed" line.
+    func missed(before meeting: Meeting, now: Date = .now) -> [Meeting] {
+        let open = (meetings + testMeetings).filter { !cleared.contains($0.id) && $0.end > now }
+        return open.filter { $0.start < meeting.start && isMissed($0, among: open, now: now) }.sorted { $0.start < $1.start }
     }
 
     // MARK: Permissions and first run
@@ -479,21 +506,21 @@ final class AppModel {
                 tick += 1
                 // Every half minute, hold back any alarm that has come within the quiet window.
                 if tick % 15 == 0 { await self?.syncAlarms() }
-                guard let self, UIApplication.shared.applicationState == .active, self.arrived == nil,
-                      !self.settingsOpen else { continue }
+                guard let self, UIApplication.shared.applicationState == .active, !self.settingsOpen, !ScreenshotMode.isOn else { continue }
                 let now = Date.now
-                if let hit = self.snoozedUntil.first(where: { $0.value <= now }) {
-                    let id = hit.key
-                    self.snoozedUntil[id] = nil
-                    if let m = self.upcoming(at: now).first(where: { $0.id == id }) { self.show(m, ring: true) }
-                    continue
-                }
-                let lead = TimeInterval(self.leadMinutes * 60)
-                if let due = self.upcoming(at: now).first(where: {
-                    self.ringsFully($0) && !self.isPaused($0, now: now) && self.snoozedUntil[$0.id] == nil
-                        && now >= $0.start.addingTimeInterval(-lead) && now <= $0.start.addingTimeInterval(5 * 60)
-                }), !self.shownNowFor.contains(due.id) {
-                    self.show(due, ring: true)
+                let open = (self.meetings + self.testMeetings).filter { !self.cleared.contains($0.id) && $0.end > now }
+                let state = AlarmScreenRule.State(showing: self.arrived?.id, shown: self.shownNowFor, snoozedUntil: self.snoozedUntil)
+                let (action, next) = AlarmScreenRule.tick(open: open, state: state, now: now, config: self.screenConfig(now))
+                self.snoozedUntil = next.snoozedUntil
+                switch action {
+                case .none:
+                    break
+                case .close:
+                    AlarmLoop.stop()
+                    self.arrived = nil
+                case .show(let id), .replace(let id):
+                    if case .replace = action { AlarmLoop.stop(); self.arrived = nil }
+                    if let m = open.first(where: { $0.id == id }) { self.show(m, ring: true) }
                 }
             }
         }
@@ -528,7 +555,8 @@ final class AppModel {
         guard alarmsAuthorized else { return }
         let now = Date.now
         if let p = pausedUntil, p <= now { pausedUntil = nil; return }
-        let live = meetings.filter { !isPaused($0, now: now) }
+        let open = meetings.filter { !cleared.contains($0.id) && $0.end > now }
+        let live = meetings.filter { !isPaused($0, now: now) && !isMissed($0, among: open, now: now) }
         let alarmMeetings = live.filter { ringsFully($0) }
         let gentleMeetings = live.filter { !ringsFully($0) }
         let planned = AlarmPlanner.plan(meetings: alarmMeetings, leadMinutes: leadMinutes, now: now, cleared: cleared,
