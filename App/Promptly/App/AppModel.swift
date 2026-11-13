@@ -283,11 +283,19 @@ final class AppModel {
             leadMinutes = 2
             cleared = []
             calendars = scene == .manycals ? ScreenshotMode.manyCalendars : ScreenshotMode.calendars
-            meetings = scene == .empty ? [] : ScreenshotMode.meetings()
+            meetings = scene == .empty ? [] : MeetingMerge.merge(ScreenshotMode.meetings())
+            pausedUntil = scene == .paused ? Date.now.addingTimeInterval(3600) : nil
+            var hours = WorkHours.standard
+            if scene == .outside {
+                // Work hours that have already ended today, so the next meeting is outside them.
+                hours = WorkHours(on: true, start: 6 * 60, end: 6 * 60 + 1, days: Set(1...7))
+            }
+            workHours = hours
             // The Pro sheet scene shows the App Store version of the sheet (price and buy button), for Apple's
             // in-app purchase review screenshot; every other scene shows Pro features unlocked.
             store.setDemoAccess(![.pro, .settings].contains(scene) && !ScreenshotMode.free)   // App Store pictures of Settings and Pro show the price
             if scene == .now || scene == .late { arrived = meetings.first }
+            if scene == .missed { arrived = meetings.first { $0.id == "shot-design" } }
             if scene == .pro { showPro = true }
             return
         }

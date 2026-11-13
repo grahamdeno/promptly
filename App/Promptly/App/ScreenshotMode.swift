@@ -6,6 +6,9 @@ enum ScreenshotScene: String {
     case home, now, late, unicorn, settings, pop, pro
     /// For the UX audit: first run, nothing coming up, the next meeting tomorrow, and a long list of calendars.
     case welcome, empty, far, manycals, fortune, moon, grenade
+    /// Edge cases for the simulator walk-through: a missed meeting under a new alarm, alerts paused, a meeting
+    /// outside work hours, an own reminder, the same meeting twice, and the Pop for fun playground.
+    case missed, paused, outside, reminder, dupes, playground
 }
 
 enum ScreenshotMode {
@@ -37,6 +40,7 @@ enum ScreenshotMode {
         case .far: firstStart = Calendar.current.date(bySettingHour: 16, minute: 35, second: 0,
                                                       of: now.addingTimeInterval(24 * 3600)) ?? now.addingTimeInterval(20 * 3600)
         case .late: firstStart = now.addingTimeInterval(120 - 50)   // 50 s after a 2-minute-early ring
+        case .missed: firstStart = now.addingTimeInterval(90)        // the new meeting's alarm is up
         default: firstStart = now.addingTimeInterval(7 * 60 + 20)
         }
         func meeting(_ id: String, _ title: String, _ start: Date, minutes: Double, calendar: String, link: String?) -> Meeting {
@@ -45,7 +49,20 @@ enum ScreenshotMode {
         }
         let tomorrow = Calendar.current.date(bySettingHour: 9, minute: 30, second: 0,
                                              of: now.addingTimeInterval(24 * 3600)) ?? now.addingTimeInterval(24 * 3600)
-        return [
+        var extra: [Meeting] = []
+        switch scene {
+        case .missed:
+            extra.append(meeting("old", "Weekly sync", now.addingTimeInterval(-25 * 60), minutes: 60, calendar: "shot-work",
+                                 link: "https://zoom.us/j/5550100300"))
+        case .reminder:
+            extra.append(OwnReminder(id: "shot", title: "Pick up Nora", date: now.addingTimeInterval(4 * 60)).meeting)
+        case .dupes:
+            extra.append(meeting("design-fw", "FW: Design review", firstStart, minutes: 30, calendar: "shot-home",
+                                 link: "https://zoom.us/j/5550100200?pwd=fw"))
+        default:
+            break
+        }
+        return extra + [
             meeting("design", "Design review", firstStart, minutes: 30, calendar: "shot-work",
                     link: "https://zoom.us/j/5550100200"),
             meeting("standup", "Team standup", firstStart.addingTimeInterval(55 * 60), minutes: 15, calendar: "shot-work",

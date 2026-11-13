@@ -287,4 +287,44 @@ final class Journeys: XCTestCase {
             a.shot("\(theme)-pop")
         }
     }
+
+    // J13. Edge cases: the screens a person meets on an awkward day, for a sticking-point review.
+    func test13_EdgeCases() {
+        let a = Audit("J13-edge-cases")
+        defer { a.finish() }
+        a.launch("missed")
+        a.shot("missed-under-new-alarm", note: "New alarm up; the unpopped earlier meeting shows as Missed with Join")
+        a.accessibility("missed")
+        a.launch("paused")
+        a.shot("paused-home", note: "Paused until pill under the header; card says Paused until")
+        a.launch("outside")
+        a.shot("outside-work-hours", note: "Card says Outside work hours, quiet notification")
+        a.launch("reminder")
+        a.shot("own-reminder-next", note: "An own reminder is next: card label Reminder")
+        a.launch("dupes")
+        a.shot("duplicate-merged", note: "Design review and its FW copy show as one meeting")
+        a.launch("home")
+        let more = a.app.buttons["More: add a reminder, pop for fun, pause alerts, settings"]
+        if more.waitForExistence(timeout: 4) {
+            more.tap()
+            a.pause(0.8)
+            a.shot("more-menu", note: "Add a reminder, Pop for fun, Pause alerts, Settings")
+            let add = a.app.buttons["Add a reminder"]
+            if add.waitForExistence(timeout: 2) {
+                add.tap()
+                a.pause(1)
+                a.shot("add-reminder-sheet")
+                a.accessibility("add-reminder")
+            }
+        }
+        a.launch("playground", settle: 3)
+        a.shot("pop-for-fun")
+        let ball = a.app.descendants(matching: .any).matching(NSPredicate(format: "label ENDSWITH 'bubble'")).firstMatch
+        if ball.waitForExistence(timeout: 3) {
+            ball.tap()
+            a.pause(0.25)
+            a.shot("pop-for-fun-popped")
+        }
+        a.accessibility("playground")
+    }
 }
