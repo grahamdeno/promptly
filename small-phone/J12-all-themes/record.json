@@ -1,0 +1,1370 @@
+{
+  "accessibility" : [
+
+  ],
+  "config" : "small-phone",
+  "journey" : "J12-all-themes",
+  "seconds" : 597,
+  "steps" : [
+    {
+      "dt" : 8.0999999999999996,
+      "file" : "01-snowball.png",
+      "kind" : "shot",
+      "n" : 1,
+      "name" : "snowball",
+      "note" : "",
+      "t" : 8.0999999999999996
+    },
+    {
+      "detail" : "Attributes: Button, 0x104333620, {{-218.1, 311.4}, {826.3, 908.3}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x10",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x10447c5c0, {{-214.0, 325.2}, {819.4, 894.4}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x10",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 9.8100000000000005,
+      "file" : "02-snowball-pop.png",
+      "kind" : "shot",
+      "n" : 2,
+      "name" : "snowball-pop",
+      "note" : "",
+      "t" : 17.899999999999999
+    },
+    {
+      "dt" : 9.0600000000000005,
+      "file" : "03-ornament.png",
+      "kind" : "shot",
+      "n" : 3,
+      "name" : "ornament",
+      "note" : "",
+      "t" : 27
+    },
+    {
+      "detail" : "Attributes: Button, 0x1044c33e0, {{-218.9, 307.3}, {828.4, 912.4}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x10",
+      "kind" : "check",
+      "n" : 3,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x104460a10, {{-219.6, 306.5}, {828.6, 912.8}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x10",
+      "kind" : "check",
+      "n" : 3,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 9.3100000000000005,
+      "file" : "04-ornament-pop.png",
+      "kind" : "shot",
+      "n" : 4,
+      "name" : "ornament-pop",
+      "note" : "",
+      "t" : 36.299999999999997
+    },
+    {
+      "dt" : 8.1099999999999994,
+      "file" : "05-pumpkin.png",
+      "kind" : "shot",
+      "n" : 5,
+      "name" : "pumpkin",
+      "note" : "",
+      "t" : 44.399999999999999
+    },
+    {
+      "detail" : "Attributes: Button, 0x11735b060, {{-217.8, 311.5}, {826.2, 908.2}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 5,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x10932c490, {{-217.9, 310.8}, {826.4, 908.5}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x10",
+      "kind" : "check",
+      "n" : 5,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 11.300000000000001,
+      "file" : "06-pumpkin-pop.png",
+      "kind" : "shot",
+      "n" : 6,
+      "name" : "pumpkin-pop",
+      "note" : "",
+      "t" : 55.700000000000003
+    },
+    {
+      "dt" : 11.720000000000001,
+      "file" : "07-disco.png",
+      "kind" : "shot",
+      "n" : 7,
+      "name" : "disco",
+      "note" : "",
+      "t" : 67.400000000000006
+    },
+    {
+      "detail" : "Attributes: Button, 0x10437c3a0, {{-215.2, 322.1}, {821.1, 897.9}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x10",
+      "kind" : "check",
+      "n" : 7,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x1094b2990, {{-219.3, 307.1}, {828.6, 912.9}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x10",
+      "kind" : "check",
+      "n" : 7,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 6.2800000000000002,
+      "file" : "08-disco-pop.png",
+      "kind" : "shot",
+      "n" : 8,
+      "name" : "disco-pop",
+      "note" : "",
+      "t" : 73.700000000000003
+    },
+    {
+      "dt" : 8.1400000000000006,
+      "file" : "09-soap.png",
+      "kind" : "shot",
+      "n" : 9,
+      "name" : "soap",
+      "note" : "",
+      "t" : 81.799999999999997
+    },
+    {
+      "detail" : "Attributes: Button, 0x1094b4850, {{-214.7, 325.3}, {819.4, 894.4}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x10",
+      "kind" : "check",
+      "n" : 9,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x1176df0a0, {{-214.7, 325.3}, {819.3, 894.4}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 9,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 6.9900000000000002,
+      "file" : "10-soap-pop.png",
+      "kind" : "shot",
+      "n" : 10,
+      "name" : "soap-pop",
+      "note" : "",
+      "t" : 88.799999999999997
+    },
+    {
+      "dt" : 11.390000000000001,
+      "file" : "11-planet.png",
+      "kind" : "shot",
+      "n" : 11,
+      "name" : "planet",
+      "note" : "",
+      "t" : 100.2
+    },
+    {
+      "detail" : "Attributes: Button, 0x1176d6970, {{-219.0, 308.2}, {827.9, 911.5}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 11,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x119a8caa0, {{-219.5, 305.9}, {829.0, 913.7}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 11,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 5.6299999999999999,
+      "file" : "12-planet-pop.png",
+      "kind" : "shot",
+      "n" : 12,
+      "name" : "planet-pop",
+      "note" : "",
+      "t" : 105.8
+    },
+    {
+      "dt" : 10.09,
+      "file" : "13-basketball.png",
+      "kind" : "shot",
+      "n" : 13,
+      "name" : "basketball",
+      "note" : "",
+      "t" : 115.90000000000001
+    },
+    {
+      "detail" : "Attributes: Button, 0x119a05390, {{-217.1, 315.7}, {824.1, 904.0}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 13,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x11b1c0660, {{-215.1, 325.1}, {819.4, 894.5}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 13,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 9.5,
+      "file" : "14-basketball-pop.png",
+      "kind" : "shot",
+      "n" : 14,
+      "name" : "basketball-pop",
+      "note" : "",
+      "t" : 125.40000000000001
+    },
+    {
+      "dt" : 7.8200000000000003,
+      "file" : "15-donut.png",
+      "kind" : "shot",
+      "n" : 15,
+      "name" : "donut",
+      "note" : "",
+      "t" : 133.30000000000001
+    },
+    {
+      "detail" : "Attributes: Button, 0x1153d2900, {{-218.3, 309.7}, {827.3, 910.3}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 15,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x11584b770, {{-214.7, 325.4}, {819.5, 894.6}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 15,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 4.7800000000000002,
+      "file" : "16-donut-pop.png",
+      "kind" : "shot",
+      "n" : 16,
+      "name" : "donut-pop",
+      "note" : "",
+      "t" : 138
+    },
+    {
+      "dt" : 7.9500000000000002,
+      "file" : "17-waterBalloon.png",
+      "kind" : "shot",
+      "n" : 17,
+      "name" : "waterBalloon",
+      "note" : "",
+      "t" : 146
+    },
+    {
+      "detail" : "Attributes: Button, 0x1157ad320, {{-214.8, 324.5}, {819.6, 894.8}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 17,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x1157c2bd0, {{-215.7, 321.3}, {821.4, 898.4}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 17,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 6.1200000000000001,
+      "file" : "18-waterBalloon-pop.png",
+      "kind" : "shot",
+      "n" : 18,
+      "name" : "waterBalloon-pop",
+      "note" : "",
+      "t" : 152.09999999999999
+    },
+    {
+      "dt" : 8.4000000000000004,
+      "file" : "19-eyeball.png",
+      "kind" : "shot",
+      "n" : 19,
+      "name" : "eyeball",
+      "note" : "",
+      "t" : 160.5
+    },
+    {
+      "detail" : "Attributes: Button, 0x115e39190, {{-215.6, 320.5}, {821.8, 899.2}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 19,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x115e91600, {{-216.1, 321.0}, {821.5, 898.7}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 19,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 4.8799999999999999,
+      "file" : "20-eyeball-pop.png",
+      "kind" : "shot",
+      "n" : 20,
+      "name" : "eyeball-pop",
+      "note" : "",
+      "t" : 165.40000000000001
+    },
+    {
+      "dt" : 8.9199999999999999,
+      "file" : "21-fishbowl.png",
+      "kind" : "shot",
+      "n" : 21,
+      "name" : "fishbowl",
+      "note" : "",
+      "t" : 174.30000000000001
+    },
+    {
+      "detail" : "Attributes: Button, 0x115c78b10, {{-215.3, 324.1}, {820.0, 895.6}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 21,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x117224930, {{-214.4, 324.6}, {819.5, 894.7}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 21,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 6.5800000000000001,
+      "file" : "22-fishbowl-pop.png",
+      "kind" : "shot",
+      "n" : 22,
+      "name" : "fishbowl-pop",
+      "note" : "",
+      "t" : 180.90000000000001
+    },
+    {
+      "dt" : 8.6899999999999995,
+      "file" : "23-moodRing.png",
+      "kind" : "shot",
+      "n" : 23,
+      "name" : "moodRing",
+      "note" : "",
+      "t" : 189.59999999999999
+    },
+    {
+      "detail" : "Attributes: Button, 0x1172194e0, {{-218.9, 307.1}, {828.4, 912.5}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 23,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x1174dd100, {{-218.5, 311.6}, {826.4, 908.4}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 23,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 5.8499999999999996,
+      "file" : "24-moodRing-pop.png",
+      "kind" : "shot",
+      "n" : 24,
+      "name" : "moodRing-pop",
+      "note" : "",
+      "t" : 195.40000000000001
+    },
+    {
+      "dt" : 8.8599999999999994,
+      "file" : "25-lavaLamp.png",
+      "kind" : "shot",
+      "n" : 25,
+      "name" : "lavaLamp",
+      "note" : "",
+      "t" : 204.30000000000001
+    },
+    {
+      "detail" : "Attributes: Button, 0x1174fbc30, {{-217.3, 315.9}, {824.0, 903.7}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 25,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x1174b1b60, {{-214.6, 324.6}, {819.9, 895.4}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 25,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 8.6199999999999992,
+      "file" : "26-lavaLamp-pop.png",
+      "kind" : "shot",
+      "n" : 26,
+      "name" : "lavaLamp-pop",
+      "note" : "",
+      "t" : 212.90000000000001
+    },
+    {
+      "dt" : 8.2400000000000002,
+      "file" : "27-soccer.png",
+      "kind" : "shot",
+      "n" : 27,
+      "name" : "soccer",
+      "note" : "",
+      "t" : 221.19999999999999
+    },
+    {
+      "detail" : "Attributes: Button, 0x117276ab0, {{-216.7, 317.5}, {823.4, 902.5}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 27,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x118a1f330, {{-216.0, 320.1}, {822.0, 899.6}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 27,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 7.2800000000000002,
+      "file" : "28-soccer-pop.png",
+      "kind" : "shot",
+      "n" : 28,
+      "name" : "soccer-pop",
+      "note" : "",
+      "t" : 228.40000000000001
+    },
+    {
+      "dt" : 8.2899999999999991,
+      "file" : "29-hockey.png",
+      "kind" : "shot",
+      "n" : 29,
+      "name" : "hockey",
+      "note" : "",
+      "t" : 236.69999999999999
+    },
+    {
+      "detail" : "Attributes: Button, 0x117f78e90, {{-218.3, 309.5}, {827.3, 910.2}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 29,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x118bbc030, {{-216.7, 316.0}, {824.0, 903.7}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 29,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 5.6100000000000003,
+      "file" : "30-hockey-pop.png",
+      "kind" : "shot",
+      "n" : 30,
+      "name" : "hockey-pop",
+      "note" : "",
+      "t" : 242.30000000000001
+    },
+    {
+      "dt" : 7.8799999999999999,
+      "file" : "31-tennis.png",
+      "kind" : "shot",
+      "n" : 31,
+      "name" : "tennis",
+      "note" : "",
+      "t" : 250.19999999999999
+    },
+    {
+      "detail" : "Attributes: Button, 0x117fe1c70, {{-216.1, 320.8}, {821.6, 898.8}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 31,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x117fe5e90, {{-215.6, 320.3}, {821.9, 899.4}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 31,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 5.0199999999999996,
+      "file" : "32-tennis-pop.png",
+      "kind" : "shot",
+      "n" : 32,
+      "name" : "tennis-pop",
+      "note" : "",
+      "t" : 255.19999999999999
+    },
+    {
+      "dt" : 8.0899999999999999,
+      "file" : "33-golf.png",
+      "kind" : "shot",
+      "n" : 33,
+      "name" : "golf",
+      "note" : "",
+      "t" : 263.30000000000001
+    },
+    {
+      "detail" : "Attributes: Button, 0x118f41df0, {{-216.1, 321.4}, {821.5, 898.6}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 33,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x1198ec500, {{-219.8, 305.7}, {829.0, 913.6}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 33,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 5.3700000000000001,
+      "file" : "34-golf-pop.png",
+      "kind" : "shot",
+      "n" : 34,
+      "name" : "golf-pop",
+      "note" : "",
+      "t" : 268.69999999999999
+    },
+    {
+      "dt" : 8.6199999999999992,
+      "file" : "35-baseball.png",
+      "kind" : "shot",
+      "n" : 35,
+      "name" : "baseball",
+      "note" : "",
+      "t" : 277.30000000000001
+    },
+    {
+      "detail" : "Attributes: Button, 0x119960fa0, {{-216.0, 319.7}, {822.0, 899.7}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 35,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x1198c7a50, {{-219.2, 305.9}, {829.1, 913.8}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 35,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 4.9500000000000002,
+      "file" : "36-baseball-pop.png",
+      "kind" : "shot",
+      "n" : 36,
+      "name" : "baseball-pop",
+      "note" : "",
+      "t" : 282.30000000000001
+    },
+    {
+      "dt" : 8.6799999999999997,
+      "file" : "37-bowling.png",
+      "kind" : "shot",
+      "n" : 37,
+      "name" : "bowling",
+      "note" : "",
+      "t" : 291
+    },
+    {
+      "detail" : "Attributes: Button, 0x11b29e270, {{-217.5, 312.8}, {825.6, 906.8}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 37,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x11b92e110, {{-217.4, 314.6}, {824.9, 905.4}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 37,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 6.6699999999999999,
+      "file" : "38-bowling-pop.png",
+      "kind" : "shot",
+      "n" : 38,
+      "name" : "bowling-pop",
+      "note" : "",
+      "t" : 297.60000000000002
+    },
+    {
+      "dt" : 7.7300000000000004,
+      "file" : "39-pixel.png",
+      "kind" : "shot",
+      "n" : 39,
+      "name" : "pixel",
+      "note" : "",
+      "t" : 305.39999999999998
+    },
+    {
+      "detail" : "Attributes: Button, 0x119ee2170, {{-216.1, 320.9}, {821.6, 898.8}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 39,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x11b5949a0, {{-218.9, 309.8}, {827.1, 909.8}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 39,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 5.8700000000000001,
+      "file" : "40-pixel-pop.png",
+      "kind" : "shot",
+      "n" : 40,
+      "name" : "pixel-pop",
+      "note" : "",
+      "t" : 311.19999999999999
+    },
+    {
+      "dt" : 7.9900000000000002,
+      "file" : "41-gumball.png",
+      "kind" : "shot",
+      "n" : 41,
+      "name" : "gumball",
+      "note" : "",
+      "t" : 319.19999999999999
+    },
+    {
+      "detail" : "Attributes: Button, 0x11bd34ee0, {{-217.0, 315.9}, {824.1, 903.8}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 41,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x11b610600, {{-219.2, 306.0}, {829.2, 914.0}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 41,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 5.1500000000000004,
+      "file" : "42-gumball-pop.png",
+      "kind" : "shot",
+      "n" : 42,
+      "name" : "gumball-pop",
+      "note" : "",
+      "t" : 324.39999999999998
+    },
+    {
+      "dt" : 7.4800000000000004,
+      "file" : "43-cherry.png",
+      "kind" : "shot",
+      "n" : 43,
+      "name" : "cherry",
+      "note" : "",
+      "t" : 331.80000000000001
+    },
+    {
+      "detail" : "Attributes: Button, 0x11d209a30, {{-217.6, 312.0}, {825.8, 907.3}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 43,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x11bca8960, {{-215.1, 325.4}, {819.5, 894.6}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 43,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 5.29,
+      "file" : "44-cherry-pop.png",
+      "kind" : "shot",
+      "n" : 44,
+      "name" : "cherry-pop",
+      "note" : "",
+      "t" : 337.10000000000002
+    },
+    {
+      "dt" : 8.4499999999999993,
+      "file" : "45-orange.png",
+      "kind" : "shot",
+      "n" : 45,
+      "name" : "orange",
+      "note" : "",
+      "t" : 345.60000000000002
+    },
+    {
+      "detail" : "Attributes: Button, 0x11bfd1da0, {{-216.6, 317.3}, {823.2, 902.0}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 45,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x11e00d520, {{-214.4, 324.9}, {819.5, 894.7}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 45,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 5.7599999999999998,
+      "file" : "46-orange-pop.png",
+      "kind" : "shot",
+      "n" : 46,
+      "name" : "orange-pop",
+      "note" : "",
+      "t" : 351.30000000000001
+    },
+    {
+      "dt" : 8.7699999999999996,
+      "file" : "47-macaron.png",
+      "kind" : "shot",
+      "n" : 47,
+      "name" : "macaron",
+      "note" : "",
+      "t" : 360.10000000000002
+    },
+    {
+      "detail" : "Attributes: Button, 0x11d5752f0, {{-219.2, 306.7}, {828.5, 912.7}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 47,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x11e09e890, {{-215.6, 320.1}, {821.9, 899.5}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 47,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 6.1799999999999997,
+      "file" : "48-macaron-pop.png",
+      "kind" : "shot",
+      "n" : 48,
+      "name" : "macaron-pop",
+      "note" : "",
+      "t" : 366.30000000000001
+    },
+    {
+      "dt" : 8.2400000000000002,
+      "file" : "49-cakePop.png",
+      "kind" : "shot",
+      "n" : 49,
+      "name" : "cakePop",
+      "note" : "",
+      "t" : 374.5
+    },
+    {
+      "detail" : "Attributes: Button, 0x11d2eedc0, {{-219.1, 306.3}, {828.9, 913.4}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 49,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x11e08b3f0, {{-215.3, 321.7}, {820.9, 897.5}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 49,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 9.4000000000000004,
+      "file" : "50-cakePop-pop.png",
+      "kind" : "shot",
+      "n" : 50,
+      "name" : "cakePop-pop",
+      "note" : "",
+      "t" : 383.89999999999998
+    },
+    {
+      "dt" : 9.2300000000000004,
+      "file" : "51-earth.png",
+      "kind" : "shot",
+      "n" : 51,
+      "name" : "earth",
+      "note" : "",
+      "t" : 393.19999999999999
+    },
+    {
+      "detail" : "Attributes: Button, 0x11e609260, {{-216.1, 318.5}, {822.9, 901.5}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 51,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x11e6df350, {{-214.7, 325.3}, {819.4, 894.4}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 51,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 5.5,
+      "file" : "52-earth-pop.png",
+      "kind" : "shot",
+      "n" : 52,
+      "name" : "earth-pop",
+      "note" : "",
+      "t" : 398.69999999999999
+    },
+    {
+      "dt" : 7.3099999999999996,
+      "file" : "53-sun.png",
+      "kind" : "shot",
+      "n" : 53,
+      "name" : "sun",
+      "note" : "",
+      "t" : 406
+    },
+    {
+      "detail" : "Attributes: Button, 0x11e5d2870, {{-216.8, 317.2}, {823.6, 902.8}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 53,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x11eca3cc0, {{-219.7, 306.1}, {828.8, 913.2}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 53,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 5.5300000000000002,
+      "file" : "54-sun-pop.png",
+      "kind" : "shot",
+      "n" : 54,
+      "name" : "sun-pop",
+      "note" : "",
+      "t" : 411.5
+    },
+    {
+      "dt" : 8.3699999999999992,
+      "file" : "55-dandelion.png",
+      "kind" : "shot",
+      "n" : 55,
+      "name" : "dandelion",
+      "note" : "",
+      "t" : 419.89999999999998
+    },
+    {
+      "detail" : "Attributes: Button, 0x120206950, {{-216.5, 318.0}, {823.0, 901.7}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x12",
+      "kind" : "check",
+      "n" : 55,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x11e57d2e0, {{-219.3, 307.3}, {828.5, 912.7}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 55,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 5.8399999999999999,
+      "file" : "56-dandelion-pop.png",
+      "kind" : "shot",
+      "n" : 56,
+      "name" : "dandelion-pop",
+      "note" : "",
+      "t" : 425.69999999999999
+    },
+    {
+      "dt" : 8.6300000000000008,
+      "file" : "57-atom.png",
+      "kind" : "shot",
+      "n" : 57,
+      "name" : "atom",
+      "note" : "",
+      "t" : 434.30000000000001
+    },
+    {
+      "detail" : "Attributes: Button, 0x11ed9b720, {{-214.8, 323.9}, {820.2, 896.1}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 57,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x1200ddd90, {{-219.1, 309.0}, {827.5, 910.7}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x12",
+      "kind" : "check",
+      "n" : 57,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 5.5700000000000003,
+      "file" : "58-atom-pop.png",
+      "kind" : "shot",
+      "n" : 58,
+      "name" : "atom-pop",
+      "note" : "",
+      "t" : 439.89999999999998
+    },
+    {
+      "dt" : 11.800000000000001,
+      "file" : "59-geode.png",
+      "kind" : "shot",
+      "n" : 59,
+      "name" : "geode",
+      "note" : "",
+      "t" : 451.69999999999999
+    },
+    {
+      "detail" : "Attributes: Button, 0x11ed9d440, {{-215.4, 321.3}, {821.1, 897.9}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x11",
+      "kind" : "check",
+      "n" : 59,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x1210738d0, {{-216.3, 318.3}, {822.7, 901.0}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x12",
+      "kind" : "check",
+      "n" : 59,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 8.6799999999999997,
+      "file" : "60-geode-pop.png",
+      "kind" : "shot",
+      "n" : 60,
+      "name" : "geode-pop",
+      "note" : "",
+      "t" : 460.39999999999998
+    },
+    {
+      "dt" : 7.9400000000000004,
+      "file" : "61-yarn.png",
+      "kind" : "shot",
+      "n" : 61,
+      "name" : "yarn",
+      "note" : "",
+      "t" : 468.30000000000001
+    },
+    {
+      "detail" : "Attributes: Button, 0x1210b5c30, {{-214.7, 325.0}, {819.5, 894.6}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x12",
+      "kind" : "check",
+      "n" : 61,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x1217258d0, {{-215.7, 320.0}, {822.0, 899.6}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x12",
+      "kind" : "check",
+      "n" : 61,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 5.5199999999999996,
+      "file" : "62-yarn-pop.png",
+      "kind" : "shot",
+      "n" : 62,
+      "name" : "yarn-pop",
+      "note" : "",
+      "t" : 473.80000000000001
+    },
+    {
+      "dt" : 8.8699999999999992,
+      "file" : "63-arcadeButton.png",
+      "kind" : "shot",
+      "n" : 63,
+      "name" : "arcadeButton",
+      "note" : "",
+      "t" : 482.69999999999999
+    },
+    {
+      "detail" : "Attributes: Button, 0x1206633e0, {{-216.3, 318.4}, {822.6, 900.9}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x12",
+      "kind" : "check",
+      "n" : 63,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x1213ae0f0, {{-214.8, 323.6}, {820.2, 896.1}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x12",
+      "kind" : "check",
+      "n" : 63,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 5.5999999999999996,
+      "file" : "64-arcadeButton-pop.png",
+      "kind" : "shot",
+      "n" : 64,
+      "name" : "arcadeButton-pop",
+      "note" : "",
+      "t" : 488.30000000000001
+    },
+    {
+      "dt" : 8.7799999999999994,
+      "file" : "65-clock.png",
+      "kind" : "shot",
+      "n" : 65,
+      "name" : "clock",
+      "note" : "",
+      "t" : 497.10000000000002
+    },
+    {
+      "detail" : "Attributes: Button, 0x1213c2ae0, {{-218.2, 309.8}, {827.1, 909.9}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x12",
+      "kind" : "check",
+      "n" : 65,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x123458430, {{-215.4, 321.9}, {820.9, 897.4}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x12",
+      "kind" : "check",
+      "n" : 65,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 5.6500000000000004,
+      "file" : "66-clock-pop.png",
+      "kind" : "shot",
+      "n" : 66,
+      "name" : "clock-pop",
+      "note" : "",
+      "t" : 502.69999999999999
+    },
+    {
+      "dt" : 11.17,
+      "file" : "67-marble.png",
+      "kind" : "shot",
+      "n" : 67,
+      "name" : "marble",
+      "note" : "",
+      "t" : 513.89999999999998
+    },
+    {
+      "detail" : "Attributes: Button, 0x1232e3f70, {{-218.1, 312.0}, {826.2, 908.0}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x12",
+      "kind" : "check",
+      "n" : 67,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x123a10ae0, {{-214.5, 324.6}, {819.7, 895.0}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x12",
+      "kind" : "check",
+      "n" : 67,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 5.3300000000000001,
+      "file" : "68-marble-pop.png",
+      "kind" : "shot",
+      "n" : 68,
+      "name" : "marble-pop",
+      "note" : "",
+      "t" : 519.20000000000005
+    },
+    {
+      "dt" : 7.6699999999999999,
+      "file" : "69-duck.png",
+      "kind" : "shot",
+      "n" : 69,
+      "name" : "duck",
+      "note" : "",
+      "t" : 526.89999999999998
+    },
+    {
+      "detail" : "Attributes: Button, 0x123b2a6b0, {{-214.7, 325.6}, {819.3, 894.4}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x12",
+      "kind" : "check",
+      "n" : 69,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x123b72370, {{-216.3, 317.1}, {823.3, 902.2}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x12",
+      "kind" : "check",
+      "n" : 69,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 6.6399999999999997,
+      "file" : "70-duck-pop.png",
+      "kind" : "shot",
+      "n" : 70,
+      "name" : "duck-pop",
+      "note" : "",
+      "t" : 533.5
+    },
+    {
+      "dt" : 7.5199999999999996,
+      "file" : "71-easterEgg.png",
+      "kind" : "shot",
+      "n" : 71,
+      "name" : "easterEgg",
+      "note" : "",
+      "t" : 541.10000000000002
+    },
+    {
+      "detail" : "Attributes: Button, 0x123b4c160, {{-214.7, 324.9}, {819.4, 894.5}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x12",
+      "kind" : "check",
+      "n" : 71,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x123be9890, {{-214.7, 323.7}, {820.1, 895.9}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x12",
+      "kind" : "check",
+      "n" : 71,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 5.5099999999999998,
+      "file" : "72-easterEgg-pop.png",
+      "kind" : "shot",
+      "n" : 72,
+      "name" : "easterEgg-pop",
+      "note" : "",
+      "t" : 546.60000000000002
+    },
+    {
+      "dt" : 7.3499999999999996,
+      "file" : "73-valentine.png",
+      "kind" : "shot",
+      "n" : 73,
+      "name" : "valentine",
+      "note" : "",
+      "t" : 553.89999999999998
+    },
+    {
+      "detail" : "Attributes: Button, 0x123e6fc00, {{-218.7, 307.4}, {828.1, 911.9}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x12",
+      "kind" : "check",
+      "n" : 73,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x12532bc50, {{-217.6, 313.4}, {825.1, 905.9}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x12",
+      "kind" : "check",
+      "n" : 73,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 4.7300000000000004,
+      "file" : "74-valentine-pop.png",
+      "kind" : "shot",
+      "n" : 74,
+      "name" : "valentine-pop",
+      "note" : "",
+      "t" : 558.70000000000005
+    },
+    {
+      "dt" : 7.46,
+      "file" : "75-fireworks.png",
+      "kind" : "shot",
+      "n" : 75,
+      "name" : "fireworks",
+      "note" : "",
+      "t" : 566.10000000000002
+    },
+    {
+      "detail" : "Attributes: Button, 0x1252b26b0, {{-214.3, 325.6}, {819.4, 894.4}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x12",
+      "kind" : "check",
+      "n" : 75,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x125a07420, {{-217.0, 314.7}, {824.7, 905.0}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x12",
+      "kind" : "check",
+      "n" : 75,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 5.5700000000000003,
+      "file" : "76-fireworks-pop.png",
+      "kind" : "shot",
+      "n" : 76,
+      "name" : "fireworks-pop",
+      "note" : "",
+      "t" : 571.70000000000005
+    },
+    {
+      "dt" : 7.8499999999999996,
+      "file" : "77-beachBall.png",
+      "kind" : "shot",
+      "n" : 77,
+      "name" : "beachBall",
+      "note" : "",
+      "t" : 579.5
+    },
+    {
+      "detail" : "Attributes: Button, 0x1259224b0, {{-215.9, 320.0}, {821.8, 899.4}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x12",
+      "kind" : "check",
+      "n" : 77,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x125a9d500, {{-219.2, 305.6}, {829.0, 913.7}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x12",
+      "kind" : "check",
+      "n" : 77,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 4.8200000000000003,
+      "file" : "78-beachBall-pop.png",
+      "kind" : "shot",
+      "n" : 78,
+      "name" : "beachBall-pop",
+      "note" : "",
+      "t" : 584.39999999999998
+    },
+    {
+      "dt" : 7.5,
+      "file" : "79-zen.png",
+      "kind" : "shot",
+      "n" : 79,
+      "name" : "zen",
+      "note" : "",
+      "t" : 591.89999999999998
+    },
+    {
+      "detail" : "Attributes: Button, 0x1259a5ed0, {{-216.4, 319.5}, {822.2, 900.1}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x12",
+      "kind" : "check",
+      "n" : 79,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x125e79fd0, {{-215.0, 325.2}, {819.4, 894.5}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x12",
+      "kind" : "check",
+      "n" : 79,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 5.3799999999999999,
+      "file" : "80-zen-pop.png",
+      "kind" : "shot",
+      "n" : 80,
+      "name" : "zen-pop",
+      "note" : "",
+      "t" : 597.20000000000005
+    }
+  ]
+}

@@ -1,0 +1,212 @@
+{
+  "accessibility" : [
+    {
+      "detail" : "Text of this UITextField may be clipped at larger Dynamic Type sizes.",
+      "element" : "",
+      "screen" : "calendars",
+      "summary" : "Text clipped",
+      "type" : "textClipped"
+    }
+  ],
+  "config" : "big-text",
+  "journey" : "J7-many-calendars",
+  "seconds" : 79,
+  "steps" : [
+    {
+      "detail" : "Attributes: Button, 0x103e50320, {{36.0, 437.7}, {330.0, 144.7}}, label: 'Calendars, All 22'\nElement subtree:\n →Button, 0x103e50320, {{36.0, 437.7}, {330.0, 144.7}}, label: 'Calendars, All 22'\n    Sta",
+      "kind" : "check",
+      "n" : 0,
+      "name" : "can tap Calendars",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 38.420000000000002,
+      "file" : "01-calendars.png",
+      "kind" : "shot",
+      "n" : 1,
+      "name" : "calendars",
+      "note" : "",
+      "t" : 38.399999999999999
+    },
+    {
+      "buttons" : [
+        "Settings",
+        "Exchange, 6 of 6 calendars on",
+        "Turn all off",
+        "Gmail, 4 of 4 calendars on",
+        "Turn all off",
+        "Band alerts: Smart",
+        "Personal alerts: Smart",
+        "School alerts: Smart",
+        "Soccer alerts: Smart",
+        "iCloud, 5 of 5 calendars on",
+        "Turn all off",
+        "Anniversaries alerts: Smart",
+        "Birthdays alerts: Smart",
+        "Family alerts: Smart",
+        "Home alerts: Smart",
+        "Kids alerts: Smart",
+        "Other, 3 of 3 calendars on",
+        "Turn all off",
+        "Found in Mail alerts: Smart",
+        "Scheduled Reminders alerts: Smart",
+        "Siri Suggestions alerts: Smart",
+        "Subscribed, 4 of 4 calendars on",
+        "Turn all off",
+        "Hockey schedule alerts: Smart",
+        "Moon phases alerts: Smart",
+        "Sunrise and sunset alerts: Smart",
+        "US Holidays alerts: Smart"
+      ],
+      "kind" : "labels",
+      "n" : 1,
+      "name" : "calendars",
+      "texts" : [
+        "Calendars",
+        "Exchange",
+        "6 of 6 on",
+        "Gmail",
+        "4 of 4 on",
+        "Band",
+        "Smart",
+        "Personal",
+        "Smart",
+        "School",
+        "Smart",
+        "Soccer",
+        "Smart",
+        "iCloud",
+        "5 of 5 on",
+        "Anniversaries",
+        "Smart",
+        "Birthdays",
+        "Smart",
+        "Family",
+        "Smart",
+        "Home",
+        "Smart",
+        "Kids",
+        "Smart",
+        "Other",
+        "3 of 3 on",
+        "Found in Mail",
+        "Smart",
+        "Scheduled Reminders",
+        "Smart",
+        "Siri Suggestions",
+        "Smart",
+        "Subscribed",
+        "4 of 4 on",
+        "Hockey schedule",
+        "Smart",
+        "Moon phases",
+        "Smart",
+        "Sunrise and sunset",
+        "Smart",
+        "US Holidays",
+        "Smart",
+        "Smart rings full screen for meetings with a video link and sends a quiet notification for the rest. Pick Always rings or Quiet for a whole calendar."
+      ]
+    },
+    {
+      "detail" : "Attributes: TextField, 0x103e9c170, {{102.7, 140.0}, {267.3, 64.0}}, placeholderValue: 'Find a calendar', value: Find a calendar\nElement subtree:\n →TextField, 0x103e9c170, {{102.7, 140.0}, {267.3, 64.",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "search shows with many calendars",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: TextField, 0x103e99c50, {{102.7, 140.0}, {267.3, 64.0}}, placeholderValue: 'Find a calendar', value: Find a calendar\nElement subtree:\n →TextField, 0x103e99c50, {{102.7, 140.0}, {267.3, 64.",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "can tap search",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 20.239999999999998,
+      "file" : "02-search-soccer.png",
+      "kind" : "shot",
+      "n" : 2,
+      "name" : "search-soccer",
+      "note" : "",
+      "t" : 58.700000000000003
+    },
+    {
+      "detail" : "Attributes: Switch, 0x119a6be90, {{305.0, 505.0}, {61.0, 28.0}}, label: 'Soccer', value: 1\nElement subtree:\n →Switch, 0x119a6be90, {{305.0, 505.0}, {61.0, 28.0}}, label: 'Soccer', value: 1\n    Switch,",
+      "kind" : "check",
+      "n" : 2,
+      "name" : "can tap Soccer switch",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "kind" : "benchmark",
+      "n" : 2,
+      "name" : "Find and turn off one calendar",
+      "ok" : true,
+      "seconds" : 44.899999999999999,
+      "taps" : 3
+    },
+    {
+      "detail" : "",
+      "kind" : "check",
+      "n" : 2,
+      "name" : "job done: Find and turn off one calendar",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 5.2300000000000004,
+      "file" : "03-soccer-off.png",
+      "kind" : "shot",
+      "n" : 3,
+      "name" : "soccer-off",
+      "note" : "",
+      "t" : 63.899999999999999
+    },
+    {
+      "detail" : "Attributes: Button, 0x103c8ab50, {{307.7, 142.3}, {62.3, 60.3}}, identifier: 'xmark.circle.fill', label: 'Clear search'\nElement subtree:\n →Button, 0x103c8ab50, {{307.7, 142.3}, {62.3, 60.3}}, identifi",
+      "kind" : "check",
+      "n" : 3,
+      "name" : "can tap clear search",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x103c9a360, {{236.3, 303.7}, {129.7, 140.7}}, label: 'Turn all off'\nElement subtree:\n →Button, 0x103c9a360, {{236.3, 303.7}, {129.7, 140.7}}, label: 'Turn all off'\nPath to element",
+      "kind" : "check",
+      "n" : 3,
+      "name" : "can tap Turn all off",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "kind" : "benchmark",
+      "n" : 3,
+      "name" : "Turn off a whole account",
+      "ok" : true,
+      "seconds" : 9.1999999999999993,
+      "taps" : 1
+    },
+    {
+      "detail" : "",
+      "kind" : "check",
+      "n" : 3,
+      "name" : "job done: Turn off a whole account",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 15.09,
+      "file" : "04-account-off.png",
+      "kind" : "shot",
+      "n" : 4,
+      "name" : "account-off",
+      "note" : "",
+      "t" : 79
+    }
+  ]
+}

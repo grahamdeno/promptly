@@ -1,0 +1,155 @@
+{
+  "accessibility" : [
+    {
+      "detail" : "Contrast failed for SwiftUI.AccessibilityNode",
+      "element" : "Next transmission · Zoom",
+      "screen" : "moon-home",
+      "summary" : "Contrast failed",
+      "type" : "contrast"
+    },
+    {
+      "detail" : "User will not be able to change the font size of this SwiftUI.AccessibilityNode",
+      "element" : "pop in",
+      "screen" : "moon-home",
+      "summary" : "Dynamic Type font sizes are unsupported",
+      "type" : "dynamicType"
+    },
+    {
+      "detail" : "Text of this SwiftUI.AccessibilityNode may be clipped at larger Dynamic Type sizes.",
+      "element" : "Sprint planning",
+      "screen" : "moon-home",
+      "summary" : "Text clipped",
+      "type" : "textClipped"
+    },
+    {
+      "detail" : "Text of this SwiftUI.AccessibilityNode may be clipped at larger Dynamic Type sizes.",
+      "element" : "Next transmission · Zoom",
+      "screen" : "moon-home",
+      "summary" : "Text clipped",
+      "type" : "textClipped"
+    },
+    {
+      "detail" : "Text of this SwiftUI.AccessibilityNode may be clipped at larger Dynamic Type sizes.",
+      "element" : "Lunch with Sam",
+      "screen" : "moon-home",
+      "summary" : "Text clipped",
+      "type" : "textClipped"
+    },
+    {
+      "detail" : "Text of this SwiftUI.AccessibilityNode may be clipped at larger Dynamic Type sizes.",
+      "element" : "Team standup",
+      "screen" : "moon-home",
+      "summary" : "Text clipped",
+      "type" : "textClipped"
+    },
+    {
+      "detail" : "User will not be able to change the font size of this SwiftUI.AccessibilityNode",
+      "element" : "pop in",
+      "screen" : "grenade-home",
+      "summary" : "Dynamic Type font sizes are unsupported",
+      "type" : "dynamicType"
+    },
+    {
+      "detail" : "Text of this SwiftUI.AccessibilityNode may be clipped at larger Dynamic Type sizes.",
+      "element" : "Team standup",
+      "screen" : "grenade-home",
+      "summary" : "Text clipped",
+      "type" : "textClipped"
+    },
+    {
+      "detail" : "Text of this SwiftUI.AccessibilityNode may be clipped at larger Dynamic Type sizes.",
+      "element" : "Lunch with Sam",
+      "screen" : "grenade-home",
+      "summary" : "Text clipped",
+      "type" : "textClipped"
+    },
+    {
+      "detail" : "Text of this SwiftUI.AccessibilityNode may be clipped at larger Dynamic Type sizes.",
+      "element" : "Sprint planning",
+      "screen" : "grenade-home",
+      "summary" : "Text clipped",
+      "type" : "textClipped"
+    }
+  ],
+  "config" : "ipad",
+  "journey" : "J11-moon-grenade",
+  "seconds" : 56,
+  "steps" : [
+    {
+      "dt" : 10.619999999999999,
+      "file" : "01-moon-home.png",
+      "kind" : "shot",
+      "n" : 1,
+      "name" : "moon-home",
+      "note" : "",
+      "t" : 10.6
+    },
+    {
+      "detail" : "Attributes: Button, 0x101c63600, {{620.2, 577.9}, {711.5, 779.1}}, label: 'Pop the bubble to join Design review'\nElement subtree:\n →Button, 0x101c63600, {{620.2, 577.9}, {711.5, 779.1}}, label: 'Pop t",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x101c4ccc0, {{619.8, 576.1}, {712.4, 780.9}}, label: 'Pop the bubble to join Design review'\nElement subtree:\n →Button, 0x101c4ccc0, {{619.8, 576.1}, {712.4, 780.9}}, label: 'Pop t",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 13.73,
+      "file" : "02-moon-pop.png",
+      "kind" : "shot",
+      "n" : 2,
+      "name" : "moon-pop",
+      "note" : "",
+      "t" : 24.300000000000001
+    },
+    {
+      "dt" : 11.52,
+      "file" : "03-grenade-home.png",
+      "kind" : "shot",
+      "n" : 3,
+      "name" : "grenade-home",
+      "note" : "",
+      "t" : 35.899999999999999
+    },
+    {
+      "detail" : "Attributes: Button, 0x118170c60, {{777.6, 780.0}, {396.3, 433.5}}, label: 'Pop the bubble to join Design review'\nElement subtree:\n →Button, 0x118170c60, {{777.6, 780.0}, {396.3, 433.5}}, label: 'Pop t",
+      "kind" : "check",
+      "n" : 3,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x115079f40, {{777.0, 777.7}, {397.4, 435.8}}, label: 'Pop the bubble to join Design review'\nElement subtree:\n →Button, 0x115079f40, {{777.0, 777.7}, {397.4, 435.8}}, label: 'Pop t",
+      "kind" : "check",
+      "n" : 3,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 10.300000000000001,
+      "file" : "04-grenade-pop.png",
+      "kind" : "shot",
+      "n" : 4,
+      "name" : "grenade-pop",
+      "note" : "",
+      "t" : 46.200000000000003
+    },
+    {
+      "detail" : "",
+      "kind" : "check",
+      "n" : 4,
+      "name" : "Moon says Next transmission",
+      "ok" : true,
+      "severity" : 0
+    }
+  ]
+}

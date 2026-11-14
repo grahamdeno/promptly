@@ -1,0 +1,59 @@
+{
+  "accessibility" : [
+    {
+      "detail" : "Contrast failed for SwiftUI.AccessibilityNode",
+      "element" : "Rings 2 min before",
+      "screen" : "unicorn-home",
+      "summary" : "Contrast failed",
+      "type" : "contrast"
+    }
+  ],
+  "config" : "big-text",
+  "journey" : "J9-unicorn",
+  "seconds" : 27,
+  "steps" : [
+    {
+      "dt" : 10.99,
+      "file" : "01-unicorn-home.png",
+      "kind" : "shot",
+      "n" : 1,
+      "name" : "unicorn-home",
+      "note" : "",
+      "t" : 11
+    },
+    {
+      "detail" : "Attributes: Button, 0x103c5c8f0, {{-191.8, 521.4}, {785.5, 859.3}}, label: 'Pop the bubble to join Design review'\nElement subtree:\n →Button, 0x103c5c8f0, {{-191.8, 521.4}, {785.5, 859.3}}, label: 'Pop",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x103e58720, {{-189.0, 532.3}, {780.0, 848.4}}, label: 'Pop the bubble to join Design review'\nElement subtree:\n →Button, 0x103e58720, {{-189.0, 532.3}, {780.0, 848.4}}, label: 'Pop",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 15.17,
+      "file" : "02-unicorn-pop-early.png",
+      "kind" : "shot",
+      "n" : 2,
+      "name" : "unicorn-pop-early",
+      "note" : "",
+      "t" : 26.199999999999999
+    },
+    {
+      "dt" : 0.48999999999999999,
+      "file" : "03-unicorn-pop-late.png",
+      "kind" : "shot",
+      "n" : 3,
+      "name" : "unicorn-pop-late",
+      "note" : "",
+      "t" : 26.600000000000001
+    }
+  ]
+}

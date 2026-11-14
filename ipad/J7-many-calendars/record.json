@@ -1,0 +1,303 @@
+{
+  "accessibility" : [
+    {
+      "detail" : "Contrast failed for SwiftUI.AccessibilityNode",
+      "element" : "Birthdays",
+      "screen" : "calendars",
+      "summary" : "Contrast failed",
+      "type" : "contrast"
+    },
+    {
+      "detail" : "Contrast failed for SwiftUI.AccessibilityNode",
+      "element" : "Family",
+      "screen" : "calendars",
+      "summary" : "Contrast failed",
+      "type" : "contrast"
+    },
+    {
+      "detail" : "Contrast failed for SwiftUI.AccessibilityNode",
+      "element" : "Smart",
+      "screen" : "calendars",
+      "summary" : "Contrast failed",
+      "type" : "contrast"
+    },
+    {
+      "detail" : "Contrast failed for SwiftUI.AccessibilityNode",
+      "element" : "Smart",
+      "screen" : "calendars",
+      "summary" : "Contrast failed",
+      "type" : "contrast"
+    },
+    {
+      "detail" : "This element appears to display text that should be represented using the accessibility API.",
+      "element" : "",
+      "screen" : "calendars",
+      "summary" : "Potentially inaccessible text",
+      "type" : "elementDetection"
+    },
+    {
+      "detail" : "This element appears to display text that should be represented using the accessibility API.",
+      "element" : "",
+      "screen" : "calendars",
+      "summary" : "Potentially inaccessible text",
+      "type" : "elementDetection"
+    },
+    {
+      "detail" : "This element appears to display text that should be represented using the accessibility API.",
+      "element" : "",
+      "screen" : "calendars",
+      "summary" : "Potentially inaccessible text",
+      "type" : "elementDetection"
+    },
+    {
+      "detail" : "This element appears to display text that should be represented using the accessibility API.",
+      "element" : "",
+      "screen" : "calendars",
+      "summary" : "Potentially inaccessible text",
+      "type" : "elementDetection"
+    },
+    {
+      "detail" : "This element contains content that could potentially form one or more separate accessibility elements.",
+      "element" : "",
+      "screen" : "calendars",
+      "summary" : "Potentially inaccessible element",
+      "type" : "elementDetection"
+    },
+    {
+      "detail" : "This element appears to display text that should be represented using the accessibility API.",
+      "element" : "",
+      "screen" : "calendars",
+      "summary" : "Potentially inaccessible text",
+      "type" : "elementDetection"
+    },
+    {
+      "detail" : "This element appears to display text that should be represented using the accessibility API.",
+      "element" : "",
+      "screen" : "calendars",
+      "summary" : "Potentially inaccessible text",
+      "type" : "elementDetection"
+    },
+    {
+      "detail" : "This element appears to display text that should be represented using the accessibility API.",
+      "element" : "",
+      "screen" : "calendars",
+      "summary" : "Potentially inaccessible text",
+      "type" : "elementDetection"
+    },
+    {
+      "detail" : "This element appears to display text that should be represented using the accessibility API.",
+      "element" : "",
+      "screen" : "calendars",
+      "summary" : "Potentially inaccessible text",
+      "type" : "elementDetection"
+    },
+    {
+      "detail" : "This element appears to display text that should be represented using the accessibility API.",
+      "element" : "",
+      "screen" : "calendars",
+      "summary" : "Potentially inaccessible text",
+      "type" : "elementDetection"
+    }
+  ],
+  "config" : "ipad",
+  "journey" : "J7-many-calendars",
+  "seconds" : 71,
+  "steps" : [
+    {
+      "detail" : "Attributes: Button, 0x101946520, {{434.0, 428.0}, {508.0, 52.0}}, label: 'Calendars, All 22'\nElement subtree:\n →Button, 0x101946520, {{434.0, 428.0}, {508.0, 52.0}}, label: 'Calendars, All 22'\n    Sta",
+      "kind" : "check",
+      "n" : 0,
+      "name" : "can tap Calendars",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 24.850000000000001,
+      "file" : "01-calendars.png",
+      "kind" : "shot",
+      "n" : 1,
+      "name" : "calendars",
+      "note" : "",
+      "t" : 24.800000000000001
+    },
+    {
+      "buttons" : [
+        "Settings",
+        "Exchange, 6 of 6 calendars on",
+        "Turn all off",
+        "Gmail, 4 of 4 calendars on",
+        "Turn all off",
+        "Band alerts: Smart",
+        "Personal alerts: Smart",
+        "School alerts: Smart",
+        "Soccer alerts: Smart",
+        "iCloud, 5 of 5 calendars on",
+        "Turn all off",
+        "Anniversaries alerts: Smart",
+        "Birthdays alerts: Smart",
+        "Family alerts: Smart",
+        "Home alerts: Smart",
+        "Kids alerts: Smart",
+        "Other, 3 of 3 calendars on",
+        "Turn all off",
+        "Found in Mail alerts: Smart",
+        "Scheduled Reminders alerts: Smart",
+        "Siri Suggestions alerts: Smart",
+        "Subscribed, 4 of 4 calendars on",
+        "Turn all off",
+        "Hockey schedule alerts: Smart",
+        "Moon phases alerts: Smart",
+        "Sunrise and sunset alerts: Smart",
+        "US Holidays alerts: Smart"
+      ],
+      "kind" : "labels",
+      "n" : 1,
+      "name" : "calendars",
+      "texts" : [
+        "Calendars",
+        "Exchange",
+        "6 of 6 on",
+        "Gmail",
+        "4 of 4 on",
+        "Band",
+        "Smart",
+        "Personal",
+        "Smart",
+        "School",
+        "Smart",
+        "Soccer",
+        "Smart",
+        "iCloud",
+        "5 of 5 on",
+        "Anniversaries",
+        "Smart",
+        "Birthdays",
+        "Smart",
+        "Family",
+        "Smart",
+        "Home",
+        "Smart",
+        "Kids",
+        "Smart",
+        "Other",
+        "3 of 3 on",
+        "Found in Mail",
+        "Smart",
+        "Scheduled Reminders",
+        "Smart",
+        "Siri Suggestions",
+        "Smart",
+        "Subscribed",
+        "4 of 4 on",
+        "Hockey schedule",
+        "Smart",
+        "Moon phases",
+        "Smart",
+        "Sunrise and sunset",
+        "Smart",
+        "US Holidays",
+        "Smart",
+        "Smart rings full screen for meetings with a video link and sends a quiet notification for the rest. Pick Always rings or Quiet for a whole calendar."
+      ]
+    },
+    {
+      "detail" : "Attributes: TextField, 0x101992290, {{458.5, 269.0}, {487.5, 22.0}}, placeholderValue: 'Find a calendar', value: Find a calendar\nElement subtree:\n →TextField, 0x101992290, {{458.5, 269.0}, {487.5, 22.",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "search shows with many calendars",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: TextField, 0x106c0b860, {{458.5, 269.0}, {487.5, 22.0}}, placeholderValue: 'Find a calendar', value: Find a calendar\nElement subtree:\n →TextField, 0x106c0b860, {{458.5, 269.0}, {487.5, 22.",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "can tap search",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 26.140000000000001,
+      "file" : "02-search-soccer.png",
+      "kind" : "shot",
+      "n" : 2,
+      "name" : "search-soccer",
+      "note" : "",
+      "t" : 51
+    },
+    {
+      "detail" : "Attributes: Switch, 0x1019aaac0, {{881.0, 252.5}, {61.0, 28.0}}, label: 'Soccer', value: 1\nElement subtree:\n →Switch, 0x1019aaac0, {{881.0, 252.5}, {61.0, 28.0}}, label: 'Soccer', value: 1\n    Switch,",
+      "kind" : "check",
+      "n" : 2,
+      "name" : "can tap Soccer switch",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "kind" : "benchmark",
+      "n" : 2,
+      "name" : "Find and turn off one calendar",
+      "ok" : true,
+      "seconds" : 39.200000000000003,
+      "taps" : 3
+    },
+    {
+      "detail" : "",
+      "kind" : "check",
+      "n" : 2,
+      "name" : "job done: Find and turn off one calendar",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 6.4900000000000002,
+      "file" : "03-soccer-off.png",
+      "kind" : "shot",
+      "n" : 3,
+      "name" : "soccer-off",
+      "note" : "",
+      "t" : 57.5
+    },
+    {
+      "detail" : "Attributes: Button, 0x101c85000, {{926.0, 126.5}, {20.0, 19.0}}, identifier: 'xmark.circle.fill', label: 'Clear search'\nElement subtree:\n →Button, 0x101c85000, {{926.0, 126.5}, {20.0, 19.0}}, identifi",
+      "kind" : "check",
+      "n" : 3,
+      "name" : "can tap clear search",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x1182a3ea0, {{854.5, 187.0}, {87.5, 42.0}}, label: 'Turn all off'\nElement subtree:\n →Button, 0x1182a3ea0, {{854.5, 187.0}, {87.5, 42.0}}, label: 'Turn all off'\nPath to element:\n →",
+      "kind" : "check",
+      "n" : 3,
+      "name" : "can tap Turn all off",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "kind" : "benchmark",
+      "n" : 3,
+      "name" : "Turn off a whole account",
+      "ok" : true,
+      "seconds" : 6.7999999999999998,
+      "taps" : 1
+    },
+    {
+      "detail" : "",
+      "kind" : "check",
+      "n" : 3,
+      "name" : "job done: Turn off a whole account",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 13.460000000000001,
+      "file" : "04-account-off.png",
+      "kind" : "shot",
+      "n" : 4,
+      "name" : "account-off",
+      "note" : "",
+      "t" : 70.900000000000006
+    }
+  ]
+}

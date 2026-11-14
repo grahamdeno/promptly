@@ -1,0 +1,62 @@
+{
+  "accessibility" : [
+    {
+      "detail" : "User will not be able to change the font size of this SwiftUI.AccessibilityNode",
+      "element" : "pop in",
+      "screen" : "home-far",
+      "summary" : "Dynamic Type font sizes are unsupported",
+      "type" : "dynamicType"
+    }
+  ],
+  "config" : "small-phone",
+  "journey" : "J4-home-far",
+  "seconds" : 15,
+  "steps" : [
+    {
+      "dt" : 9.0099999999999998,
+      "file" : "01-home-far.png",
+      "kind" : "shot",
+      "n" : 1,
+      "name" : "home-far",
+      "note" : "",
+      "t" : 9
+    },
+    {
+      "buttons" : [
+        "Pop the bubble to join Sprint planning",
+        "More: add a reminder, pop for fun, pause alerts, settings",
+        "Not going"
+      ],
+      "kind" : "labels",
+      "n" : 1,
+      "name" : "home-far",
+      "texts" : [
+        "pop in",
+        "Next · Meet, Rings 2 min before, Sprint planning, 16 h, 45, Tomorrow 9:30 AM to 10:30 AM",
+        "Next · Meet",
+        "Rings 2 min before",
+        "Sprint planning",
+        "16 h",
+        "45",
+        "Tomorrow 9:30 AM to 10:30 AM",
+        "Then Tomorrow 4:35 PM, Design review"
+      ]
+    },
+    {
+      "detail" : "Attributes: StaticText, 0x10444bd60, {{36.0, 191.0}, {226.3, 193.4}}, label: 'Next · Meet, Rings 2 min before, Sprint planning, 16 h, 45, Tomorrow 9:30 AM to 10:30 AM'\nElement subtree:\n →StaticText, 0",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "the day is named",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x1043495f0, {{36.0, 396.3}, {84.7, 42.0}}, label: 'Not going'\nElement subtree:\n →Button, 0x1043495f0, {{36.0, 396.3}, {84.7, 42.0}}, label: 'Not going'\nPath to element:\n →Applicat",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "Not going is visible",
+      "ok" : true,
+      "severity" : 0
+    }
+  ]
+}

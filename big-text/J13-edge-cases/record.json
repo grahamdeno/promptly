@@ -1,0 +1,68 @@
+{
+  "accessibility" : [
+    {
+      "detail" : "Text of this SwiftUI.AccessibilityNode may be clipped at larger Dynamic Type sizes.",
+      "element" : "Missed: 4:38 PM Weekly sync · Join",
+      "screen" : "missed",
+      "summary" : "Text clipped",
+      "type" : "textClipped"
+    },
+    {
+      "detail" : "Contrast failed for SwiftUI.AccessibilityNode",
+      "element" : "5:05 PM to 5:35 PM · Zoom",
+      "screen" : "missed",
+      "summary" : "Contrast failed",
+      "type" : "contrast"
+    }
+  ],
+  "config" : "big-text",
+  "journey" : "J13-edge-cases",
+  "seconds" : 57,
+  "steps" : [
+    {
+      "dt" : 10.59,
+      "file" : "01-missed-under-new-alarm.png",
+      "kind" : "shot",
+      "n" : 1,
+      "name" : "missed-under-new-alarm",
+      "note" : "New alarm up; the unpopped earlier meeting shows as Missed with Join",
+      "t" : 10.6
+    },
+    {
+      "dt" : 21.620000000000001,
+      "file" : "02-paused-home.png",
+      "kind" : "shot",
+      "n" : 2,
+      "name" : "paused-home",
+      "note" : "Paused until pill under the header; card says Paused until",
+      "t" : 32.200000000000003
+    },
+    {
+      "dt" : 8.3200000000000003,
+      "file" : "03-outside-work-hours.png",
+      "kind" : "shot",
+      "n" : 3,
+      "name" : "outside-work-hours",
+      "note" : "Card says Outside work hours, quiet notification",
+      "t" : 40.5
+    },
+    {
+      "dt" : 8.8300000000000001,
+      "file" : "04-own-reminder-next.png",
+      "kind" : "shot",
+      "n" : 4,
+      "name" : "own-reminder-next",
+      "note" : "An own reminder is next: card label Reminder",
+      "t" : 49.399999999999999
+    },
+    {
+      "dt" : 7.2000000000000002,
+      "file" : "05-duplicate-merged.png",
+      "kind" : "shot",
+      "n" : 5,
+      "name" : "duplicate-merged",
+      "note" : "Design review and its FW copy show as one meeting",
+      "t" : 56.600000000000001
+    }
+  ]
+}

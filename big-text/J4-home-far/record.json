@@ -1,0 +1,56 @@
+{
+  "accessibility" : [
+
+  ],
+  "config" : "big-text",
+  "journey" : "J4-home-far",
+  "seconds" : 14,
+  "steps" : [
+    {
+      "dt" : 8.2699999999999996,
+      "file" : "01-home-far.png",
+      "kind" : "shot",
+      "n" : 1,
+      "name" : "home-far",
+      "note" : "",
+      "t" : 8.3000000000000007
+    },
+    {
+      "buttons" : [
+        "Pop the bubble to join Sprint planning",
+        "More: add a reminder, pop for fun, pause alerts, settings",
+        "Not going"
+      ],
+      "kind" : "labels",
+      "n" : 1,
+      "name" : "home-far",
+      "texts" : [
+        "pop in",
+        "Next · Meet, Rings 2 min before, Sprint planning, 16 h, 49, Tomorrow 9:30 AM to 10:30 AM",
+        "Next · Meet",
+        "Rings 2 min before",
+        "Sprint planning",
+        "16 h",
+        "49",
+        "Tomorrow 9:30 AM to 10:30 AM",
+        "Then Tomorrow 4:35 PM, Design review"
+      ]
+    },
+    {
+      "detail" : "Attributes: StaticText, 0x103c2c490, {{36.0, 33.3}, {262.3, 586.0}}, label: 'Next · Meet, Rings 2 min before, Sprint planning, 16 h, 49, Tomorrow 9:30 AM to 10:30 AM'\nElement subtree:\n →StaticText, 0x",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "the day is named",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x103f8ebc0, {{36.0, 631.3}, {225.7, 82.7}}, label: 'Not going'\nElement subtree:\n →Button, 0x103f8ebc0, {{36.0, 631.3}, {225.7, 82.7}}, label: 'Not going'\nPath to element:\n →Applic",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "Not going is visible",
+      "ok" : true,
+      "severity" : 0
+    }
+  ]
+}

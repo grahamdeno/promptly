@@ -1,0 +1,88 @@
+{
+  "accessibility" : [
+    {
+      "detail" : "Contrast failed for SwiftUI.AccessibilityNode",
+      "element" : "Your next two days are clear on the calendars Pop In watches.",
+      "screen" : "empty",
+      "summary" : "Contrast failed",
+      "type" : "contrast"
+    },
+    {
+      "detail" : "User will not be able to change the font size of this SwiftUI.AccessibilityNode",
+      "element" : "pop in",
+      "screen" : "empty",
+      "summary" : "Dynamic Type font sizes are unsupported",
+      "type" : "dynamicType"
+    }
+  ],
+  "config" : "big-text",
+  "journey" : "J8-empty",
+  "seconds" : 20,
+  "steps" : [
+    {
+      "dt" : 10.789999999999999,
+      "file" : "01-empty.png",
+      "kind" : "shot",
+      "n" : 1,
+      "name" : "empty",
+      "note" : "",
+      "t" : 10.800000000000001
+    },
+    {
+      "buttons" : [
+        "More: add a reminder, pop for fun, pause alerts, settings",
+        "Try a pop"
+      ],
+      "kind" : "labels",
+      "n" : 1,
+      "name" : "empty",
+      "texts" : [
+        "pop in",
+        "Nothing coming up",
+        "Your next two days are clear on the calendars Pop In watches."
+      ]
+    },
+    {
+      "detail" : "Attributes: StaticText, 0x103e4daf0, {{36.0, 198.0}, {248.3, 130.7}}, label: 'Nothing coming up'\nElement subtree:\n →StaticText, 0x103e4daf0, {{36.0, 198.0}, {248.3, 130.7}}, label: 'Nothing coming up'",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "says nothing is coming up",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x103c48580, {{36.0, 653.7}, {248.3, 77.0}}, label: 'Try a pop'\nElement subtree:\n →Button, 0x103c48580, {{36.0, 653.7}, {248.3, 77.0}}, label: 'Try a pop'\nPath to element:\n →Applic",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "can tap Try a pop",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 9.5199999999999996,
+      "file" : "02-demo.png",
+      "kind" : "shot",
+      "n" : 2,
+      "name" : "demo",
+      "note" : "",
+      "t" : 20.300000000000001
+    },
+    {
+      "buttons" : [
+        "Pop the bubble to clear Try a pop",
+        "More: add a reminder, pop for fun, pause alerts, settings",
+        "Skip"
+      ],
+      "kind" : "labels",
+      "n" : 2,
+      "name" : "demo",
+      "texts" : [
+        "pop in",
+        "Practice, Try a pop, Practice: pop the bubble below.",
+        "Practice",
+        "Try a pop",
+        "Practice: pop the bubble below."
+      ]
+    }
+  ]
+}

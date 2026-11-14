@@ -1,0 +1,440 @@
+{
+  "accessibility" : [
+    {
+      "detail" : "User will not be able to change the font size of this SwiftUI.AccessibilityNode",
+      "element" : "Done",
+      "screen" : "settings",
+      "summary" : "Dynamic Type font sizes are partially unsupported",
+      "type" : "dynamicType"
+    },
+    {
+      "detail" : "User will not be able to change the font size of this SwiftUI.AccessibilityNode",
+      "element" : "Done",
+      "screen" : "settings-bottom",
+      "summary" : "Dynamic Type font sizes are partially unsupported",
+      "type" : "dynamicType"
+    },
+    {
+      "detail" : "Contrast failed for SwiftUI.AccessibilityNode",
+      "element" : "Done",
+      "screen" : "settings-bottom",
+      "summary" : "Contrast failed",
+      "type" : "contrast"
+    },
+    {
+      "detail" : "Contrast failed for SwiftUI.AccessibilityNode",
+      "element" : "Work hours",
+      "screen" : "settings-bottom",
+      "summary" : "Contrast failed",
+      "type" : "contrast"
+    },
+    {
+      "detail" : "Contrast failed for SwiftUI.AccessibilityNode",
+      "element" : "Coral",
+      "screen" : "theme-gallery",
+      "summary" : "Contrast failed",
+      "type" : "contrast"
+    },
+    {
+      "detail" : "User will not be able to change the font size of this SwiftUI.AccessibilityNode",
+      "element" : "Classic",
+      "screen" : "theme-gallery",
+      "summary" : "Dynamic Type font sizes are partially unsupported",
+      "type" : "dynamicType"
+    },
+    {
+      "detail" : "User will not be able to change the font size of this SwiftUI.AccessibilityNode",
+      "element" : "Changes once a day when you open Pop In",
+      "screen" : "theme-gallery",
+      "summary" : "Dynamic Type font sizes are partially unsupported",
+      "type" : "dynamicType"
+    },
+    {
+      "detail" : "User will not be able to change the font size of this SwiftUI.AccessibilityNode",
+      "element" : "Surprise me ✦",
+      "screen" : "theme-gallery",
+      "summary" : "Dynamic Type font sizes are partially unsupported",
+      "type" : "dynamicType"
+    },
+    {
+      "detail" : "User will not be able to change the font size of this SwiftUI.AccessibilityNode",
+      "element" : "A different theme each day, picked from the ones you have.",
+      "screen" : "theme-gallery",
+      "summary" : "Dynamic Type font sizes are partially unsupported",
+      "type" : "dynamicType"
+    },
+    {
+      "detail" : "Contrast failed for SwiftUI.AccessibilityNode",
+      "element" : "Unicorn mode: a rainbow bubble that bursts into confetti",
+      "screen" : "pro-sheet",
+      "summary" : "Contrast failed",
+      "type" : "contrast"
+    }
+  ],
+  "config" : "big-text",
+  "journey" : "J6-settings",
+  "seconds" : 322,
+  "steps" : [
+    {
+      "dt" : 19.43,
+      "file" : "01-settings-top.png",
+      "kind" : "shot",
+      "n" : 1,
+      "name" : "settings-top",
+      "note" : "",
+      "t" : 19.399999999999999
+    },
+    {
+      "buttons" : [
+        "Done",
+        "Pop In Pro, Unicorn mode, more sounds, desk mode, $4.99",
+        "Calendars, All 3",
+        "Ring before, 2 min",
+        "Early alarm, Off",
+        "Work hours, Off",
+        "Pause alerts, Off",
+        "Test the alarm, Rings in 20 seconds, the same way a meeting would",
+        "Sound, Gum pops",
+        "Theme, Bubblegum",
+        "Pop sound, Off",
+        "Tip $0.99",
+        "Tip $2.99",
+        "Tip $4.99",
+        "Help and support",
+        "Privacy"
+      ],
+      "kind" : "labels",
+      "n" : 1,
+      "name" : "settings",
+      "texts" : [
+        "Settings",
+        "Pop In Pro",
+        "Unicorn mode, more sounds, desk mode",
+        "$4.99",
+        "Meetings",
+        "Calendars",
+        "All 3",
+        "Ring before",
+        "2 min",
+        "Early alarm",
+        "Off",
+        "Work hours",
+        "Off",
+        "Pause alerts",
+        "Off",
+        "Apple Reminders",
+        "Ring for reminders with a time, like ones you ask Siri for",
+        "Accepted meetings only",
+        "Skip meetings you haven't accepted yet",
+        "Meetings with a video link ring full screen. Other events get a quiet notification.",
+        "Alarm",
+        "Test the alarm",
+        "Rings in 20 seconds, the same way a meeting would",
+        "Sound",
+        "Gum pops",
+        "Lock Screen countdown",
+        "The bubble on your Lock Screen before it rings",
+        "Heads-up buzzes",
+        "One buzz at 5 and at 2 minutes, even when locked",
+        "Bubble",
+        "Theme",
+        "Bubblegum",
+        "Pop sound",
+        "Off",
+        "Buzz as it gets close",
+        "Builds over the last ten minutes while Pop In is open",
+        "Keep screen on ✦",
+        "Like a desk clock while Pop In is open",
+        "Support Pop In",
+        "$0.99",
+        "$2.99",
+        "$4.99",
+        "Like Pop In? A tip helps keep it going. Tips don't unlock anything.",
+        "Help",
+        "Help and support",
+        "Privacy",
+        "pop in",
+        "Reads your calendar. Never changes it.\nNothing leaves your phone."
+      ]
+    },
+    {
+      "detail" : "Attributes: Button, 0x103c54dc0, {{36.0, 2627.0}, {330.0, 408.0}}, label: 'Test the alarm, Rings in 20 seconds, the same way a meeting would'\nElement subtree:\n →Button, 0x103c54dc0, {{36.0, 2627.0}, {",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "Test the alarm is visible",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x103c74c40, {{36.0, 654.3}, {330.0, 144.7}}, label: 'Calendars, All 3'\nElement subtree:\n →Button, 0x103c74c40, {{36.0, 654.3}, {330.0, 144.7}}, label: 'Calendars, All 3'\n    Stati",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "row Calendars shows",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x109210b70, {{36.0, 800.0}, {330.0, 144.7}}, label: 'Ring before, 2 min'\nElement subtree:\n →Button, 0x109210b70, {{36.0, 800.0}, {330.0, 144.7}}, label: 'Ring before, 2 min'\n    S",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "row Ring before shows",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x114cabaf0, {{36.0, 3036.0}, {330.0, 144.7}}, label: 'Sound, Gum pops'\nElement subtree:\n →Button, 0x114cabaf0, {{36.0, 3036.0}, {330.0, 144.7}}, label: 'Sound, Gum pops'\n    Stati",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "row Sound shows",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x115304080, {{36.0, 800.0}, {330.0, 144.7}}, label: 'Ring before, 2 min'\nElement subtree:\n →Button, 0x115304080, {{36.0, 800.0}, {330.0, 144.7}}, label: 'Ring before, 2 min'\n    S",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "can tap Ring before",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 102.09,
+      "file" : "02-ring-before.png",
+      "kind" : "shot",
+      "n" : 2,
+      "name" : "ring-before",
+      "note" : "",
+      "t" : 121.5
+    },
+    {
+      "detail" : "Attributes: Button, 0x1170626a0, {{36.0, 204.3}, {330.0, 63.3}}, label: '2 minutes', Selected\nElement subtree:\n →Button, 0x1170626a0, {{36.0, 204.3}, {330.0, 63.3}}, label: '2 minutes', Selected\n    S",
+      "kind" : "check",
+      "n" : 2,
+      "name" : "can tap 2 minutes",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "",
+      "kind" : "check",
+      "n" : 2,
+      "name" : "can go back",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "kind" : "benchmark",
+      "n" : 2,
+      "name" : "Ring 2 minutes before",
+      "ok" : true,
+      "seconds" : 8.3000000000000007,
+      "taps" : 2
+    },
+    {
+      "detail" : "",
+      "kind" : "check",
+      "n" : 2,
+      "name" : "job done: Ring 2 minutes before",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x1173746b0, {{36.0, 414.3}, {330.0, 144.7}}, label: 'Sound, Gum pops'\nElement subtree:\n →Button, 0x1173746b0, {{36.0, 414.3}, {330.0, 144.7}}, label: 'Sound, Gum pops'\n    StaticT",
+      "kind" : "check",
+      "n" : 2,
+      "name" : "can tap Sound",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 42.390000000000001,
+      "file" : "03-sound.png",
+      "kind" : "shot",
+      "n" : 3,
+      "name" : "sound",
+      "note" : "",
+      "t" : 163.90000000000001
+    },
+    {
+      "detail" : "",
+      "kind" : "check",
+      "n" : 3,
+      "name" : "Pro sounds are marked",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "",
+      "kind" : "check",
+      "n" : 3,
+      "name" : "can go back",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 15.02,
+      "file" : "04-settings-bottom.png",
+      "kind" : "shot",
+      "n" : 4,
+      "name" : "settings-bottom",
+      "note" : "",
+      "t" : 178.90000000000001
+    },
+    {
+      "buttons" : [
+        "Done",
+        "Pop In Pro, Unicorn mode, more sounds, desk mode, $4.99",
+        "Calendars, All 3",
+        "Ring before, 2 min",
+        "Early alarm, Off",
+        "Work hours, Off",
+        "Pause alerts, Off",
+        "Test the alarm, Rings in 20 seconds, the same way a meeting would",
+        "Sound, Gum pops",
+        "Theme, Bubblegum",
+        "Pop sound, Off",
+        "Tip $0.99",
+        "Tip $2.99",
+        "Tip $4.99",
+        "Help and support",
+        "Privacy"
+      ],
+      "kind" : "labels",
+      "n" : 4,
+      "name" : "settings-bottom",
+      "texts" : [
+        "Settings",
+        "Pop In Pro",
+        "Unicorn mode, more sounds, desk mode",
+        "$4.99",
+        "Meetings",
+        "Calendars",
+        "All 3",
+        "Ring before",
+        "2 min",
+        "Early alarm",
+        "Off",
+        "Work hours",
+        "Off",
+        "Pause alerts",
+        "Off",
+        "Apple Reminders",
+        "Ring for reminders with a time, like ones you ask Siri for",
+        "Accepted meetings only",
+        "Skip meetings you haven't accepted yet",
+        "Meetings with a video link ring full screen. Other events get a quiet notification.",
+        "Alarm",
+        "Test the alarm",
+        "Rings in 20 seconds, the same way a meeting would",
+        "Sound",
+        "Gum pops",
+        "Lock Screen countdown",
+        "The bubble on your Lock Screen before it rings",
+        "Heads-up buzzes",
+        "One buzz at 5 and at 2 minutes, even when locked",
+        "Bubble",
+        "Theme",
+        "Bubblegum",
+        "Pop sound",
+        "Off",
+        "Buzz as it gets close",
+        "Builds over the last ten minutes while Pop In is open",
+        "Keep screen on ✦",
+        "Like a desk clock while Pop In is open",
+        "Support Pop In",
+        "$0.99",
+        "$2.99",
+        "$4.99",
+        "Like Pop In? A tip helps keep it going. Tips don't unlock anything.",
+        "Help",
+        "Help and support",
+        "Privacy",
+        "pop in",
+        "Reads your calendar. Never changes it.\nNothing leaves your phone."
+      ]
+    },
+    {
+      "detail" : "Attributes: Button, 0x117646c90, {{36.0, 3200.0}, {330.0, 144.7}}, label: 'Pop sound, Off'\nElement subtree:\n →Button, 0x117646c90, {{36.0, 3200.0}, {330.0, 144.7}}, label: 'Pop sound, Off'\n    StaticT",
+      "kind" : "check",
+      "n" : 4,
+      "name" : "can tap Pop sound",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 12.970000000000001,
+      "file" : "05-pop-sound.png",
+      "kind" : "shot",
+      "n" : 5,
+      "name" : "pop-sound",
+      "note" : "",
+      "t" : 191.90000000000001
+    },
+    {
+      "detail" : "",
+      "kind" : "check",
+      "n" : 5,
+      "name" : "can go back",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x1176e17d0, {{36.0, 462.3}, {330.0, 144.7}}, label: 'Theme, Bubblegum'\nElement subtree:\n →Button, 0x1176e17d0, {{36.0, 462.3}, {330.0, 144.7}}, label: 'Theme, Bubblegum'\n    Stati",
+      "kind" : "check",
+      "n" : 5,
+      "name" : "can tap Theme",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 35.439999999999998,
+      "file" : "06-theme-gallery.png",
+      "kind" : "shot",
+      "n" : 6,
+      "name" : "theme-gallery",
+      "note" : "",
+      "t" : 227.30000000000001
+    },
+    {
+      "detail" : "Attributes: Button, 0x119164fc0, {{30.0, 568.7}, {107.3, 157.3}}, label: 'Unicorn, Pro'\nElement subtree:\n →Button, 0x119164fc0, {{30.0, 568.7}, {107.3, 157.3}}, label: 'Unicorn, Pro'\n    Other, 0x1191",
+      "kind" : "check",
+      "n" : 6,
+      "name" : "can tap Unicorn (locked)",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x1193359c0, {{97.0, 701.0}, {208.0, 232.7}}, label: 'Get Pop In Pro'\nElement subtree:\n →Button, 0x1193359c0, {{97.0, 701.0}, {208.0, 232.7}}, label: 'Get Pop In Pro'\nPath to eleme",
+      "kind" : "check",
+      "n" : 6,
+      "name" : "can tap Get Pop In Pro",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 39.740000000000002,
+      "file" : "07-pro-sheet-from-locked.png",
+      "kind" : "shot",
+      "n" : 7,
+      "name" : "pro-sheet-from-locked",
+      "note" : "",
+      "t" : 267.10000000000002
+    },
+    {
+      "detail" : "Attributes: StaticText, 0x119432270, {{24.0, 252.0}, {236.3, 65.3}}, label: 'Pop In Pro'\nElement subtree:\n →StaticText, 0x119432270, {{24.0, 252.0}, {236.3, 65.3}}, label: 'Pop In Pro'\nPath to element",
+      "kind" : "check",
+      "n" : 7,
+      "name" : "a locked choice opens Pop In Pro",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x119a6ffe0, {{24.0, 671.0}, {354.0, 137.0}}, label: 'Restore purchase'\nElement subtree:\n →Button, 0x119a6ffe0, {{24.0, 671.0}, {354.0, 137.0}}, label: 'Restore purchase'\nPath to e",
+      "kind" : "check",
+      "n" : 7,
+      "name" : "Restore purchase",
+      "ok" : true,
+      "severity" : 0
+    }
+  ]
+}

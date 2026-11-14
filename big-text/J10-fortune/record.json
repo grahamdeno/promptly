@@ -1,0 +1,75 @@
+{
+  "accessibility" : [
+
+  ],
+  "config" : "big-text",
+  "journey" : "J10-fortune",
+  "seconds" : 23,
+  "steps" : [
+    {
+      "dt" : 8.1999999999999993,
+      "file" : "01-fortune-home.png",
+      "kind" : "shot",
+      "n" : 1,
+      "name" : "fortune-home",
+      "note" : "",
+      "t" : 8.1999999999999993
+    },
+    {
+      "buttons" : [
+        "Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.",
+        "More: add a reminder, pop for fun, pause alerts, settings",
+        "Not going"
+      ],
+      "kind" : "labels",
+      "n" : 1,
+      "name" : "fortune-home",
+      "texts" : [
+        "The first two minutes are about the weather.",
+        "pop in",
+        "Next · Zoom, Rings 2 min before, Design review, 4, min, 4:55 PM to 5:25 PM",
+        "Next · Zoom",
+        "Rings 2 min before",
+        "Design review",
+        "4",
+        "min",
+        "4:55 PM to 5:25 PM",
+        "Pop the bubble to join",
+        "Then 5:50 PM, Team standup"
+      ]
+    },
+    {
+      "detail" : "Attributes: Button, 0x103e4b7f0, {{-210.0, 502.5}, {821.4, 898.5}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x10",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "the card shows a fortune",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x103c6b910, {{-213.3, 488.6}, {828.5, 912.8}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x10",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x103f9ccb0, {{-213.2, 487.4}, {829.1, 913.9}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x10",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 15,
+      "file" : "02-fortune-pop.png",
+      "kind" : "shot",
+      "n" : 2,
+      "name" : "fortune-pop",
+      "note" : "",
+      "t" : 23.199999999999999
+    }
+  ]
+}

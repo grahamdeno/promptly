@@ -1,0 +1,167 @@
+{
+  "accessibility" : [
+    {
+      "detail" : "The size of this SwiftUI.AccessibilityNode is too small for user to interact.",
+      "element" : "Missed: 4:40 PM Weekly sync · Join",
+      "screen" : "missed",
+      "summary" : "Hit area is too small",
+      "type" : "hitRegion"
+    },
+    {
+      "detail" : "Text of this SwiftUI.AccessibilityNode may be clipped at larger Dynamic Type sizes.",
+      "element" : "Missed: 4:40 PM Weekly sync · Join",
+      "screen" : "missed",
+      "summary" : "Text clipped",
+      "type" : "textClipped"
+    },
+    {
+      "detail" : "Contrast failed for SwiftUI.AccessibilityNode",
+      "element" : "5:07 PM to 5:37 PM · Zoom",
+      "screen" : "missed",
+      "summary" : "Contrast failed",
+      "type" : "contrast"
+    },
+    {
+      "detail" : "Contrast failed for SwiftUI.AccessibilityNode",
+      "element" : "Not going",
+      "screen" : "missed",
+      "summary" : "Contrast failed",
+      "type" : "contrast"
+    },
+    {
+      "detail" : "Contrast is not high enough for SwiftUI.AccessibilityNode unless font size is larger.",
+      "element" : "Reminders stay on this iPhone and ring like a meeting. Swipe one to delete it.",
+      "screen" : "add-reminder",
+      "summary" : "Contrast nearly passed",
+      "type" : "contrast"
+    },
+    {
+      "detail" : "User will not be able to change the font size of this SwiftUI.AccessibilityNode",
+      "element" : "Cancel",
+      "screen" : "add-reminder",
+      "summary" : "Dynamic Type font sizes are partially unsupported",
+      "type" : "dynamicType"
+    },
+    {
+      "detail" : "User will not be able to change the font size of this SwiftUI.AccessibilityNode",
+      "element" : "Add",
+      "screen" : "add-reminder",
+      "summary" : "Dynamic Type font sizes are partially unsupported",
+      "type" : "dynamicType"
+    },
+    {
+      "detail" : "User will not be able to change the font size of this SwiftUI.AccessibilityNode",
+      "element" : "Reminders stay on this iPhone and ring like a meeting. Swipe one to delete it.",
+      "screen" : "add-reminder",
+      "summary" : "Dynamic Type font sizes are partially unsupported",
+      "type" : "dynamicType"
+    },
+    {
+      "detail" : "Text of this SwiftUI.AccessibilityNode may be clipped at larger Dynamic Type sizes.",
+      "element" : "Reminders stay on this iPhone and ring like a meeting. Swipe one to delete it.",
+      "screen" : "add-reminder",
+      "summary" : "Text clipped",
+      "type" : "textClipped"
+    },
+    {
+      "detail" : "Text of this UITextField may be clipped at larger Dynamic Type sizes.",
+      "element" : "",
+      "screen" : "add-reminder",
+      "summary" : "Text clipped",
+      "type" : "textClipped"
+    },
+    {
+      "detail" : "Text of this SwiftUI.AccessibilityNode may be clipped at larger Dynamic Type sizes.",
+      "element" : "Cancel",
+      "screen" : "add-reminder",
+      "summary" : "Text clipped",
+      "type" : "textClipped"
+    }
+  ],
+  "config" : "small-phone",
+  "journey" : "J13-edge-cases",
+  "seconds" : 97,
+  "steps" : [
+    {
+      "dt" : 9.7899999999999991,
+      "file" : "01-missed-under-new-alarm.png",
+      "kind" : "shot",
+      "n" : 1,
+      "name" : "missed-under-new-alarm",
+      "note" : "New alarm up; the unpopped earlier meeting shows as Missed with Join",
+      "t" : 9.8000000000000007
+    },
+    {
+      "dt" : 17.93,
+      "file" : "02-paused-home.png",
+      "kind" : "shot",
+      "n" : 2,
+      "name" : "paused-home",
+      "note" : "Paused until pill under the header; card says Paused until",
+      "t" : 27.699999999999999
+    },
+    {
+      "dt" : 7.4100000000000001,
+      "file" : "03-outside-work-hours.png",
+      "kind" : "shot",
+      "n" : 3,
+      "name" : "outside-work-hours",
+      "note" : "Card says Outside work hours, quiet notification",
+      "t" : 35.100000000000001
+    },
+    {
+      "dt" : 7.71,
+      "file" : "04-own-reminder-next.png",
+      "kind" : "shot",
+      "n" : 4,
+      "name" : "own-reminder-next",
+      "note" : "An own reminder is next: card label Reminder",
+      "t" : 42.799999999999997
+    },
+    {
+      "dt" : 7.4400000000000004,
+      "file" : "05-duplicate-merged.png",
+      "kind" : "shot",
+      "n" : 5,
+      "name" : "duplicate-merged",
+      "note" : "Design review and its FW copy show as one meeting",
+      "t" : 50.299999999999997
+    },
+    {
+      "dt" : 11.81,
+      "file" : "06-more-menu.png",
+      "kind" : "shot",
+      "n" : 6,
+      "name" : "more-menu",
+      "note" : "Add a reminder, Pop for fun, Pause alerts, Settings",
+      "t" : 62.100000000000001
+    },
+    {
+      "dt" : 6.4000000000000004,
+      "file" : "07-add-reminder-sheet.png",
+      "kind" : "shot",
+      "n" : 7,
+      "name" : "add-reminder-sheet",
+      "note" : "",
+      "t" : 68.5
+    },
+    {
+      "dt" : 19.960000000000001,
+      "file" : "08-pop-for-fun.png",
+      "kind" : "shot",
+      "n" : 8,
+      "name" : "pop-for-fun",
+      "note" : "",
+      "t" : 88.5
+    },
+    {
+      "dt" : 3.0600000000000001,
+      "file" : "09-pop-for-fun-popped.png",
+      "kind" : "shot",
+      "n" : 9,
+      "name" : "pop-for-fun-popped",
+      "note" : "",
+      "t" : 91.5
+    }
+  ]
+}

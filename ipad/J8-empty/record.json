@@ -1,0 +1,81 @@
+{
+  "accessibility" : [
+    {
+      "detail" : "User will not be able to change the font size of this SwiftUI.AccessibilityNode",
+      "element" : "pop in",
+      "screen" : "empty",
+      "summary" : "Dynamic Type font sizes are unsupported",
+      "type" : "dynamicType"
+    }
+  ],
+  "config" : "ipad",
+  "journey" : "J8-empty",
+  "seconds" : 23,
+  "steps" : [
+    {
+      "dt" : 14.15,
+      "file" : "01-empty.png",
+      "kind" : "shot",
+      "n" : 1,
+      "name" : "empty",
+      "note" : "",
+      "t" : 14.199999999999999
+    },
+    {
+      "buttons" : [
+        "More: add a reminder, pop for fun, pause alerts, settings",
+        "Try a pop"
+      ],
+      "kind" : "labels",
+      "n" : 1,
+      "name" : "empty",
+      "texts" : [
+        "pop in",
+        "Nothing coming up",
+        "Your next two days are clear on the calendars Pop In watches."
+      ]
+    },
+    {
+      "detail" : "Attributes: StaticText, 0x101c6ca60, {{56.0, 200.0}, {261.0, 38.5}}, label: 'Nothing coming up'\nElement subtree:\n →StaticText, 0x101c6ca60, {{56.0, 200.0}, {261.0, 38.5}}, label: 'Nothing coming up'\nP",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "says nothing is coming up",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x1019a0500, {{56.0, 282.0}, {113.5, 44.0}}, label: 'Try a pop'\nElement subtree:\n →Button, 0x1019a0500, {{56.0, 282.0}, {113.5, 44.0}}, label: 'Try a pop'\nPath to element:\n →Applic",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "can tap Try a pop",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 8.6999999999999993,
+      "file" : "02-demo.png",
+      "kind" : "shot",
+      "n" : 2,
+      "name" : "demo",
+      "note" : "",
+      "t" : 22.800000000000001
+    },
+    {
+      "buttons" : [
+        "More: add a reminder, pop for fun, pause alerts, settings",
+        "Skip",
+        "Pop the bubble to clear Try a pop"
+      ],
+      "kind" : "labels",
+      "n" : 2,
+      "name" : "demo",
+      "texts" : [
+        "pop in",
+        "Practice, Try a pop, Practice: pop the bubble below.",
+        "Practice",
+        "Try a pop",
+        "Practice: pop the bubble below."
+      ]
+    }
+  ]
+}

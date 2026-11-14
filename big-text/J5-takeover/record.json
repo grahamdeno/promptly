@@ -1,0 +1,110 @@
+{
+  "accessibility" : [
+
+  ],
+  "config" : "big-text",
+  "journey" : "J5-takeover",
+  "seconds" : 89,
+  "steps" : [
+    {
+      "dt" : 8.6400000000000006,
+      "file" : "01-ringing.png",
+      "kind" : "shot",
+      "n" : 1,
+      "name" : "ringing",
+      "note" : "",
+      "t" : 8.5999999999999996
+    },
+    {
+      "buttons" : [
+        "Pop the bubble to join Design review",
+        "Not going",
+        "Snooze two minutes"
+      ],
+      "kind" : "labels",
+      "n" : 1,
+      "name" : "ringing",
+      "texts" : [
+        "Starts in 2 min",
+        "Design review",
+        "4:43 PM to 5:13 PM · Zoom",
+        "In 2 min"
+      ]
+    },
+    {
+      "detail" : "Attributes: Button, 0x103e4c250, {{12.0, 476.3}, {161.3, 116.7}}, label: 'Not going'\nElement subtree:\n →Button, 0x103e4c250, {{12.0, 476.3}, {161.3, 116.7}}, label: 'Not going'\nPath to element:\n →Appl",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "Not going on the takeover",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x103f49320, {{-268.8, 257.7}, {938.4, 1042.4}}, label: 'Pop the bubble to join Design review'\nElement subtree:\n →Button, 0x103f49320, {{-268.8, 257.7}, {938.4, 1042.4}}, label: 'P",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "the meeting title",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 29.960000000000001,
+      "file" : "02-late-50s.png",
+      "kind" : "shot",
+      "n" : 2,
+      "name" : "late-50s",
+      "note" : "50 s after the ring: the first bud should be out",
+      "t" : 38.600000000000001
+    },
+    {
+      "dt" : 25.559999999999999,
+      "file" : "03-late-75s.png",
+      "kind" : "shot",
+      "n" : 3,
+      "name" : "late-75s",
+      "note" : "75 s after the ring: two or three buds",
+      "t" : 64.200000000000003
+    },
+    {
+      "detail" : "Attributes: Button, 0x103e76660, {{-267.9, 257.0}, {938.4, 1042.4}}, label: 'Pop the bubble to join Design review'\nElement subtree:\n →Button, 0x103e76660, {{-267.9, 257.0}, {938.4, 1042.4}}, label: 'P",
+      "kind" : "check",
+      "n" : 3,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x1093b4b60, {{-270.1, 256.8}, {938.4, 1042.4}}, label: 'Pop the bubble to join Design review'\nElement subtree:\n →Button, 0x1093b4b60, {{-270.1, 256.8}, {938.4, 1042.4}}, label: 'P",
+      "kind" : "check",
+      "n" : 3,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "kind" : "benchmark",
+      "n" : 3,
+      "name" : "Pop the late bubble",
+      "ok" : true,
+      "seconds" : 24.100000000000001,
+      "taps" : 1
+    },
+    {
+      "detail" : "",
+      "kind" : "check",
+      "n" : 3,
+      "name" : "job done: Pop the late bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 24.899999999999999,
+      "file" : "04-late-popping.png",
+      "kind" : "shot",
+      "n" : 4,
+      "name" : "late-popping",
+      "note" : "",
+      "t" : 89.099999999999994
+    }
+  ]
+}

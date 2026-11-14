@@ -1,0 +1,116 @@
+{
+  "accessibility" : [
+    {
+      "detail" : "Contrast failed for SwiftUI.AccessibilityNode",
+      "element" : "Not going",
+      "screen" : "ringing",
+      "summary" : "Contrast failed",
+      "type" : "contrast"
+    }
+  ],
+  "config" : "small-phone",
+  "journey" : "J5-takeover",
+  "seconds" : 77,
+  "steps" : [
+    {
+      "dt" : 10.220000000000001,
+      "file" : "01-ringing.png",
+      "kind" : "shot",
+      "n" : 1,
+      "name" : "ringing",
+      "note" : "",
+      "t" : 10.199999999999999
+    },
+    {
+      "buttons" : [
+        "Pop the bubble to join Design review",
+        "Not going",
+        "Snooze two minutes"
+      ],
+      "kind" : "labels",
+      "n" : 1,
+      "name" : "ringing",
+      "texts" : [
+        "Starts in 2 min",
+        "Design review",
+        "4:47 PM to 5:17 PM · Zoom",
+        "In 2 min"
+      ]
+    },
+    {
+      "detail" : "Attributes: Button, 0x104447850, {{12.0, 272.3}, {108.7, 48.0}}, label: 'Not going'\nElement subtree:\n →Button, 0x104447850, {{12.0, 272.3}, {108.7, 48.0}}, label: 'Not going'\nPath to element:\n →Applic",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "Not going on the takeover",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x10416a800, {{-275.2, 226.3}, {938.4, 1042.4}}, label: 'Pop the bubble to join Design review'\nElement subtree:\n →Button, 0x10416a800, {{-275.2, 226.3}, {938.4, 1042.4}}, label: 'P",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "the meeting title",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 21.719999999999999,
+      "file" : "02-late-50s.png",
+      "kind" : "shot",
+      "n" : 2,
+      "name" : "late-50s",
+      "note" : "50 s after the ring: the first bud should be out",
+      "t" : 31.899999999999999
+    },
+    {
+      "dt" : 25.52,
+      "file" : "03-late-75s.png",
+      "kind" : "shot",
+      "n" : 3,
+      "name" : "late-75s",
+      "note" : "75 s after the ring: two or three buds",
+      "t" : 57.5
+    },
+    {
+      "detail" : "Attributes: Button, 0x10417bd90, {{-276.5, 227.9}, {938.4, 1042.4}}, label: 'Pop the bubble to join Design review'\nElement subtree:\n →Button, 0x10417bd90, {{-276.5, 227.9}, {938.4, 1042.4}}, label: 'P",
+      "kind" : "check",
+      "n" : 3,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x1094cd260, {{-274.3, 224.5}, {938.4, 1042.4}}, label: 'Pop the bubble to join Design review'\nElement subtree:\n →Button, 0x1094cd260, {{-274.3, 224.5}, {938.4, 1042.4}}, label: 'P",
+      "kind" : "check",
+      "n" : 3,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "kind" : "benchmark",
+      "n" : 3,
+      "name" : "Pop the late bubble",
+      "ok" : true,
+      "seconds" : 19,
+      "taps" : 1
+    },
+    {
+      "detail" : "",
+      "kind" : "check",
+      "n" : 3,
+      "name" : "job done: Pop the late bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 19.719999999999999,
+      "file" : "04-late-popping.png",
+      "kind" : "shot",
+      "n" : 4,
+      "name" : "late-popping",
+      "note" : "",
+      "t" : 77.200000000000003
+    }
+  ]
+}

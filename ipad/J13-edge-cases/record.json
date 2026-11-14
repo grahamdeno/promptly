@@ -1,0 +1,188 @@
+{
+  "accessibility" : [
+    {
+      "detail" : "The size of this SwiftUI.AccessibilityNode is too small for user to interact.",
+      "element" : "Missed: 4:41 PM Weekly sync · Join",
+      "screen" : "missed",
+      "summary" : "Hit area is too small",
+      "type" : "hitRegion"
+    },
+    {
+      "detail" : "Contrast failed for SwiftUI.AccessibilityNode",
+      "element" : "Not going",
+      "screen" : "missed",
+      "summary" : "Contrast failed",
+      "type" : "contrast"
+    },
+    {
+      "detail" : "Text of this SwiftUI.AccessibilityNode may be clipped at larger Dynamic Type sizes.",
+      "element" : "Missed: 4:41 PM Weekly sync · Join",
+      "screen" : "missed",
+      "summary" : "Text clipped",
+      "type" : "textClipped"
+    },
+    {
+      "detail" : "User will not be able to change the font size of this SwiftUI.AccessibilityNode",
+      "element" : "Cancel",
+      "screen" : "add-reminder",
+      "summary" : "Dynamic Type font sizes are partially unsupported",
+      "type" : "dynamicType"
+    },
+    {
+      "detail" : "User will not be able to change the font size of this SwiftUI.AccessibilityNode",
+      "element" : "Reminders stay on this iPhone and ring like a meeting. Swipe one to delete it.",
+      "screen" : "add-reminder",
+      "summary" : "Dynamic Type font sizes are partially unsupported",
+      "type" : "dynamicType"
+    },
+    {
+      "detail" : "User will not be able to change the font size of this SwiftUI.AccessibilityNode",
+      "element" : "Add",
+      "screen" : "add-reminder",
+      "summary" : "Dynamic Type font sizes are partially unsupported",
+      "type" : "dynamicType"
+    },
+    {
+      "detail" : "Text of this UITextField may be clipped at larger Dynamic Type sizes.",
+      "element" : "",
+      "screen" : "add-reminder",
+      "summary" : "Text clipped",
+      "type" : "textClipped"
+    },
+    {
+      "detail" : "Contrast is not high enough for SwiftUI.AccessibilityNode unless font size is larger.",
+      "element" : "Reminders stay on this iPhone and ring like a meeting. Swipe one to delete it.",
+      "screen" : "add-reminder",
+      "summary" : "Contrast nearly passed",
+      "type" : "contrast"
+    },
+    {
+      "detail" : "This element appears to display text that should be represented using the accessibility API.",
+      "element" : "",
+      "screen" : "add-reminder",
+      "summary" : "Potentially inaccessible text",
+      "type" : "elementDetection"
+    },
+    {
+      "detail" : "This element appears to display text that should be represented using the accessibility API.",
+      "element" : "",
+      "screen" : "add-reminder",
+      "summary" : "Potentially inaccessible text",
+      "type" : "elementDetection"
+    },
+    {
+      "detail" : "This element appears to display text that should be represented using the accessibility API.",
+      "element" : "",
+      "screen" : "add-reminder",
+      "summary" : "Potentially inaccessible text",
+      "type" : "elementDetection"
+    },
+    {
+      "detail" : "This element appears to display text that should be represented using the accessibility API.",
+      "element" : "",
+      "screen" : "add-reminder",
+      "summary" : "Potentially inaccessible text",
+      "type" : "elementDetection"
+    },
+    {
+      "detail" : "User will not be able to change the font size of this SwiftUI.AccessibilityNode",
+      "element" : "🐠",
+      "screen" : "playground",
+      "summary" : "Dynamic Type font sizes are unsupported",
+      "type" : "dynamicType"
+    },
+    {
+      "detail" : "Text of this SwiftUI.AccessibilityNode may be clipped at larger Dynamic Type sizes.",
+      "element" : "🐠",
+      "screen" : "playground",
+      "summary" : "Text clipped",
+      "type" : "textClipped"
+    }
+  ],
+  "config" : "ipad",
+  "journey" : "J13-edge-cases",
+  "seconds" : 127,
+  "steps" : [
+    {
+      "dt" : 10.23,
+      "file" : "01-missed-under-new-alarm.png",
+      "kind" : "shot",
+      "n" : 1,
+      "name" : "missed-under-new-alarm",
+      "note" : "New alarm up; the unpopped earlier meeting shows as Missed with Join",
+      "t" : 10.199999999999999
+    },
+    {
+      "dt" : 16.550000000000001,
+      "file" : "02-paused-home.png",
+      "kind" : "shot",
+      "n" : 2,
+      "name" : "paused-home",
+      "note" : "Paused until pill under the header; card says Paused until",
+      "t" : 26.800000000000001
+    },
+    {
+      "dt" : 10.449999999999999,
+      "file" : "03-outside-work-hours.png",
+      "kind" : "shot",
+      "n" : 3,
+      "name" : "outside-work-hours",
+      "note" : "Card says Outside work hours, quiet notification",
+      "t" : 37.200000000000003
+    },
+    {
+      "dt" : 10.140000000000001,
+      "file" : "04-own-reminder-next.png",
+      "kind" : "shot",
+      "n" : 4,
+      "name" : "own-reminder-next",
+      "note" : "An own reminder is next: card label Reminder",
+      "t" : 47.399999999999999
+    },
+    {
+      "dt" : 9.7599999999999998,
+      "file" : "05-duplicate-merged.png",
+      "kind" : "shot",
+      "n" : 5,
+      "name" : "duplicate-merged",
+      "note" : "Design review and its FW copy show as one meeting",
+      "t" : 57.100000000000001
+    },
+    {
+      "dt" : 13.07,
+      "file" : "06-more-menu.png",
+      "kind" : "shot",
+      "n" : 6,
+      "name" : "more-menu",
+      "note" : "Add a reminder, Pop for fun, Pause alerts, Settings",
+      "t" : 70.200000000000003
+    },
+    {
+      "dt" : 8.1899999999999995,
+      "file" : "07-add-reminder-sheet.png",
+      "kind" : "shot",
+      "n" : 7,
+      "name" : "add-reminder-sheet",
+      "note" : "",
+      "t" : 78.400000000000006
+    },
+    {
+      "dt" : 28.079999999999998,
+      "file" : "08-pop-for-fun.png",
+      "kind" : "shot",
+      "n" : 8,
+      "name" : "pop-for-fun",
+      "note" : "",
+      "t" : 106.5
+    },
+    {
+      "dt" : 4.54,
+      "file" : "09-pop-for-fun-popped.png",
+      "kind" : "shot",
+      "n" : 9,
+      "name" : "pop-for-fun-popped",
+      "note" : "",
+      "t" : 111
+    }
+  ]
+}

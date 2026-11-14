@@ -1,0 +1,59 @@
+{
+  "accessibility" : [
+    {
+      "detail" : "User will not be able to change the font size of this SwiftUI.AccessibilityNode",
+      "element" : "pop in",
+      "screen" : "unicorn-home",
+      "summary" : "Dynamic Type font sizes are unsupported",
+      "type" : "dynamicType"
+    }
+  ],
+  "config" : "pro-light",
+  "journey" : "J9-unicorn",
+  "seconds" : 17,
+  "steps" : [
+    {
+      "dt" : 9.0399999999999991,
+      "file" : "01-unicorn-home.png",
+      "kind" : "shot",
+      "n" : 1,
+      "name" : "unicorn-home",
+      "note" : "",
+      "t" : 9
+    },
+    {
+      "detail" : "Attributes: Button, 0x10195d890, {{-190.0, 376.9}, {782.0, 852.4}}, label: 'Pop the bubble to join Design review'\nElement subtree:\n →Button, 0x10195d890, {{-190.0, 376.9}, {782.0, 852.4}}, label: 'Pop",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x1019bf340, {{-192.4, 367.7}, {786.7, 861.7}}, label: 'Pop the bubble to join Design review'\nElement subtree:\n →Button, 0x1019bf340, {{-192.4, 367.7}, {786.7, 861.7}}, label: 'Pop",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 7.6100000000000003,
+      "file" : "02-unicorn-pop-early.png",
+      "kind" : "shot",
+      "n" : 2,
+      "name" : "unicorn-pop-early",
+      "note" : "",
+      "t" : 16.600000000000001
+    },
+    {
+      "dt" : 0.58999999999999997,
+      "file" : "03-unicorn-pop-late.png",
+      "kind" : "shot",
+      "n" : 3,
+      "name" : "unicorn-pop-late",
+      "note" : "",
+      "t" : 17.199999999999999
+    }
+  ]
+}

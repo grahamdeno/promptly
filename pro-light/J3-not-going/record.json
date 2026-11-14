@@ -1,0 +1,67 @@
+{
+  "accessibility" : [
+
+  ],
+  "config" : "pro-light",
+  "journey" : "J3-not-going",
+  "seconds" : 22,
+  "steps" : [
+    {
+      "detail" : "Attributes: Button, 0x10173dbb0, {{36.0, 433.7}, {84.7, 42.0}}, label: 'Not going'\nElement subtree:\n →Button, 0x10173dbb0, {{36.0, 433.7}, {84.7, 42.0}}, label: 'Not going'\nPath to element:\n →Applicat",
+      "kind" : "check",
+      "n" : 0,
+      "name" : "can tap Not going",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "kind" : "benchmark",
+      "n" : 0,
+      "name" : "Skip a meeting",
+      "ok" : true,
+      "seconds" : 8.3000000000000007,
+      "taps" : 1
+    },
+    {
+      "detail" : "",
+      "kind" : "check",
+      "n" : 0,
+      "name" : "job done: Skip a meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "",
+      "kind" : "check",
+      "n" : 0,
+      "name" : "Undo is offered",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x1019751c0, {{261.7, 768.0}, {44.0, 44.0}}, label: 'Undo'\nElement subtree:\n →Button, 0x1019751c0, {{261.7, 768.0}, {44.0, 44.0}}, label: 'Undo'\nPath to element:\n →Application, 0x1",
+      "kind" : "check",
+      "n" : 0,
+      "name" : "can tap Undo",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 20.890000000000001,
+      "file" : "01-after-undo.png",
+      "kind" : "shot",
+      "n" : 1,
+      "name" : "after-undo",
+      "note" : "",
+      "t" : 20.899999999999999
+    },
+    {
+      "detail" : "",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "the meeting is back",
+      "ok" : true,
+      "severity" : 0
+    }
+  ]
+}

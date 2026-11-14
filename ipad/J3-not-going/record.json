@@ -1,0 +1,67 @@
+{
+  "accessibility" : [
+
+  ],
+  "config" : "ipad",
+  "journey" : "J3-not-going",
+  "seconds" : 18,
+  "steps" : [
+    {
+      "detail" : "Attributes: Button, 0x101a44370, {{56.0, 473.5}, {85.0, 42.0}}, label: 'Not going'\nElement subtree:\n →Button, 0x101a44370, {{56.0, 473.5}, {85.0, 42.0}}, label: 'Not going'\nPath to element:\n →Applicat",
+      "kind" : "check",
+      "n" : 0,
+      "name" : "can tap Not going",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "kind" : "benchmark",
+      "n" : 0,
+      "name" : "Skip a meeting",
+      "ok" : true,
+      "seconds" : 3.8999999999999999,
+      "taps" : 1
+    },
+    {
+      "detail" : "",
+      "kind" : "check",
+      "n" : 0,
+      "name" : "job done: Skip a meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "",
+      "kind" : "check",
+      "n" : 0,
+      "name" : "Undo is offered",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x101a49750, {{749.0, 940.0}, {44.0, 44.0}}, label: 'Undo'\nElement subtree:\n →Button, 0x101a49750, {{749.0, 940.0}, {44.0, 44.0}}, label: 'Undo'\nPath to element:\n →Application, 0x1",
+      "kind" : "check",
+      "n" : 0,
+      "name" : "can tap Undo",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 17.09,
+      "file" : "01-after-undo.png",
+      "kind" : "shot",
+      "n" : 1,
+      "name" : "after-undo",
+      "note" : "",
+      "t" : 17.100000000000001
+    },
+    {
+      "detail" : "",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "the meeting is back",
+      "ok" : true,
+      "severity" : 0
+    }
+  ]
+}

@@ -1,0 +1,115 @@
+{
+  "accessibility" : [
+    {
+      "detail" : "User will not be able to change the font size of this SwiftUI.AccessibilityNode",
+      "element" : "pop in",
+      "screen" : "fortune-home",
+      "summary" : "Dynamic Type font sizes are unsupported",
+      "type" : "dynamicType"
+    },
+    {
+      "detail" : "User will not be able to change the font size of this SwiftUI.AccessibilityNode",
+      "element" : "The first two minutes are about the weather.",
+      "screen" : "fortune-home",
+      "summary" : "Dynamic Type font sizes are unsupported",
+      "type" : "dynamicType"
+    },
+    {
+      "detail" : "Text of this SwiftUI.AccessibilityNode may be clipped at larger Dynamic Type sizes.",
+      "element" : "Sprint planning",
+      "screen" : "fortune-home",
+      "summary" : "Text clipped",
+      "type" : "textClipped"
+    },
+    {
+      "detail" : "Text of this SwiftUI.AccessibilityNode may be clipped at larger Dynamic Type sizes.",
+      "element" : "Team standup",
+      "screen" : "fortune-home",
+      "summary" : "Text clipped",
+      "type" : "textClipped"
+    },
+    {
+      "detail" : "Text of this SwiftUI.AccessibilityNode may be clipped at larger Dynamic Type sizes.",
+      "element" : "Lunch with Sam",
+      "screen" : "fortune-home",
+      "summary" : "Text clipped",
+      "type" : "textClipped"
+    }
+  ],
+  "config" : "ipad",
+  "journey" : "J10-fortune",
+  "seconds" : 24,
+  "steps" : [
+    {
+      "dt" : 10.06,
+      "file" : "01-fortune-home.png",
+      "kind" : "shot",
+      "n" : 1,
+      "name" : "fortune-home",
+      "note" : "",
+      "t" : 10.1
+    },
+    {
+      "buttons" : [
+        "More: add a reminder, pop for fun, pause alerts, settings",
+        "Not going",
+        "Pop the bubble to join Design review. Fortune: The first two minutes are about the weather."
+      ],
+      "kind" : "labels",
+      "n" : 1,
+      "name" : "fortune-home",
+      "texts" : [
+        "pop in",
+        "Next · Zoom, Rings 2 min before, Design review, 4, min, 4:57 PM to 5:27 PM",
+        "Next · Zoom",
+        "Rings 2 min before",
+        "Design review",
+        "4",
+        "min",
+        "4:57 PM to 5:27 PM",
+        "Pop the bubble to join",
+        "Later",
+        "5:52 PM",
+        "Team standup",
+        "7:57 PM",
+        "Lunch with Sam",
+        "Tomorrow 9:30 AM",
+        "Sprint planning",
+        "The first two minutes are about the weather."
+      ]
+    },
+    {
+      "detail" : "Attributes: Button, 0x10196a020, {{617.4, 568.5}, {716.3, 788.5}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x101",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "the card shows a fortune",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x101c85360, {{619.9, 578.5}, {711.3, 778.5}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x101",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x106ed60f0, {{620.7, 581.8}, {709.6, 775.2}}, label: 'Pop the bubble to join Design review. Fortune: The first two minutes are about the weather.'\nElement subtree:\n →Button, 0x106",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 14.029999999999999,
+      "file" : "02-fortune-pop.png",
+      "kind" : "shot",
+      "n" : 2,
+      "name" : "fortune-pop",
+      "note" : "",
+      "t" : 24.100000000000001
+    }
+  ]
+}

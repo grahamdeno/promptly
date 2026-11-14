@@ -1,0 +1,163 @@
+{
+  "accessibility" : [
+
+  ],
+  "config" : "big-text",
+  "journey" : "J2-home-soon",
+  "seconds" : 50,
+  "steps" : [
+    {
+      "dt" : 19.199999999999999,
+      "file" : "01-home.png",
+      "kind" : "shot",
+      "n" : 1,
+      "name" : "home",
+      "note" : "",
+      "t" : 19.199999999999999
+    },
+    {
+      "buttons" : [
+        "Pop the bubble to join Design review",
+        "More: add a reminder, pop for fun, pause alerts, settings",
+        "Not going"
+      ],
+      "kind" : "labels",
+      "n" : 1,
+      "name" : "home",
+      "texts" : [
+        "pop in",
+        "Next · Zoom, Rings 2 min before, Design review, 8, min, 4:47 PM to 5:17 PM",
+        "Next · Zoom",
+        "Rings 2 min before",
+        "Design review",
+        "8",
+        "min",
+        "4:47 PM to 5:17 PM",
+        "Pop the bubble to join",
+        "Then 5:42 PM, Team standup"
+      ]
+    },
+    {
+      "detail" : "Attributes: Button, 0x103c2d8c0, {{-190.2, 527.4}, {782.5, 853.2}}, label: 'Pop the bubble to join Design review'\nElement subtree:\n →Button, 0x103c2d8c0, {{-190.2, 527.4}, {782.5, 853.2}}, label: 'Pop",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "the card names the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x103e58c70, {{330.0, -115.3}, {44.0, 44.0}}, label: 'More: add a reminder, pop for fun, pause alerts, settings'\nElement subtree:\n →Button, 0x103e58c70, {{330.0, -115.3}, {44.0, 44",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "the card says how long",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: StaticText, 0x103c58130, {{36.0, 20.7}, {262.3, 526.0}}, label: 'Next · Zoom, Rings 2 min before, Design review, 8, min, 4:47 PM to 5:17 PM'\nElement subtree:\n →StaticText, 0x103c58130, {{3",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "the card says it will ring",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x103c76400, {{36.0, 760.3}, {225.7, 82.7}}, label: 'Not going'\nElement subtree:\n →Button, 0x103c76400, {{36.0, 760.3}, {225.7, 82.7}}, label: 'Not going'\nPath to element:\n →Applic",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "Not going is visible",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x103fa4e00, {{330.0, -115.3}, {44.0, 44.0}}, label: 'More: add a reminder, pop for fun, pause alerts, settings'\nElement subtree:\n →Button, 0x103fa4e00, {{330.0, -115.3}, {44.0, 44",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "Settings is reachable",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x1093af0c0, {{-192.7, 517.6}, {787.4, 863.0}}, label: 'Pop the bubble to join Design review'\nElement subtree:\n →Button, 0x1093af0c0, {{-192.7, 517.6}, {787.4, 863.0}}, label: 'Pop",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "the bubble is a button named for the meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x103c8c5e0, {{-190.8, 525.2}, {783.6, 855.5}}, label: 'Pop the bubble to join Design review'\nElement subtree:\n →Button, 0x103c8c5e0, {{-190.8, 525.2}, {783.6, 855.5}}, label: 'Pop",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "can tap the bubble",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 24.73,
+      "file" : "02-popping.png",
+      "kind" : "shot",
+      "n" : 2,
+      "name" : "popping",
+      "note" : "mid-pop",
+      "t" : 43.899999999999999
+    },
+    {
+      "kind" : "benchmark",
+      "n" : 2,
+      "name" : "Join the next meeting",
+      "ok" : true,
+      "seconds" : 5.9000000000000004,
+      "taps" : 1
+    },
+    {
+      "detail" : "",
+      "kind" : "check",
+      "n" : 2,
+      "name" : "job done: Join the next meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "",
+      "kind" : "check",
+      "n" : 2,
+      "name" : "Undo is offered after the pop",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x10921da30, {{243.3, 867.0}, {119.0, 58.7}}, label: 'Undo'\nElement subtree:\n →Button, 0x10921da30, {{243.3, 867.0}, {119.0, 58.7}}, label: 'Undo'\nPath to element:\n →Application, 0",
+      "kind" : "check",
+      "n" : 2,
+      "name" : "can tap Undo",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 4.6699999999999999,
+      "file" : "03-after-undo.png",
+      "kind" : "shot",
+      "n" : 3,
+      "name" : "after-undo",
+      "note" : "",
+      "t" : 48.600000000000001
+    },
+    {
+      "kind" : "benchmark",
+      "n" : 3,
+      "name" : "Undo a pop",
+      "ok" : true,
+      "seconds" : 4.7000000000000002,
+      "taps" : 1
+    },
+    {
+      "detail" : "",
+      "kind" : "check",
+      "n" : 3,
+      "name" : "job done: Undo a pop",
+      "ok" : true,
+      "severity" : 0
+    }
+  ]
+}

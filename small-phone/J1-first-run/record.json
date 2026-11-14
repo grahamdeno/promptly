@@ -1,0 +1,243 @@
+{
+  "accessibility" : [
+    {
+      "detail" : "User will not be able to change the font size of this SwiftUI.AccessibilityNode",
+      "element" : "pop in",
+      "screen" : "hello",
+      "summary" : "Dynamic Type font sizes are unsupported",
+      "type" : "dynamicType"
+    },
+    {
+      "detail" : "User will not be able to change the font size of this SwiftUI.AccessibilityNode",
+      "element" : "pop in",
+      "screen" : "calendars-why",
+      "summary" : "Dynamic Type font sizes are unsupported",
+      "type" : "dynamicType"
+    },
+    {
+      "detail" : "Contrast failed for SwiftUI.AccessibilityNode",
+      "element" : "Meetings with a video link ring like an alarm, even in Silent and Focus. Other events get a quiet notification. iPhone decides how the alarm looks:",
+      "screen" : "alarms-why",
+      "summary" : "Contrast failed",
+      "type" : "contrast"
+    },
+    {
+      "detail" : "Contrast is not high enough for SwiftUI.AccessibilityNode unless font size is larger.",
+      "element" : "Open",
+      "screen" : "alarms-why",
+      "summary" : "Contrast nearly passed",
+      "type" : "contrast"
+    },
+    {
+      "detail" : "User will not be able to change the font size of this SwiftUI.AccessibilityNode",
+      "element" : "pop in",
+      "screen" : "alarms-why",
+      "summary" : "Dynamic Type font sizes are unsupported",
+      "type" : "dynamicType"
+    },
+    {
+      "detail" : "User will not be able to change the font size of this SwiftUI.AccessibilityNode",
+      "element" : "Pop In",
+      "screen" : "alarms-why",
+      "summary" : "Dynamic Type font sizes are partially unsupported",
+      "type" : "dynamicType"
+    },
+    {
+      "detail" : "Contrast failed for SwiftUI.AccessibilityNode",
+      "element" : "Next up: Design review, 4:50 PM. Pop In will ring 2 min before.",
+      "screen" : "covered",
+      "summary" : "Contrast failed",
+      "type" : "contrast"
+    },
+    {
+      "detail" : "User will not be able to change the font size of this SwiftUI.AccessibilityNode",
+      "element" : "pop in",
+      "screen" : "covered",
+      "summary" : "Dynamic Type font sizes are unsupported",
+      "type" : "dynamicType"
+    }
+  ],
+  "config" : "small-phone",
+  "journey" : "J1-first-run",
+  "seconds" : 64,
+  "steps" : [
+    {
+      "dt" : 25.91,
+      "file" : "01-hello.png",
+      "kind" : "shot",
+      "n" : 1,
+      "name" : "hello",
+      "note" : "",
+      "t" : 25.899999999999999
+    },
+    {
+      "buttons" : [
+        "Pop the bubble",
+        "Get started"
+      ],
+      "kind" : "labels",
+      "n" : 1,
+      "name" : "hello",
+      "texts" : [
+        "pop in",
+        "Never miss the start of a meeting.",
+        "Pop In watches your calendar and rings before each meeting. Pop the bubble to join the call."
+      ]
+    },
+    {
+      "detail" : "",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "hello says what Pop In does",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x10432f570, {{38.0, 724.0}, {314.0, 56.0}}, label: 'Get started'\nElement subtree:\n →Button, 0x10432f570, {{38.0, 724.0}, {314.0, 56.0}}, label: 'Get started'\nPath to element:\n →Ap",
+      "kind" : "check",
+      "n" : 1,
+      "name" : "can tap Get started",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 6.9800000000000004,
+      "file" : "02-calendars-why.png",
+      "kind" : "shot",
+      "n" : 2,
+      "name" : "calendars-why",
+      "note" : "",
+      "t" : 32.899999999999999
+    },
+    {
+      "detail" : "Attributes: Button, 0x10418b5f0, {{38.0, 724.0}, {314.0, 56.0}}, label: 'Allow calendar access'\nElement subtree:\n →Button, 0x10418b5f0, {{38.0, 724.0}, {314.0, 56.0}}, label: 'Allow calendar access'\nP",
+      "kind" : "check",
+      "n" : 2,
+      "name" : "can tap Allow calendar access",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 5.5999999999999996,
+      "file" : "03-alarms-why.png",
+      "kind" : "shot",
+      "n" : 3,
+      "name" : "alarms-why",
+      "note" : "",
+      "t" : 38.5
+    },
+    {
+      "detail" : "",
+      "kind" : "check",
+      "n" : 3,
+      "name" : "shows both alarm looks before iOS asks",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x1041ba580, {{38.0, 724.0}, {314.0, 56.0}}, label: 'Allow alarms'\nElement subtree:\n →Button, 0x1041ba580, {{38.0, 724.0}, {314.0, 56.0}}, label: 'Allow alarms'\nPath to element:\n →",
+      "kind" : "check",
+      "n" : 3,
+      "name" : "can tap Allow alarms",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 6.7599999999999998,
+      "file" : "04-which-calendars.png",
+      "kind" : "shot",
+      "n" : 4,
+      "name" : "which-calendars",
+      "note" : "",
+      "t" : 45.299999999999997
+    },
+    {
+      "buttons" : [
+        "Exchange, 1 of 1 calendars on",
+        "Turn all off",
+        "Work alerts: Smart",
+        "iCloud, 2 of 2 calendars on",
+        "Turn all off",
+        "Family alerts: Smart",
+        "Home alerts: Smart",
+        "Done"
+      ],
+      "kind" : "labels",
+      "n" : 4,
+      "name" : "which-calendars",
+      "texts" : [
+        "Which calendars?",
+        "Pop In rings for meetings with a video link and sends a quiet notification for the rest. Turn off any calendar you don't want.",
+        "Exchange",
+        "1 of 1 on",
+        "Work",
+        "Smart",
+        "iCloud",
+        "2 of 2 on",
+        "Family",
+        "Smart",
+        "Home",
+        "Smart",
+        "Smart rings full screen for meetings with a video link and sends a quiet notification for the rest. Pick Always rings or Quiet for a whole calendar."
+      ]
+    },
+    {
+      "detail" : "Attributes: StaticText, 0x1044a8830, {{53.7, 250.3}, {77.3, 20.3}}, label: 'Exchange'\nElement subtree:\n →StaticText, 0x1044a8830, {{53.7, 250.3}, {77.3, 20.3}}, label: 'Exchange'\nPath to element:\n →Ap",
+      "kind" : "check",
+      "n" : 4,
+      "name" : "calendars are listed by account",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x1041f54d0, {{20.0, 730.0}, {350.0, 56.0}}, label: 'Done'\nElement subtree:\n →Button, 0x1041f54d0, {{20.0, 730.0}, {350.0, 56.0}}, label: 'Done'\nPath to element:\n →Application, 0x1",
+      "kind" : "check",
+      "n" : 4,
+      "name" : "can tap Done",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 8.1799999999999997,
+      "file" : "05-covered.png",
+      "kind" : "shot",
+      "n" : 5,
+      "name" : "covered",
+      "note" : "",
+      "t" : 53.399999999999999
+    },
+    {
+      "detail" : "",
+      "kind" : "check",
+      "n" : 5,
+      "name" : "covered names the next meeting",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "detail" : "Attributes: Button, 0x10435b3c0, {{38.0, 724.0}, {314.0, 56.0}}, label: 'Done'\nElement subtree:\n →Button, 0x10435b3c0, {{38.0, 724.0}, {314.0, 56.0}}, label: 'Done'\nPath to element:\n →Application, 0x1",
+      "kind" : "check",
+      "n" : 5,
+      "name" : "can tap Done (covered)",
+      "ok" : true,
+      "severity" : 0
+    },
+    {
+      "dt" : 7.1900000000000004,
+      "file" : "06-home-after-first-run.png",
+      "kind" : "shot",
+      "n" : 6,
+      "name" : "home-after-first-run",
+      "note" : "",
+      "t" : 60.600000000000001
+    },
+    {
+      "detail" : "Attributes: Button, 0x10936a6f0, {{-198.8, 337.3}, {787.7, 862.6}}, label: 'Pop the bubble to join Design review'\nElement subtree:\n →Button, 0x10936a6f0, {{-198.8, 337.3}, {787.7, 862.6}}, label: 'Pop",
+      "kind" : "check",
+      "n" : 6,
+      "name" : "Home shows the next meeting",
+      "ok" : true,
+      "severity" : 0
+    }
+  ]
+}
