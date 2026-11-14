@@ -370,3 +370,8 @@ Code needed after approval (Sonnet): per-theme release dates replacing the singl
 ## Sprint 30: Apple Reminders (owner, 2026-11-13: "I used Siri to create the reminder... a lot of people might do that")
 - Settings > Meetings > Apple Reminders (off until turned on; turning it on asks for Reminders access). Unfinished reminders with a due time in the next 48 hours ring like a meeting, labeled Reminder. Date-only reminders are skipped.
 - Read only: Pop In never creates, completes or changes a reminder; popping only clears it inside Pop In. read_only_guard now allows reading reminders and blocks saving, removing, creating or completing them.
+
+## Sprint 31: set the alarm expectation (owner, 2026-11-14: "Do both")
+- Asked why Rep Bell seemed to have a full-screen consent. It is Apple's AlarmKit prompt (the same one Pop In shows); allowing it never makes an unlocked alarm full screen, for any app.
+- Apple's prompt now reads: "Meetings ring like an alarm, even in Silent and Focus. Full screen when your phone is locked, a banner at the top when you're using it."
+- First run: the "permission to ring" screen shows both looks (locked full screen, banner over another app) before iOS asks. The separate "When your phone is locked" step is gone, one screen fewer. J1 checks the looks show before the prompt.
