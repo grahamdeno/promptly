@@ -205,6 +205,33 @@ final class Audit {
         return app.textFields[names.first ?? ""]
     }
 
+    /// Scrolls the screen up until the element can be tapped (Settings grew past one screen, November 14).
+    @discardableResult
+    func reveal(_ e: XCUIElement, tries: Int = 6) -> XCUIElement {
+        var i = 0
+        while i < tries && !(e.exists && e.isHittable) {
+            app.swipeUp(velocity: .slow)
+            i += 1
+        }
+        return e
+    }
+
+    /// Goes back one page: the navigation bar's back button when there is one, else the left-edge swipe.
+    /// Never falls through to the sheet's Done button, which closed Settings mid-journey before.
+    @discardableResult
+    func back(severity: Int = 3) -> Bool {
+        let bar = app.navigationBars.buttons.matching(NSPredicate(format: "label != %@", "Done")).firstMatch
+        if bar.waitForExistence(timeout: 2), bar.isHittable {
+            taps += 1
+            bar.tap()
+            return check("can go back", true, severity: severity)
+        }
+        let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.01, dy: 0.5))
+        start.press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.8, dy: 0.5)))
+        taps += 1
+        return check("can go back", true, severity: severity)
+    }
+
     /// Taps a word if it is there; written down as a finding if not.
     @discardableResult
     func tap(_ name: String, _ e: XCUIElement, severity: Int = 3, timeout: Double = 4) -> Bool {

@@ -151,7 +151,7 @@ struct AlarmLooksPreview: View {
         VStack(alignment: .leading, spacing: 6) {
             Text(label).font(.footnote.weight(.semibold)).foregroundStyle(Brand.ink)
             content()
-            Text(caption).font(.footnote).foregroundStyle(Brand.secondary)
+            Text(caption).font(.footnote).foregroundStyle(Brand.ink)
                 .fixedSize(horizontal: false, vertical: true)
         }
     }
