@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// First run: one screen per permission, each saying why before iOS asks, then the calendar choices, then
+/// First run: one screen per permission, each saying why before iOS asks (the alarm screen also shows how the
+/// alarm looks locked and unlocked, so nobody expects a takeover mid-app), then the calendar choices, then
 /// "You're covered" with the next meeting (or a demo pop when nothing is coming up).
 struct WelcomeView: View {
     @Environment(AppModel.self) private var model
@@ -9,7 +10,7 @@ struct WelcomeView: View {
     @ScaledMetric(relativeTo: .largeTitle) private var titleSize: CGFloat = 34
     @ScaledMetric(relativeTo: .body) private var bodySize: CGFloat = 16
 
-    enum Step { case hello, calendars, alarms, locked, choose, covered }
+    enum Step { case hello, calendars, alarms, choose, covered }
 
     var body: some View {
         switch step {
@@ -34,7 +35,7 @@ struct WelcomeView: View {
                                 .font(.system(size: bodySize))
                                 .foregroundStyle(Brand.secondary)
                                 .fixedSize(horizontal: false, vertical: true)
-                            if step == .locked { LockedAlarmPreview().padding(.top, 6) }
+                            if step == .alarms { AlarmLooksPreview().padding(.top, 6) }
                         }
                         .glassCard()
                         Spacer(minLength: 24)
@@ -70,7 +71,6 @@ struct WelcomeView: View {
         case .hello: 0.2
         case .calendars: 0.4
         case .alarms: 0.6
-        case .locked: 0.7
         default: 0.8
         }
     }
@@ -80,7 +80,6 @@ struct WelcomeView: View {
         case .hello: "Never miss the start of a meeting."
         case .calendars: "First, your calendars"
         case .alarms: "Then, permission to ring"
-        case .locked: "When your phone is locked"
         default: model.upcoming(at: .now).first.map { _ in "You're covered" } ?? "You're all set"
         }
     }
@@ -91,10 +90,8 @@ struct WelcomeView: View {
             return "Pop In watches your calendar and rings before each meeting. Pop the bubble to join the call."
         case .calendars:
             return "Pop In reads the calendars on this device, including Google and Outlook accounts added in Settings. It never changes them, and nothing leaves this device."
-        case .locked:
-            return "iPhone shows its own alarm, like this. Tap Open to join the call. Open Pop In any time to see the bubble."
         case .alarms:
-            return "For meetings with a video link, Pop In rings like an alarm, even in Silent and Focus, with Join on the alert. Other events get a quiet notification. You can change this per calendar."
+            return "Meetings with a video link ring like an alarm, even in Silent and Focus. Other events get a quiet notification. iPhone decides how the alarm looks:"
         default:
             if let next = model.upcoming(at: .now).first {
                 return "Next up: \(next.title), \(Countdown.time(next.start)). Pop In will ring \(model.leadMinutes) min before."
@@ -108,7 +105,6 @@ struct WelcomeView: View {
         case .hello: "Get started"
         case .calendars: "Allow calendar access"
         case .alarms: "Allow alarms"
-        case .locked: "Got it"
         default: "Done"
         }
     }
@@ -129,15 +125,71 @@ struct WelcomeView: View {
             Task {
                 await model.requestAlarmAccess()
                 asking = false
-                step = .locked
+                step = .choose
             }
-        case .locked:
-            step = .choose
         case .choose:
             step = .covered
         case .covered:
             model.finishOnboarding()
         }
+    }
+}
+
+/// Sketches of Apple's alarm in its two looks: full screen when locked, a banner when the phone is in use.
+/// AlarmKit decides this, not Pop In, so showing both up front keeps the first unlocked alarm from feeling broken.
+struct AlarmLooksPreview: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            look("Phone locked", "Full screen. Tap Open to join.") { LockedAlarmPreview() }
+            look("Using your phone", "A banner at the top. Tap it for the bubble.") { UnlockedBannerPreview() }
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("When your phone is locked, the alarm fills the screen with Open and Stop. When you're using your phone, it shows as a banner at the top; tap it for the bubble.")
+    }
+
+    private func look<Content: View>(_ label: String, _ caption: String, @ViewBuilder _ content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(label).font(.footnote.weight(.semibold)).foregroundStyle(Brand.ink)
+            content()
+            Text(caption).font(.footnote).foregroundStyle(Brand.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+}
+
+/// A sketch of the AlarmKit banner over another app: a dark pill at the top with the meeting and two round buttons.
+struct UnlockedBannerPreview: View {
+    var body: some View {
+        VStack(spacing: 10) {
+            HStack(spacing: 10) {
+                GumBall().frame(width: 26, height: 26)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("Design review").font(.caption.weight(.semibold)).foregroundStyle(.white)
+                    Text("Pop In").font(.caption2).foregroundStyle(.white.opacity(0.7))
+                }
+                Spacer(minLength: 4)
+                Image(systemName: "xmark")
+                    .font(.caption.weight(.bold)).foregroundStyle(.white)
+                    .frame(width: 32, height: 32).background(Circle().fill(.white.opacity(0.2)))
+                Image(systemName: "arrow.up.right")
+                    .font(.caption.weight(.bold)).foregroundStyle(.white)
+                    .frame(width: 32, height: 32).background(Circle().fill(Brand.coralDark))
+            }
+            .padding(.horizontal, 12).padding(.vertical, 10)
+            .background(Capsule().fill(Color(white: 0.12)))
+            // Faint lines stand in for whatever app is open underneath.
+            VStack(alignment: .leading, spacing: 7) {
+                ForEach([0.9, 0.7, 0.8], id: \.self) { w in
+                    GeometryReader { g in
+                        Capsule().fill(Color.black.opacity(0.07)).frame(width: g.size.width * w, height: 8)
+                    }
+                    .frame(height: 8)
+                }
+            }
+            .padding(.horizontal, 8)
+        }
+        .padding(10)
+        .background(RoundedRectangle(cornerRadius: 22).fill(Color.black.opacity(0.04)))
     }
 }
 
