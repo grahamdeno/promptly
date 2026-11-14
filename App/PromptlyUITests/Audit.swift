@@ -205,7 +205,6 @@ final class Audit {
         return app.textFields[names.first ?? ""]
     }
 
-    /// Taps a word if it is there; written down as a finding if not.
     /// Scrolls the screen up until the element can be tapped (Settings grew past one screen, November 14).
     @discardableResult
     func reveal(_ e: XCUIElement, tries: Int = 6) -> XCUIElement {
@@ -233,6 +232,7 @@ final class Audit {
         return check("can go back", true, severity: severity)
     }
 
+    /// Taps a word if it is there; written down as a finding if not.
     @discardableResult
     func tap(_ name: String, _ e: XCUIElement, severity: Int = 3, timeout: Double = 4) -> Bool {
         guard expect("can tap \(name)", e, timeout: timeout, severity: severity) else { return false }
