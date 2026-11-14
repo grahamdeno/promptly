@@ -369,10 +369,15 @@ struct HomeView: View {
                     .font(.subheadline)
                     .foregroundStyle(Brand.ink)
                     .lineLimit(1)
-                Button("Undo") { model.undoClear() }
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(Brand.ink)
-                    .frame(minHeight: 44)
+                // The tappable area is the full 44 pt height, not just the word (the iPad audit's taps missed it).
+                Button { model.undoClear() } label: {
+                    Text("Undo")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Brand.ink)
+                        .frame(minWidth: 44, minHeight: 44)
+                        .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
             }
             .padding(.horizontal, 18)
             .glassEffect(.regular, in: .capsule)
